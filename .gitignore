@@ -37,6 +37,17 @@
 *.xcodeproj
 *.bundle
 
+# Visual Studio Files
+*.ncb
+*.sln
+*.suo
+*.vcproj
+*.user
+*.pdb
+*.idb
+*.htm
+*.manifest
+
 # Qt Creator Files
 *.config
 *.creator
