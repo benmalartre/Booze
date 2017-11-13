@@ -8,7 +8,7 @@ HDF5_INCLUDES = /Users/benmalartre/Documents/RnD/hdf5-1.8.7/include
 ABC_INCLUDES = /Users/benmalartre/Documents/RnD/alembic-1_05_08/lib
 BOOZE_INCLUDES = /Users/benmalartre/Documents/RnD/booze/Framework
 Z_INCLUDES = /Users/benmalartre/Documents/RnD/zlib-1.2.8
-PB_INCLUDES = /Applications/PureBasic/sdk/c/PureLibraries
+PB_INCLUDES = /Applications/PureBasic.app/Contents/Resources/sdk/c/PureLibraries
 GLEW_INCLUDES = /Users/benmalartre/Documents/RnD/glew/include
 GL_INCLUDES = /Applications/Unity/PlaybackEngines/WebGLSupport/BuildTools/Emscripten/system/include
 
@@ -47,8 +47,8 @@ LIBS += /Users/benmalartre/Documents/RnD/booze/Framework/libAbcFramework.a
 LIBS += /Users/benmalartre/Documents/RnD/boost_1_49_0/stage/lib/libboost_program_options.a
 LIBS += /Users/benmalartre/Documents/RnD/boost_1_49_0/stage/lib/libboost_python.a
 LIBS += /Users/benmalartre/Documents/RnD/boost_1_49_0/stage/lib/libboost_thread.a
-LIBS += /Applications/PureBasic/compilers/ObjectManager.a
-LIBS += /Applications/PureBasic/compilers/StringManager.a
+LIBS += /Applications/PureBasic.app/Contents/Resources/compilers/ObjectManager.a
+LIBS += /Applications/PureBasic.app/Contents/Resources/compilers/StringManager.a
 
 # Rules
 #Compile-only with -c option

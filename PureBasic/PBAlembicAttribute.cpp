@@ -7,7 +7,7 @@ EXPORT bool ABC_HasProperty(AlembicIObject* obj,const char* p_name){
 	return false;
 }
 
-EXPORT void ABC_GetAttributeSampleDescription(AlembicIProperty* prop,float frame,ABC_Attribute_Sample_Infos* infos)
+EXPORT bool ABC_GetAttributeSampleDescription(AlembicIProperty* prop,float frame,ABC_Attribute_Sample_Infos* infos)
 {
 	std::string s(prop->GetName());
 	int size = (int)s.size()+1;
@@ -16,7 +16,8 @@ EXPORT void ABC_GetAttributeSampleDescription(AlembicIProperty* prop,float frame
 	infos->_time = frame;
 	infos->_traits = prop->GetDataTraits();
 	infos->_type = prop->GetPropertyType();
-	infos->_nbitems = prop->GetNbItems((Alembic::Abc::chrono_t)frame);
+    infos->_nbitems = prop->GetNbItems((Alembic::Abc::chrono_t)frame);
+    return true;
 
 }
 

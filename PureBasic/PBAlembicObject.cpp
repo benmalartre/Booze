@@ -28,6 +28,7 @@ EXPORT void ABC_SetGeometryScope(AlembicIObject* obj, ABCGeometryScope scope){
 // Init Object
 //----------------------------------------------------------
 EXPORT void ABC_InitObject(AlembicIObject* obj,ABCGeometricType type){
+    std::cout << "ABC_OBJECT INIT CALLED" <<std::endl;
 	obj->Init(type);
 }
 // Get Object From Archive

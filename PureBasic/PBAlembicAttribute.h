@@ -5,11 +5,12 @@
 
 struct ABC_Attribute_Sample_Infos
 {
-	char _name[32];
+    uint64_t _nbitems;
+    float _time;
 	ABCPropertyType _type;
 	ABCDataTraits _traits;
-	uint64_t _nbitems;
-	float _time;
+    char _name[32];
+	
 };
 
 struct ABC_Attribute_Sample
