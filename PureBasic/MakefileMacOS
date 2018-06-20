@@ -2,20 +2,15 @@
 
 # Includes
 ILM_INCLUDES = /usr/local/include/OpenEXR
-ABC_INCLUDES = /usr/local/lib
+ABC_INCLUDES = /usr/local/include/Alembic
 HDF5_INCLUDES = /Users/benmalartre/Documents/RnD/hdf5-1.8.9/include
-BOOZE_INCLUDES = /Users/benmalartre/Documents/RnD/booze/Framework
-Z_INCLUDES = /Users/benmalartre/Documents/RnD/zlib-1.2.8
 PB_INCLUDES = /Applications/PureBasic.app/Contents/Resources/sdk/c/PureLibraries
-#GLEW_INCLUDES = /Users/benmalartre/Documents/RnD/glew/include
-#GL_INCLUDES = /Applications/Unity/PlaybackEngines/WebGLSupport/BuildTools/Emscripten/system/include
+BOOZE_INCLUDES = /Users/benmalartre/Documents/RnD/booze/Framework
 
-CFLAGS += -DPB_MACOS -std=c++11 -fPIC -arch x86_64 -DNDEBUG -c -I$(ABC_INCLUDES) -I$(ILM_INCLUDES) -I$(BOOZE_INCLUDES) -I$(Z_INCLUDES) -I$(HDF5_INCLUDES) -I$(PB_INCLUDES) -static
-#-I$(GLEW_INCLUDES) -I$(GL_INCLUDES)
+
+CFLAGS += -DPB_MACOS -std=c++11 -fPIC -arch x86_64 -DNDEBUG -c -I$(ILM_INCLUDES) -I$(HDF5_INCLUDES) -I$(PB_INCLUDES) -I$(ABC_INCLUDES) -I$(BOOZE_INCLUDES) -static
 FRAMEWORK_PATH = /Users/benmalartre/Documents/RnD/booze/Framework
 HDF5_PATH = /usr/local/lib
-#BOOST_PATH = /Users/benmalartre/Documents/RnD/boost_1_49_0/stage/lib
-Z_PATH = /Users/benmalartre/Documents/RnD/zlib-1.2.8
 ILM_PATH = /usr/local/lib
 ALEMBIC_PATH = /usr/local/lib
 PB_PATH = /Applications/PureBasic.app/Contents/Resources/compilers
@@ -33,7 +28,6 @@ LIBS += $(PB_PATH)/StringManager.a
 LIBS += $(ALEMBIC_PATH)/libAlembic.a
 
 # Rules
-#Compile-only with -c option
 All: Archive.o Object.o XForm.o Polymesh.o PointCloud.o Attribute.o PBAlembic.so 
 Archive.o:
 	g++ $(CFLAGS) -c -Wall -g PBAlembicArchive.cpp

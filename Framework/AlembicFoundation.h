@@ -180,11 +180,6 @@ enum ABCDataTraits_
 	DataTraits_N3f,
 	DataTraits_N3d,
 
-	DataTraits_V4f,
-
-	DataTraits_Rotf,
-
-	DataTraits_NumDataTypes,
 	DataTraits_Unknown
 };
 

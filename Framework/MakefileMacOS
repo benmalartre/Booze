@@ -33,7 +33,8 @@ C++FLAGS = $(CFLAGS) \
 	   -std=c++11 \
 	   -stdlib=libc++ \
 	   -fno-gnu-keywords \
-	   -fpascal-strings 
+	   -fpascal-strings  \
+	   -Wno-deprecated
 
 # includes
 #

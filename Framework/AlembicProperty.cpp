@@ -526,18 +526,40 @@ void AlembicIProperty::Init(Alembic::Abc::ICompoundProperty& iParentProp)
 				_scalar = Alembic::AbcGeom::IN3dProperty(iParentProp,_name,0);
 				break;
 			}
-			/*
-			case DataTraits_V4f:
+			case DataTraits_String:
 			{
-				_scalar = Alembic::AbcGeom::IC4fProperty(iParentProp,_name,0);
+				_scalar = Alembic::AbcGeom::IStringProperty(iParentProp,_name,0);
 				break;
 			}
-			case DataTraits_Rotf:
+			case DataTraits_WString:
 			{
-				_scalar = Alembic::AbcGeom::IQuatfProperty(iParentProp,_name,0);
+				_scalar = Alembic::AbcGeom::IWstringProperty(iParentProp,_name,0);
 				break;
 			}
-			*/
+			case DataTraits_P2d:
+			{
+				_scalar = Alembic::AbcGeom::IP2dProperty(iParentProp,_name,0);
+				break;
+			}
+			case DataTraits_P2f:
+			{
+				_scalar = Alembic::AbcGeom::IP2fProperty(iParentProp,_name,0);
+				break;
+			}
+			case DataTraits_P2i:
+			{
+				_scalar = Alembic::AbcGeom::IP2iProperty(iParentProp,_name,0);
+				break;
+			}
+			case DataTraits_P2s:
+			{
+				_scalar = Alembic::AbcGeom::IP2sProperty(iParentProp,_name,0);
+				break;
+			}
+			default:
+			{
+				break;
+			}
 		}
 	}
 	else if(_type == PropertyType_Array)
@@ -622,6 +644,26 @@ void AlembicIProperty::Init(Alembic::Abc::ICompoundProperty& iParentProp)
 			case DataTraits_V2d:
 			{
 				_array = Alembic::Abc::IV2dArrayProperty(iParentProp,_name);
+				break;
+			}
+			case DataTraits_P2s:
+			{
+				_array = Alembic::Abc::IP2sArrayProperty(iParentProp,_name);
+				break;
+			}
+			case DataTraits_P2i:
+			{
+				_array = Alembic::Abc::IP2iArrayProperty(iParentProp,_name);
+				break;
+			}
+			case DataTraits_P2f:
+			{
+				_array = Alembic::Abc::IP2fArrayProperty(iParentProp,_name);
+				break;
+			}
+			case DataTraits_P2d:
+			{
+				_array = Alembic::Abc::IP2dArrayProperty(iParentProp,_name);
 				break;
 			}
 			case DataTraits_V3s:
@@ -784,18 +826,20 @@ void AlembicIProperty::Init(Alembic::Abc::ICompoundProperty& iParentProp)
 				_array = Alembic::Abc::IN3dArrayProperty(iParentProp,_name);
 				break;
 			}
-			/*
-			case DataTraits_V4f:
+			case DataTraits_String:
 			{
-				_array = Alembic::Abc::IC4fArrayProperty(iParentProp,_name);
+				_array = Alembic::Abc::IStringArrayProperty(iParentProp,_name);
 				break;
 			}
-			case DataTraits_Rotf:
+			case DataTraits_WString:
 			{
-				_array = Alembic::Abc::IQuatfArrayProperty(iParentProp,_name);
+				_array = Alembic::Abc::IWstringArrayProperty(iParentProp,_name);
 				break;
 			}
-			*/
+			default:
+			{
+				break;
+			}
 		}
 	}
 }
@@ -816,6 +860,16 @@ void* AlembicIProperty::GetSample(float T){
 			Alembic::AbcCoreAbstract::ArraySamplePtr sample;
 			_array.get(sample,selector);
 			return (void*)sample->getData();
+			break;
+		}
+		case PropertyType_Compound:
+		{
+			//TO BE IMPLEMENTED
+			break;
+		}
+		default:
+		{
+			//TO BE IMPLEMENTED
 			break;
 		}
 	}
@@ -861,6 +915,16 @@ Alembic::Abc::int64_t AlembicIProperty::GetNbItems(Alembic::Abc::chrono_t T)cons
 			_array.get(sample,selector);
             
 			return sample->size();
+		}
+		case PropertyType_Compound:
+		{
+			//TO BE IMPLEMENTED
+			return 0;
+		}
+		default:
+		{
+			//TO BE IMPLEMENTED
+			return 0;
 		}
 	}
 }
@@ -987,6 +1051,26 @@ AlembicOProperty::AlembicOProperty(Alembic::Abc::OCompoundProperty& iParentProp,
 				case DataTraits_V2d:
 				{
 					_scalar = Alembic::AbcGeom::OV2dProperty(iParentProp,name,0);
+					break;
+				}
+				case DataTraits_P2s:
+				{
+					_scalar = Alembic::AbcGeom::OP2sProperty(iParentProp,name,0);
+					break;
+				}
+				case DataTraits_P2i:
+				{
+					_scalar = Alembic::AbcGeom::OP2iProperty(iParentProp,name,0);
+					break;
+				}
+				case DataTraits_P2f:
+				{
+					_scalar = Alembic::AbcGeom::OP2fProperty(iParentProp,name,0);
+					break;
+				}
+				case DataTraits_P2d:
+				{
+					_scalar = Alembic::AbcGeom::OP2dProperty(iParentProp,name,0);
 					break;
 				}
 				case DataTraits_V3s:
@@ -1159,15 +1243,8 @@ AlembicOProperty::AlembicOProperty(Alembic::Abc::OCompoundProperty& iParentProp,
 					_scalar = Alembic::AbcGeom::OWstringProperty(iParentProp,name,0);
 					break;
 				}
-				
-				case DataTraits_V4f:
+				default:
 				{
-					_scalar = Alembic::AbcGeom::OC4fProperty(iParentProp,name,0);
-					break;
-				}
-				case DataTraits_Rotf:
-				{
-					_scalar = Alembic::AbcGeom::OQuatfProperty(iParentProp,name,0);
 					break;
 				}
 			}
@@ -1270,6 +1347,30 @@ AlembicOProperty::AlembicOProperty(Alembic::Abc::OCompoundProperty& iParentProp,
 				case DataTraits_V2d:
 				{
 					Alembic::AbcGeom::OV2dGeomParam p(iParentProp,name, false, iScope, 1,0);
+					_array = p.getValueProperty();
+					break;
+				}
+				case DataTraits_P2s:
+				{
+					Alembic::AbcGeom::OP2sGeomParam p(iParentProp,name, false, iScope, 1,0);
+					_array = p.getValueProperty();
+					break;
+				}
+				case DataTraits_P2i:
+				{
+					Alembic::AbcGeom::OP2iGeomParam p(iParentProp,name, false, iScope, 1,0);
+					_array = p.getValueProperty();
+					break;
+				}
+				case DataTraits_P2f:
+				{
+					Alembic::AbcGeom::OP2fGeomParam p(iParentProp,name, false, iScope, 1,0);
+					_array = p.getValueProperty();
+					break;
+				}
+				case DataTraits_P2d:
+				{
+					Alembic::AbcGeom::OP2dGeomParam p(iParentProp,name, false, iScope, 1,0);
 					_array = p.getValueProperty();
 					break;
 				}
@@ -1477,19 +1578,19 @@ AlembicOProperty::AlembicOProperty(Alembic::Abc::OCompoundProperty& iParentProp,
 					_array = p.getValueProperty();
 					break;
 				}
-				case DataTraits_V4f:
+				default:
 				{
-					Alembic::AbcGeom::OC4fGeomParam p(iParentProp,name, false, iScope, 1,0);
-					_array = p.getValueProperty();
-					break;
-				}
-				case DataTraits_Rotf:
-				{
-					Alembic::AbcGeom::OQuatfGeomParam p(iParentProp,name, false, iScope, 1,0);
-					_array = p.getValueProperty();
 					break;
 				}
 			}
+		}
+		case PropertyType_Compound:
+		{
+			// TO BE IMPLEMENTED
+			break;
+		}
+		default:
+		{
 			break;
 		}
 	}
