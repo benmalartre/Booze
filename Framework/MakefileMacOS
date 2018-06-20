@@ -1,71 +1,126 @@
-# Includes
+# =============================================================
+# Alembic Framework MakefileMacOS
+# =============================================================
+
+LIBRARY_NAME = AbcFramework
+
+# make sure these are in your path
+#
+CC          = clang
+C++         = clang++
+LD          = clang++
+
+SRCDIR := .
+DSTDIR := .
+
+# settings
+#
+CFLAGS = -DPLATFORM_DARWIN \
+	 -DCC_GNU_ \
+	 -DOSMac_ \
+	 -DOSMacOSX_ \
+	 -DOSMac_MachO_ \
+	 -O3 \
+	 -D_LANGUAGE_C_PLUS_PLUS\
+	 -mmacosx-version-min=10.9\
+	 -arch x86_64\
+	 -fPIC\
+	 -DNDEBUG\
+	 -static
+			
+
+C++FLAGS = $(CFLAGS) \
+	   -std=c++11 \
+	   -stdlib=libc++ \
+	   -fno-gnu-keywords \
+	   -fpascal-strings 
+
+# includes
+#
 ILM_INCLUDES = /usr/local/include/OpenEXR
 ABC_INCLUDES = /usr/local/include/Alembic
-HDF5_INCLUDES = /Users/benmalartre/Documents/RnD/hdf5-1.8.7/include
-BOOZE_INCLUDES = /Users/benmalartre/Documents/RnD/booze/Framework
-Z_INCLUDES = /Users/benmalartre/Documents/RnD/zlib-1.2.8
-PB_INCLUDES = /Applications/PureBasic/sdk/c/PureLibraries
-#GLEW_INCLUDES = /Users/benmalartre/Documents/RnD/glew/include
-#GL_INCLUDES = /Applications/Unity/PlaybackEngines/WebGLSupport/BuildTools/Emscripten/system/include
+HDF_INCLUDES = /usr/local/include
+INCLUDES = -I$(ILM_INCLUDES) -I$(ABC_INCLUDES) -I$(HDF_INCLUDES)
 
-CFLAGS +=  -DPLATFORM_DARWIN -std=c++11 -fPIC -arch x86_64 -DNDEBUG -c -I$(ABC_INCLUDES) -I$(ILM_INCLUDES) -I$(BOOZE_INCLUDES) -I$(Z_INCLUDES) -I$(HDF5_INCLUDES) -I$(PB_INCLUDES) -static
-#-I$(GL_INCLUDES) -I$(GLEW_INCLUDES) -I$(BOOST_INCLUDES) -I$(TR1_INCLUDES) 
-
-FRAMEWORK_PATH = -L/Users/benmalartre/Documents/RnD/booze/Framework
-ALEMBIC_PATH = -L/usr/local/lib
-HDF5_PATH = -L/Users/benmalartre/Documents/RnD/hdf5-1.8.7/lib
-#BOOST_PATH = -L/Users/benmalartre/Documents/RnD/boost_1_49_0/stage/lib
-Z_PATH = -L/Users/benmalartre/Documents/RnD/zlib-1.2.8
+# libraries
+#
 ILM_PATH = -L/usr/local/lib
+HDF_PATH = -L/usr/local/lib
+ABC_PATH = -L/usr/local/lib
 
-#-isysroot 
-#/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk 
-#-Wl,-search_paths_first -Wl,-headerpad_max_install_names  
-#CMakeFiles/SimpleAbcViewer.dir/Transport.cpp.o CMakeFiles/SimpleAbcViewer.dir/Viewer.cpp.o CMakeFiles/SimpleAbcViewer.dir/main.cpp.o  -o SimpleAbcViewer  
-LIBS = $(ALEMBIC_PATH)/libAlembic.a 
-LIBS += $(HDF5_PATH)/libhdf5.a 
-LIBS += $(HDF5_PATH)/libhdf5_hl.a 
-#LIBS += $(HDF5_PATH)/libsz.a 
-LIBS += $(HDF5_PATH)/libz.a 
-#LIBS += /usr/lib/libm.dylib 
-#LIBS += -framework GLUT 
-#LIBS += -framework Cocoa 
-#LIBS += -framework OpenGL 
-LIBS += $(ILM_PATH)/libImath.a 
+LIBS = $(ILM_PATH)/libImath.a 
 LIBS += $(ILM_PATH)/libIlmThread.a 
 LIBS += $(ILM_PATH)/libIex.a 
 LIBS += $(ILM_PATH)/libHalf.a 
+LIBS += $(HDF_PATH)/libhdf5.a 
+LIBS += $(HDF_PATH)/libhdf5_hl.a 
+LIBS += $(HDF_PATH)/libz.a  
+LIBS += $(ABC_PATH)/libAlembic.a 
 LIBS += -lm 
 
-LIBS_PATH = $(FRAMEWORK_PATH) $(ALEMBIC_PATH) $(HDF5_PATH) $(BOOST_PATH) $(Z_PATH) $(ILM_PATH)
-#LIBS =  -lboost_program_options -lboost_thread -lboost_python -lAlembicAbc -lAlembicAbcCollection -lAlembicAbcCoreAbstract -lAlembicAbcCoreFactory -lAlembicAbcCoreHDF5 -lAlembicAbcCoreOgawa -lAlembicAbcGeom -lAlembicUtil -lpthread -lz -lhdf5 -lhdf5_hl -lImath -lIlmThread -lIex -lHalf
+LIBS_PATH = $(ILM_PATH) $(HDF5_PATH) $(ABC_PATH)
 
 LDFLAGS += -static $(LIBS)
 
-# Rules
+# infos
+#
+MSG1 = "== Compile $(LIBRARY_NAME)"
+MSG2 = "==  CC      $(CC)"
+MSG3 = "==  C++     $(C++)"
 
-all: AbcUtil.o AbcArchiveStorage.o AbcMessage.o AbcObject.o AbcProperty.o AbcWriteJob.o libAbcFramework.a
-	
-AbcUtil.o: AlembicUtil.cpp AlembicUtil.h
-	g++ $(CFLAGS) -c -Wall -g AlembicUtil.cpp
-	
-AbcArchiveStorage.o: AlembicArchiveStorage.cpp AlembicArchiveStorage.h
-	g++ $(CFLAGS) -c -Wall -g AlembicArchiveStorage.cpp
+# variable definitions
+#
+SOURCES = $(SRCDIR)/AlembicUtil.cpp 
+SOURCES += $(SRCDIR)/AlembicArchiveStorage.cpp 
+SOURCES += $(SRCDIR)/AlembicMessage.cpp
+SOURCES += $(SRCDIR)/AlembicObject.cpp 
+SOURCES += $(SRCDIR)/AlembicProperty.cpp 
+SOURCES += $(SRCDIR)/AlembicWriteJob.cpp 
 
-AbcMessage.o: AlembicMessage.cpp AlembicMessage.h
-	g++ $(CFLAGS) -c -Wall -g AlembicMessage.cpp
-	
-AbcObject.o: AlembicObject.cpp AlembicObject.h
-	g++ $(CFLAGS) -c -Wall -g AlembicObject.cpp
+OBJECTS  := $(patsubst %.cpp,$(DSTDIR)/%.o,$(SOURCES))
 
-AbcProperty.o: AlembicProperty.cpp AlembicProperty.h
-	g++ $(CFLAGS) -c -Wall -g AlembicProperty.cpp
-	
-AbcWriteJob.o: AlembicWriteJob.cpp AlembicWriteJob.h
-	g++ $(CFLAGS) -c -Wall -g AlembicWriteJob.cpp
+STATIC_LIB := lib$(LIBRARY_NAME).a
+MAKEFILE := $(SRCDIR)/MakefileMacOS
 
-libAbcFramework.a:  AlembicUtil.o AlembicArchiveStorage.o AlembicMessage.o AlembicObject.o  AlembicProperty.o AlembicWriteJob.o
-	        ar rcs $@ $^ 
+# target specific flags.
+#
+$(OBJECTS): CFLAGS   := $(CFLAGS)
+$(OBJECTS): C++FLAGS := $(C++FLAGS)
+$(OBJECTS): INCLUDES := $(INCLUDES) -I/usr/X11R6/include 
+
+DEPENDS:     INCLUDES := $(INCLUDES)
+
+# rules definitions
+#
+.PHONY:	all depend clean print
+
+all:
+	+@$(MAKE) -f $(MAKEFILE) print
+	+@$(MAKE) -f $(MAKEFILE) $(STATIC_LIB)
+
+print:
+	@echo $(MSG1)
+	@echo $(MSG2)
+	@echo $(MSG3)
+
+%.o :	%.c
+	$(CC) -c $(INCLUDES) $(CFLAGS) $< -o $@
+
+%.o :	%.cpp
+	@echo INCLUDES : $(INCLUDES)
+	@echo "Compiling $< ..."
+	$(C++) -c $(INCLUDES) $(C++FLAGS) $< -o $@
+
+%.i :	%.cpp
+	$(C++) -E $(INCLUDES) $(C++FLAGS) $*.cpp > $*.i
+
+$(STATIC_LIB): $(OBJECTS)
+	#$(LD) -o $@ $(LFLAGS) $^ $(LIBS)
+	ar rcs $(STATIC_LIB) $(OBJECTS)
+	ranlib $(STATIC_LIB)
+
+depend:
+	makedepend $(INCLUDES) $(MDFLAGS) -f$(MAKEFILE) $(SOURCES)
 
 clean:
-	rm -rf *.o *.gah
+	rm -rf *.o *.gah *.a
