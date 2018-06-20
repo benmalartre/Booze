@@ -1,6 +1,5 @@
 #include "AlembicArchiveStorage.h"
 #include <map>
-#include <boost/algorithm/string.hpp>
 
 // Archive Manager
 //--------------------------------------------------------
@@ -40,13 +39,12 @@ void AlembicArchiveManager::RemoveArchive(AlembicIArchive* archive)
     map<string,AlembicIArchive *>::iterator it;
     for(it = _archives.begin(); it != _archives.end(); it++) {
         // iterator->first = key
-        if(it->second = archive)
+        if(it->second == archive)
         {
+			delete(it->second);
             _archives.erase(it);
-            delete(it->second);
         }
     }
-    _archives.erase(it);
 }
 
 void AlembicArchiveManager::DeleteArchive(std::string path)

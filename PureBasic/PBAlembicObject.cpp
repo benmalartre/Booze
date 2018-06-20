@@ -133,7 +133,7 @@ EXPORT TCHAR* ABC_GetObjectHeader(AlembicIObject* obj)
 	if(!obj->GetIObject()->valid())
 		return NULL;
 	
-	Alembic::AbcCoreAbstract::v7::ObjectHeader header = obj->GetIObject()->getHeader();
+	Alembic::AbcCoreAbstract::ObjectHeader header = obj->GetIObject()->getHeader();
 	std::string str = header.getFullName();//getMetaData().serialize();
 	 
 	if(!str.size())

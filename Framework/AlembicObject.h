@@ -54,8 +54,8 @@ public:
 	//virtual bool HasProperty(std::string);
 	//virtual void Init(){};
 };
-typedef boost::shared_ptr < AlembicIObject > AlembicIObjectPtr;
-typedef boost::shared_ptr < AlembicOObject> AlembicOObjectPtr;
+typedef std::shared_ptr < AlembicIObject > AlembicIObjectPtr;
+typedef std::shared_ptr < AlembicOObject> AlembicOObjectPtr;
 
 #include "AlembicWriteJob.h"
 

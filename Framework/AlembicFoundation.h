@@ -1,10 +1,6 @@
 #ifndef _BOOZE_FOUNDATION_H_
 #define _BOOZE_FOUNDATION_H_
 
-#include <boost/smart_ptr.hpp>
-#include <boost/format.hpp>
-#include <boost/variant.hpp>
-
 #include <Alembic/Abc/All.h>
 #include <Alembic/AbcGeom/All.h>
 #include <Alembic/AbcCoreFactory/All.h>
@@ -31,6 +27,7 @@
 #include <exception>
 #include <string>
 #include <limits>
+#include <memory>
 
 #include <stdlib.h>
 #include <stdio.h>
