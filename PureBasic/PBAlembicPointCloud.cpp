@@ -1,4 +1,4 @@
-		#include "PBAlembicXForm.h"
+#include "PBAlembicXForm.h"
 #include "PBAlembicObject.h"
 #include "PBAlembicPointCloud.h"
 
@@ -11,7 +11,7 @@ EXPORT bool ABC_ObjectIsPointCloud(AlembicIObject* obj)
 	
 };
 
-EXPORT TCHAR* ABC_TestPointCloud(AlembicIObject* obj,ABC_PointCloud_Sample_Infos* io_sample)
+EXPORT char* ABC_TestPointCloud(AlembicIObject* obj,ABC_PointCloud_Sample_Infos* io_sample)
 {
 	return 0;//ABC_PassStringToPureBasic(std::string("ABC Test Polymesh Succeeded!!"));
 }
@@ -28,9 +28,7 @@ EXPORT void ABC_GetPointCloudSampleDescription(AlembicIObject* obj,float frame,A
 	infos->_sampleindex = (Alembic::AbcCoreAbstract::index_t)int(frame)-1;
 
    // Clamp if necessary
-   if(infos->_sampleindex < 0)
-      infos->_sampleindex = 0;
-   else if(infos->_sampleindex >= (Alembic::AbcCoreAbstract::index_t)points.getSchema().getNumSamples())
+   if(infos->_sampleindex >= (Alembic::AbcCoreAbstract::index_t)points.getSchema().getNumSamples())
       infos->_sampleindex = Alembic::AbcCoreAbstract::index_t(points.getSchema().getNumSamples()) - 1;
 	
 	Alembic::AbcGeom::IPointsSchema::Sample sample;

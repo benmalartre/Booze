@@ -33,18 +33,8 @@
 #include <math.h>
 
 #include "AlembicArchiveStorage.h"
-#include "PureLibrary.h"
-
-static TCHAR alembic_io_string(4096);
-
-#ifndef UNICODE
-	typedef std::string String;
-#else
-	typedef std::wstring String;
-#endif
 
 #if defined(_WINDOWS)
-	//extern "C"  TCHAR* __cdecl SYS_GetOuputBuffer(int,int);
 	#if defined(STATIC_LIB)
 		#define EXPORT extern "C" 
 	#else
@@ -52,24 +42,7 @@ static TCHAR alembic_io_string(4096);
 	#endif
     #include "stdint.h"
 #else
-	//extern "C" char* SYS_GetOuputBuffer(int,int);
 	#define EXPORT extern "C"
     #include <stdint.h>
 #endif
-
-/*
-kernel32.lib
-user32.lib
-gdi32.lib
-winspool.lib
-shell32.lib
-ole32.lib
-oleaut32.lib
-uuid.lib
-comdlg32.lib
-advapi32.lib
-libcpmt.lib
-shlwapi.lib
-
-*/
 #endif

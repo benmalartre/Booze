@@ -10,7 +10,7 @@ EXPORT bool ABC_ObjectIsPolymesh(AlembicIObject* obj)
 	return Alembic::AbcGeom::IPolyMesh::matches(obj->GetIObject()->getMetaData());;
 };
 
-EXPORT TCHAR* ABC_TestPolymesh(AlembicIObject* obj,ABC_Polymesh_Topo_Sample_Infos* io_sample)
+EXPORT const char* ABC_TestPolymesh(AlembicIObject* obj,ABC_Polymesh_Topo_Sample_Infos* io_sample)
 {
 	return 0;//ABC_PassStringToPureBasic(std::string("ABC Test Polymesh Succeeded!!"));
 }

@@ -48,8 +48,8 @@ public:
 	Alembic::Abc::IObject* GetIObject(){return _abcobject;};
 	bool Initialized(){return _init;};
 	void GetProperties();
-	int GetNumProperties();
-	AlembicIProperty* GetProperty(int ID);
+	uint64_t GetNumProperties();
+	AlembicIProperty* GetProperty(uint64_t id);
 	
 	//virtual bool HasProperty(std::string);
 	//virtual void Init(){};

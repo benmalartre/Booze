@@ -27,11 +27,11 @@ public:
 	Alembic::Abc::IArchive* GetArchive();
 	void GetAllObjects();
 	void GetObjectChildren(Alembic::Abc::IObject* obj);
-	long GetNumObjects();
-	long GetNumTimeSamplings();
+	uint64_t GetNumObjects();
+	uint64_t GetNumTimeSamplings();
 	Alembic::Abc::IObject* GetObjectFromID(std::string identifier);
 	Alembic::Abc::IObject* GetObjectFromID(std::string identifier,std::string& debug);
-	Alembic::Abc::IObject* GetObjectFromID(long id);
+	Alembic::Abc::IObject* GetObjectFromID(uint64_t id);
 };
 
 class AlembicOArchive
@@ -48,15 +48,14 @@ public:
 class AlembicArchiveManager
 {
 public:
-	//std::map<std::string,Alembic::Abc::IArchive *> _archives;
 	std::map<std::string,AlembicIArchive *> _archives;
 public:
 	AlembicIArchive* GetArchiveFromID(std::string path);
 	std::string AddArchive(AlembicIArchive * archive);
-    void RemoveArchive(AlembicIArchive* archive);
+    bool RemoveArchive(AlembicIArchive* archive);
 	void DeleteArchive(std::string path);
 	void DeleteAllArchives();
-	long GetNumOpenArchives();
+	uint64_t GetNumOpenArchives();
 };
 
 #endif //_BOOZE_ARCHIVE_STORAGE_H_

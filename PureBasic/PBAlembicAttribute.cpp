@@ -11,7 +11,7 @@ EXPORT bool ABC_GetAttributeSampleDescription(AlembicIProperty* prop,float frame
 {
 	std::string s(prop->GetName());
 	int size = (int)s.size()+1;
-	SYS_FastStringCopy((TCHAR*)infos->_name, s.c_str(), size);
+	memcpy(&infos->_name[0], s.c_str(), size);
 
 	infos->_time = frame;
 	infos->_traits = prop->GetDataTraits();
@@ -21,16 +21,13 @@ EXPORT bool ABC_GetAttributeSampleDescription(AlembicIProperty* prop,float frame
 
 }
 
-EXPORT TCHAR* ABC_GetAttributeSampleName(ABC_Attribute_Sample_Infos* infos)
+EXPORT char* ABC_GetAttributeSampleName(ABC_Attribute_Sample_Infos* infos)
 {
     std::string name = (std::string)infos->_name;
     if(!name.size())
         return NULL;
-    int size = (int)name.size()+1;
-    
-    SYS_FastStringCopy(&alembic_io_string, infos->_name, size);
-    
-    return &alembic_io_string;
+
+	return &infos->_name[0];
     
 }
 

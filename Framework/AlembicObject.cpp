@@ -61,23 +61,26 @@ void AlembicIObject::GetProperties()
 			return;
 
 	}
-	int total = 0;
+	
+	/*
     for ( size_t i = 0 ; i < p.getNumProperties() ; i++ ) {
 		Alembic::Abc::PropertyHeader header = p.getPropertyHeader( i );
 		AlembicIProperty prop(header);
 		prop.Init(p);
 		_props.push_back(prop);
     }
+	*/
 }
 
-int AlembicIObject::GetNumProperties(){
-	return _props.size();
+uint64_t AlembicIObject::GetNumProperties()
+{
+	return (uint64_t)_props.size();
 }
 
-AlembicIProperty* AlembicIObject::GetProperty(int ID){
-    if(ID>=0 && ID<_props.size())
-	return &_props[ID];
-    
+AlembicIProperty* AlembicIObject::GetProperty(uint64_t id)
+{
+    if(id<_props.size())
+		return &_props[id];
     return NULL;
 }
 

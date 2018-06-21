@@ -29,22 +29,24 @@ AlembicIArchive* AlembicArchiveManager::GetArchiveFromID(std::string path)
 
 std::string AlembicArchiveManager::AddArchive(AlembicIArchive* archive)
 {
-   _archives.insert(std::pair<string,AlembicIArchive *>(archive->GetName(),archive));
-   return archive->GetName();
+	string name = archive->GetName();
+	_archives.insert(std::pair<string,AlembicIArchive *>(name, archive));
+	return name;
 }
 
-
-void AlembicArchiveManager::RemoveArchive(AlembicIArchive* archive)
+bool AlembicArchiveManager::RemoveArchive(AlembicIArchive* archive)
 {
     map<string,AlembicIArchive *>::iterator it;
-    for(it = _archives.begin(); it != _archives.end(); it++) {
-        // iterator->first = key
+    for(it = _archives.begin(); it != _archives.end(); it++) 
+	{
         if(it->second == archive)
         {
-			delete(it->second);
-            _archives.erase(it);
+			_archives.erase(it);
+			delete(archive);
+			return true;
         }
     }
+	return false;
 }
 
 void AlembicArchiveManager::DeleteArchive(std::string path)
@@ -54,8 +56,10 @@ void AlembicArchiveManager::DeleteArchive(std::string path)
     if(it == _archives.end())
         return;
     
+	AlembicIArchive* archive = it->second;
     _archives.erase(it);
-    delete(it->second);
+	delete(archive);
+    
 }
 
 void AlembicArchiveManager::DeleteAllArchives()
@@ -66,9 +70,9 @@ void AlembicArchiveManager::DeleteAllArchives()
   _archives.clear();
 }
 
-long AlembicArchiveManager::GetNumOpenArchives()
+uint64_t AlembicArchiveManager::GetNumOpenArchives()
 {
-	return (long)_archives.size();
+	return (uint64_t)_archives.size();
 }
 
 // IArchive
@@ -137,21 +141,24 @@ void AlembicIArchive::Close()
 
 void AlembicIArchive::GetAllObjects()
 {
-	Alembic::Abc::IObject* top = new Alembic::Abc::IObject(_archive.getTop());
+	Alembic::AbcGeom::IObject* top = new Alembic::AbcGeom::IObject(_archive.getTop());
 	_objects.push_back(top);
 
 	// recurse finding all objects
 	GetObjectChildren(top);
 }
 
-void AlembicIArchive::GetObjectChildren(Alembic::Abc::IObject* obj)
+void AlembicIArchive::GetObjectChildren(Alembic::AbcGeom::IObject* obj)
 {
 	for(size_t i=0;i<obj->getNumChildren();i++)
 	{
-		Alembic::Abc::IObject* child = new Alembic::Abc::IObject(obj->getChild(i));
-		_objects.push_back(child);
-		if(child->getNumChildren()>0)
-			GetObjectChildren(child);
+		if(obj->getChild(i).valid())
+		{
+			Alembic::AbcGeom::IObject* child = new Alembic::AbcGeom::IObject(obj->getChild(i));
+			_objects.push_back(child);
+			if(child->getNumChildren()>0)
+				GetObjectChildren(child);
+		}
 	}
 }
 
@@ -160,14 +167,14 @@ string AlembicIArchive::GetName()
 	return _archive.getName();
 }
 
-long AlembicIArchive::GetNumObjects()
+uint64_t AlembicIArchive::GetNumObjects()
 {
-	return (int)_objects.size();
+	return (uint64_t)_objects.size();
 }
 
-long AlembicIArchive::GetNumTimeSamplings()
+uint64_t AlembicIArchive::GetNumTimeSamplings()
 {
-	return _archive.getNumTimeSamplings();
+	return (uint64_t)_archive.getNumTimeSamplings();
 }
 
 Alembic::Abc::IObject* AlembicIArchive::GetObjectFromID(std::string identifier)
@@ -204,9 +211,9 @@ Alembic::Abc::IObject* AlembicIArchive::GetObjectFromID(std::string identifier, 
 	return NULL;
 }
 
-Alembic::Abc::IObject* AlembicIArchive::GetObjectFromID(long id)
+Alembic::Abc::IObject* AlembicIArchive::GetObjectFromID(uint64_t id)
 {
-	if(id<0 || id>_objects.size())
+	if(id>=_objects.size())
 		return NULL;
 	return _objects[id];
 }

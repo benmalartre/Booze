@@ -33,11 +33,16 @@ EXPORT void ABC_InitObject(AlembicIObject* obj,ABCGeometricType type){
 }
 // Get Object From Archive
 //----------------------------------------------------------
-EXPORT AlembicIObject* ABC_GetObjectFromArchiveByID(AlembicIArchive* archive,long identifier)
+EXPORT AlembicIObject* ABC_GetObjectFromArchiveByID(AlembicIArchive* archive,uint64_t identifier)
 {
 	Alembic::Abc::IObject* obj = archive->GetObjectFromID(identifier);
 	if(obj){
 		if(Alembic::AbcGeom::IPolyMesh::matches(obj->getMetaData())){
+			AlembicIPolymesh* polymesh = new AlembicIPolymesh(obj);
+			polymesh->Init(GeometricType_PolyMesh);
+			return (AlembicIObject*)polymesh;
+		}
+		else if(Alembic::AbcGeom::ISubD::matches(obj->getMetaData())){
 			AlembicIPolymesh* polymesh = new AlembicIPolymesh(obj);
 			polymesh->Init(GeometricType_PolyMesh);
 			return (AlembicIObject*)polymesh;
@@ -71,7 +76,7 @@ EXPORT AlembicIObject* ABC_GetObjectFromArchiveByID(AlembicIArchive* archive,lon
 
 // Get Object From Archive by Name
 //----------------------------------------------------------
-EXPORT AlembicIObject* ABC_GetObjectFromArchiveByName(AlembicIArchive* archive,TCHAR* name)
+EXPORT AlembicIObject* ABC_GetObjectFromArchiveByName(AlembicIArchive* archive,const char* name)
 {
 	archive->GetAllObjects();
 	for(int i=0;i<archive->GetNumObjects();i++)
@@ -85,18 +90,12 @@ EXPORT AlembicIObject* ABC_GetObjectFromArchiveByName(AlembicIArchive* archive,T
 	return NULL;
 }
 
-EXPORT bool ABC_ObjectIsProperty(AlembicIObject* obj)
-{
-	return false;//Alembic::AbcGeom::ICompoundProperty::matches(obj->GetIObject()->getMetaData());;
-	
-};
-
 EXPORT int ABC_GetNumProperties(AlembicIObject* obj)
 {
 	return obj->GetNumProperties();
 }
 
-EXPORT TCHAR* ABC_GetPropertyName(AlembicIObject* obj,int ID)
+EXPORT const char* ABC_GetPropertyName(AlembicIObject* obj,int ID)
 {
     
 	AlembicIProperty* prop = obj->GetProperty(ID);
@@ -104,11 +103,8 @@ EXPORT TCHAR* ABC_GetPropertyName(AlembicIObject* obj,int ID)
 
 	if(!name.size())
 		return NULL;
-	int size = (int)name.size()+1;
-	
-	SYS_FastStringCopy(&alembic_io_string, name.c_str(), size);
-	
-	return &alembic_io_string;
+
+	return name.c_str();
 }
 
 EXPORT AlembicIProperty* ABC_GetProperty(AlembicIObject* obj,int ID)
@@ -122,13 +118,13 @@ EXPORT void ABC_Polymesh_ReadFrame()
 
 }
 
-EXPORT TCHAR* ABC_TestString(TCHAR* input)
+EXPORT const char* ABC_TestString(char* input)
 {
-	std::string *out=new std::string(input);
-	return (char*)out->c_str();
+	std::string out=std::string(input);
+	return out.c_str();
 }
 
-EXPORT TCHAR* ABC_GetObjectHeader(AlembicIObject* obj)
+EXPORT const char* ABC_GetObjectHeader(AlembicIObject* obj)
 {
 	if(!obj->GetIObject()->valid())
 		return NULL;
@@ -139,13 +135,10 @@ EXPORT TCHAR* ABC_GetObjectHeader(AlembicIObject* obj)
 	if(!str.size())
 		return NULL;
 
-	int size = (int)str.size()+1;
-	SYS_FastStringCopy(&alembic_io_string, str.c_str(), size);
-	
-	return &alembic_io_string;
+	return str.c_str();
 }
 
-EXPORT TCHAR* ABC_GetObjectMetaData(AlembicIObject* obj)
+EXPORT const char* ABC_GetObjectMetaData(AlembicIObject* obj)
 {	
 	if(!obj->GetIObject()->valid())
 		return NULL;
@@ -154,28 +147,21 @@ EXPORT TCHAR* ABC_GetObjectMetaData(AlembicIObject* obj)
 	if(!metadata.size())
 		return NULL;
 
-	int size = (int)metadata.size()+1;
-
-	SYS_FastStringCopy(&alembic_io_string, metadata.c_str(), size);
-	
-	return &alembic_io_string;
+	return metadata.c_str();
 }
 
-EXPORT TCHAR* ABC_GetObjectName(AlembicIObject* obj)
+EXPORT const char* ABC_GetObjectName(AlembicIObject* obj)
 {	
 	if(!obj->GetIObject()->valid())
 		return NULL;
 	std::string name = obj->GetIObject()->getName();
 	if(!name.size())
 		return NULL;
-	int size = (int)name.size()+1;
 
-	SYS_FastStringCopy(&alembic_io_string, name.c_str(), size);
-	
-	return &alembic_io_string;
+	return name.c_str();
 }
 
-EXPORT TCHAR* ABC_GetObjectFullName(AlembicIObject* obj)
+EXPORT const char* ABC_GetObjectFullName(AlembicIObject* obj)
 {	
 	if(!obj->GetIObject()->valid())
 		return NULL;
@@ -183,22 +169,15 @@ EXPORT TCHAR* ABC_GetObjectFullName(AlembicIObject* obj)
 	
 	if(!name.size())
 		return NULL;
-	int size = (int)name.size()+1;
-	
-	SYS_FastStringCopy(&alembic_io_string, name.c_str(), size);
-	
-	return &alembic_io_string;
+
+	return name.c_str();
 }
 
-EXPORT TCHAR* ABC_GetInterpretation(AlembicIObject* obj,int ID)
+EXPORT const char* ABC_GetInterpretation(AlembicIObject* obj,int ID)
 {
 	std::string interpretation = obj->_props[ID].GetInterpretation();
 	if(!interpretation.size())
 		return NULL;
-	int size = (int)interpretation.size()+1;
-	
-	SYS_FastStringCopy(&alembic_io_string, interpretation.c_str(), size);
-	
-	return &alembic_io_string;
-	//m_Interp = in_PropHeader.getMetaData().get( "interpretation" );
+
+	return interpretation.c_str();
 }

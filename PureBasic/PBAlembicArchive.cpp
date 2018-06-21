@@ -19,14 +19,14 @@ EXPORT void  ABC_DeleteArchiveManager(AlembicArchiveManager* manager)
 
 // Get Num Objects In Archive
 //---------------------------------------------------
-EXPORT long ABC_GetNumOpenArchives(AlembicArchiveManager* manager)
+EXPORT uint64_t ABC_GetNumOpenArchives(AlembicArchiveManager* manager)
 {
 	return manager->GetNumOpenArchives();
 }
 
 // Get Infos
 //---------------------------------------------------
-EXPORT TCHAR* ABC_GetInfosFromArchive(AlembicIArchive* archive)
+EXPORT const char* ABC_GetInfosFromArchive(AlembicIArchive* archive)
 {
 	std::string infos;
 
@@ -59,14 +59,12 @@ EXPORT TCHAR* ABC_GetInfosFromArchive(AlembicIArchive* archive)
         }
 	}
 
-	int size = (int)infos.size()+1;
-	SYS_FastStringCopy(&alembic_io_string, infos.c_str(), size);
-	return &alembic_io_string;
+    return infos.c_str();
 }
 
 // Open Archive
 //---------------------------------------------------
-EXPORT AlembicIArchive* ABC_OpenArchive(AlembicArchiveManager* manager,TCHAR* filename)
+EXPORT AlembicIArchive* ABC_OpenArchive(AlembicArchiveManager* manager,const char* filename)
 {
 	std::string path(filename);
 	AlembicIArchive* archive = manager->GetArchiveFromID(path);
@@ -75,21 +73,21 @@ EXPORT AlembicIArchive* ABC_OpenArchive(AlembicArchiveManager* manager,TCHAR* fi
 
 // Close Archive
 //---------------------------------------------------
-EXPORT void ABC_CloseArchive(AlembicArchiveManager* manager,AlembicIArchive* archive)
+EXPORT bool ABC_CloseArchive(AlembicArchiveManager* manager,AlembicIArchive* archive)
 {
-    manager->RemoveArchive(archive);
+    return manager->RemoveArchive(archive);
 }
 
 // Get Num Objects In Archive
 //---------------------------------------------------
-EXPORT long ABC_GetNumObjectsInArchive(AlembicIArchive* archive)
+EXPORT uint64_t ABC_GetNumObjectsInArchive(AlembicIArchive* archive)
 {
 	return archive->GetNumObjects();
 }
 
 // Get Num Time Sampling
 //---------------------------------------------------
-EXPORT long ABC_GetNumTimeSamplingInArchive(AlembicIArchive* archive)
+EXPORT uint64_t ABC_GetNumTimeSamplingInArchive(AlembicIArchive* archive)
 {
 	return archive->GetNumTimeSamplings();
 }

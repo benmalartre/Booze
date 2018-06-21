@@ -59,7 +59,7 @@ LIBS += $(HDF_PATH)/libz.a
 LIBS += $(ABC_PATH)/libAlembic.a 
 LIBS += -lm 
 
-LIBS_PATH = $(ILM_PATH) $(HDF5_PATH) $(ABC_PATH)
+LIBS_PATH = $(ILM_PATH) $(HDF_PATH) $(ABC_PATH)
 
 LDFLAGS += -static $(LIBS)
 

@@ -45,7 +45,7 @@ XSIPLUGINCALLBACK CStatus Alembic_XForm_Init( CRef& in_ctxt )
 	ctxt.PutUserData((CValue::siPtrType)obj);
 }
 */
-EXPORT TCHAR* ABC_TestXForm(AlembicIObject* obj,XForm_Sample* io_sample)
+EXPORT const char* ABC_TestXForm(AlembicIObject* obj,XForm_Sample* io_sample)
 {
 	//return ABC_PassStringToPureBasic(std::string("Hey!!"));
 	return NULL;

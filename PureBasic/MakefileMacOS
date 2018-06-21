@@ -1,50 +1,129 @@
-# PBAlembic MakefileMacOS
+# =============================================================
+# PureBasic Alembic MakefileMacOS
+# =============================================================
 
-# Includes
+LIBRARY_NAME = PBAlembic
+
+# make sure these are in your path
+#
+CC          = clang
+C++         = clang++
+LD          = clang++
+
+SRCDIR := .
+DSTDIR := .
+
+# settings
+#
+CFLAGS = -DPLATFORM_DARWIN \
+	 -DCC_GNU_ \
+	 -DOSMac_ \
+	 -DOSMacOSX_ \
+	 -DOSMac_MachO_ \
+	 -DPB_MACOS
+	 -O3 \
+	 -D_LANGUAGE_C_PLUS_PLUS\
+	 -mmacosx-version-min=10.9\
+	 -arch x86_64\
+	 -fPIC\
+	 -DNDEBUG\
+	 -static
+
+C++FLAGS = $(CFLAGS) \
+	   -std=c++11 \
+	   -stdlib=libc++ \
+	   -fno-gnu-keywords \
+	   -fpascal-strings  \
+	   -Wno-deprecated
+
+# includes
+#
 ILM_INCLUDES = /usr/local/include/OpenEXR
 ABC_INCLUDES = /usr/local/include/Alembic
-HDF5_INCLUDES = /Users/benmalartre/Documents/RnD/hdf5-1.8.9/include
-PB_INCLUDES = /Applications/PureBasic.app/Contents/Resources/sdk/c/PureLibraries
+HDF_INCLUDES = /usr/local/include
 BOOZE_INCLUDES = /Users/benmalartre/Documents/RnD/booze/Framework
+INCLUDES = -I$(ILM_INCLUDES) -I$(ABC_INCLUDES) -I$(HDF_INCLUDES) -I$(BOOZE_INCLUDES)
 
-
-CFLAGS += -DPB_MACOS -std=c++11 -fPIC -arch x86_64 -DNDEBUG -c -I$(ILM_INCLUDES) -I$(HDF5_INCLUDES) -I$(PB_INCLUDES) -I$(ABC_INCLUDES) -I$(BOOZE_INCLUDES) -static
-FRAMEWORK_PATH = /Users/benmalartre/Documents/RnD/booze/Framework
-HDF5_PATH = /usr/local/lib
+# libraries
+#
 ILM_PATH = /usr/local/lib
-ALEMBIC_PATH = /usr/local/lib
-PB_PATH = /Applications/PureBasic.app/Contents/Resources/compilers
+HDF_PATH = /usr/local/lib
+ABC_PATH = /usr/local/lib
+FRAMEWORK_PATH = /Users/benmalartre/Documents/RnD/booze/Framework
 
-LIBS += $(HDF5_PATH)/libhdf5.a
-LIBS += $(HDF5_PATH)/libsz.a
-LIBS += $(HDF5_PATH)/libz.a
-LIBS += $(ILM_PATH)/libImath.a
-LIBS += $(ILM_PATH)/libIlmThread.a
-LIBS += $(ILM_PATH)/libIex.a
-LIBS += $(ILM_PATH)/libHalf.a
+LIBS = $(ILM_PATH)/libImath.a 
+LIBS += $(ILM_PATH)/libIlmThread.a 
+LIBS += $(ILM_PATH)/libIex.a 
+LIBS += $(ILM_PATH)/libHalf.a 
+LIBS += $(HDF_PATH)/libhdf5.a 
+LIBS += $(HDF_PATH)/libz.a  
+LIBS += $(HDF_PATH)/libsz.a 
+LIBS += $(ABC_PATH)/libAlembic.a 
+LIBS += -lm 
 LIBS += $(FRAMEWORK_PATH)/libAbcFramework.a
-LIBS += $(PB_PATH)/ObjectManager.a
-LIBS += $(PB_PATH)/StringManager.a
-LIBS += $(ALEMBIC_PATH)/libAlembic.a
 
-# Rules
-All: Archive.o Object.o XForm.o Polymesh.o PointCloud.o Attribute.o PBAlembic.so 
-Archive.o:
-	g++ $(CFLAGS) -c -Wall -g PBAlembicArchive.cpp
-Object.o:
-	g++ $(CFLAGS) -c -Wall -g PBAlembicObject.cpp PBAlembicObject.h
-Polymesh.o:
-	g++ $(CFLAGS) -c -Wall -g PBAlembicPolymesh.cpp PBAlembicPolymesh.h
-PointCloud.o:
-	g++ $(CFLAGS) -c -Wall -g PBAlembicPointCloud.cpp PBAlembicPointCloud.h
-XForm.o:
-	g++ $(CFLAGS) -c -Wall -g PBAlembicXForm.cpp PBAlembicXForm.h
-Attribute.o:
-	g++ $(CFLAGS) -c -Wall -g PBAlembicAttribute.cpp PBAlembicAttribute.h
+LIBS_PATH = -L$(ILM_PATH) -L$(HDF_PATH) -L$(ABC_PATH) -L$(FRAMEWORK_PATH) -L$(FRAMEWORK_PATH)
 
-# link in shared library
-PBAlembic.so:
-	g++ $(LIBS_PATH) -o PBAlembic.so -shared -Wl,-search_paths_first -Wl,-headerpad_max_install_names $(LIBS) -lm PBAlembicArchive.o PBAlembicAttribute.o PBAlembicObject.o PBAlembicXForm.o PBAlembicPointCloud.o PBAlembicPolymesh.o
-	
+LDFLAGS += -shared -Wl,-search_paths_first -Wl,-headerpad_max_install_names $(LIBS)
+
+# infos
+#
+MSG1 = "== Compile $(LIBRARY_NAME)"
+MSG2 = "==  CC      $(CC)"
+MSG3 = "==  C++     $(C++)"
+
+# variable definitions
+#
+SOURCES = $(SRCDIR)/PBAlembicArchive.cpp 
+SOURCES += $(SRCDIR)/PBAlembicObject.cpp 
+SOURCES += $(SRCDIR)/PBAlembicXForm.cpp 
+SOURCES += $(SRCDIR)/PBAlembicPolymesh.cpp 
+SOURCES += $(SRCDIR)/PBAlembicPointCloud.cpp 
+SOURCES += $(SRCDIR)/PBAlembicAttribute.cpp 
+
+OBJECTS  := $(patsubst %.cpp,$(DSTDIR)/%.o,$(SOURCES))
+
+DYNAMIC_LIB := $(LIBRARY_NAME).so
+MAKEFILE := $(SRCDIR)/MakefileMacOS
+
+# target specific flags.
+#
+$(OBJECTS): CFLAGS   := $(CFLAGS)
+$(OBJECTS): C++FLAGS := $(C++FLAGS)
+$(OBJECTS): INCLUDES := $(INCLUDES) -I/usr/X11R6/include 
+
+DEPENDS:     INCLUDES := $(INCLUDES)
+
+
+# rules definitions
+#
+.PHONY:	all depend clean print
+
+all:
+	+@$(MAKE) -f $(MAKEFILE) print
+	+@$(MAKE) -f $(MAKEFILE) $(DYNAMIC_LIB)
+
+print:
+	@echo $(MSG1)
+	@echo $(MSG2)
+	@echo $(MSG3)
+
+%.o :	%.c
+	$(CC) -c $(INCLUDES) $(CFLAGS) $< -o $@
+
+%.o :	%.cpp
+	@echo INCLUDES : $(INCLUDES)
+	@echo "Compiling $< ..."
+	$(C++) -c $(INCLUDES) $(C++FLAGS) $< -o $@
+
+%.i :	%.cpp
+	$(C++) -E $(INCLUDES) $(C++FLAGS) $*.cpp > $*.i
+
+$(DYNAMIC_LIB): $(OBJECTS)
+	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
+
+depend:
+	makedepend $(INCLUDES) $(MDFLAGS) -f$(MAKEFILE) $(SOURCES)
+
 clean:
-	rm -rf *.o *.gch *.so
+	rm -rf *.o *.gah *.so
