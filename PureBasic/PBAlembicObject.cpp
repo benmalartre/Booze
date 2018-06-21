@@ -10,19 +10,19 @@
 //----------------------------------------------------------
 EXPORT ABCGeometryScope ABC_GetGeometryScope(AlembicIObject* obj){
 	
-	Alembic::Abc::IObject* o = (Alembic::Abc::IObject*)obj;
+	Abc::IObject* o = (Abc::IObject*)obj;
 	
-	const Alembic::Abc::MetaData& md = o->getMetaData();
+	const Abc::MetaData& md = o->getMetaData();
 	
-	return (ABCGeometryScope)Alembic::AbcGeom::GetGeometryScope( md );
+	return (ABCGeometryScope)AbcG::GetGeometryScope( md );
 }
 
 // Set Geometry Scope
 //----------------------------------------------------------
 EXPORT void ABC_SetGeometryScope(AlembicIObject* obj, ABCGeometryScope scope){
-	Alembic::Abc::MetaData md = obj->GetIObject()->getMetaData();
-	Alembic::AbcGeom::GeometryScope iScope = (Alembic::AbcGeom::GeometryScope)scope;
-	Alembic::AbcGeom::SetGeometryScope( md, iScope );
+	Abc::MetaData md = obj->GetIObject()->getMetaData();
+	AbcG::GeometryScope iScope = (AbcG::GeometryScope)scope;
+	AbcG::SetGeometryScope( md, iScope );
 }
 
 // Init Object
@@ -35,36 +35,36 @@ EXPORT void ABC_InitObject(AlembicIObject* obj,ABCGeometricType type){
 //----------------------------------------------------------
 EXPORT AlembicIObject* ABC_GetObjectFromArchiveByID(AlembicIArchive* archive,uint64_t identifier)
 {
-	Alembic::Abc::IObject* obj = archive->GetObjectFromID(identifier);
+	Abc::IObject* obj = archive->GetObjectFromID(identifier);
 	if(obj){
-		if(Alembic::AbcGeom::IPolyMesh::matches(obj->getMetaData())){
+		if(AbcG::IPolyMesh::matches(obj->getMetaData())){
 			AlembicIPolymesh* polymesh = new AlembicIPolymesh(obj);
 			polymesh->Init(GeometricType_PolyMesh);
 			return (AlembicIObject*)polymesh;
 		}
-		else if(Alembic::AbcGeom::ISubD::matches(obj->getMetaData())){
+		else if(AbcG::ISubD::matches(obj->getMetaData())){
 			AlembicIPolymesh* polymesh = new AlembicIPolymesh(obj);
 			polymesh->Init(GeometricType_PolyMesh);
 			return (AlembicIObject*)polymesh;
 		}
-		else if(Alembic::AbcGeom::IPoints::matches(obj->getMetaData())){
+		else if(AbcG::IPoints::matches(obj->getMetaData())){
 			AlembicIPointCloud* points = new AlembicIPointCloud(obj);
 			points->Init(GeometricType_Points);
 			return (AlembicIObject*)points;
 		}
-		else if(Alembic::AbcGeom::IXform::matches(obj->getMetaData())){
+		else if(AbcG::IXform::matches(obj->getMetaData())){
 			AlembicIXForm* xform = new AlembicIXForm(obj);
 			return (AlembicIObject*)xform;
 		}
-		else if(Alembic::AbcGeom::ICurves::matches(obj->getMetaData())){
+		else if(AbcG::ICurves::matches(obj->getMetaData())){
 			AlembicICurves* curve = new AlembicICurves(obj);
 			return (AlembicIObject*)curve;
 		}
-		else if(Alembic::AbcGeom::ICamera::matches(obj->getMetaData())){
+		else if(AbcG::ICamera::matches(obj->getMetaData())){
 			AlembicICamera* camera = new AlembicICamera(obj);
 			return (AlembicIObject*)camera;
 		}
-		else if(Alembic::AbcGeom::ILight::matches(obj->getMetaData())){
+		else if(AbcG::ILight::matches(obj->getMetaData())){
 			AlembicILight* light = new AlembicILight(obj);
 			return (AlembicIObject*)light;
 		}
@@ -81,7 +81,7 @@ EXPORT AlembicIObject* ABC_GetObjectFromArchiveByName(AlembicIArchive* archive,c
 	archive->GetAllObjects();
 	for(int i=0;i<archive->GetNumObjects();i++)
 	{
-		Alembic::Abc::IObject* obj = archive->GetObjectFromID(i);
+		Abc::IObject* obj = archive->GetObjectFromID(i);
 		if(obj->getName()==name){
 			AlembicIObject* out = new AlembicIObject(obj);
 			return out;
@@ -95,10 +95,10 @@ EXPORT int ABC_GetNumProperties(AlembicIObject* obj)
 	return obj->GetNumProperties();
 }
 
-EXPORT const char* ABC_GetPropertyName(AlembicIObject* obj,int ID)
+EXPORT const char* ABC_GetPropertyName(AlembicIObject* obj,uint64_t id)
 {
     
-	AlembicIProperty* prop = obj->GetProperty(ID);
+	AlembicIProperty* prop = obj->GetProperty(id);
 	std::string name = (std::string)prop->GetName();
 
 	if(!name.size())
@@ -107,10 +107,10 @@ EXPORT const char* ABC_GetPropertyName(AlembicIObject* obj,int ID)
 	return name.c_str();
 }
 
-EXPORT AlembicIProperty* ABC_GetProperty(AlembicIObject* obj,int ID)
+EXPORT AlembicIProperty* ABC_GetProperty(AlembicIObject* obj,uint64_t id)
 {
-	if(ID<0 || ID >=obj->GetNumProperties())return NULL;
-	return obj->GetProperty(ID);
+	if(id >=obj->GetNumProperties())return NULL;
+	return obj->GetProperty(id);
 }
 
 EXPORT void ABC_Polymesh_ReadFrame()
@@ -129,7 +129,7 @@ EXPORT const char* ABC_GetObjectHeader(AlembicIObject* obj)
 	if(!obj->GetIObject()->valid())
 		return NULL;
 	
-	Alembic::AbcCoreAbstract::ObjectHeader header = obj->GetIObject()->getHeader();
+	AbcA::ObjectHeader header = obj->GetIObject()->getHeader();
 	std::string str = header.getFullName();//getMetaData().serialize();
 	 
 	if(!str.size())

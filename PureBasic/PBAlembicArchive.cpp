@@ -94,34 +94,34 @@ EXPORT uint64_t ABC_GetNumTimeSamplingInArchive(AlembicIArchive* archive)
 
 // Get Time Sampling at Index
 //---------------------------------------------------
-EXPORT Alembic::Abc::TimeSamplingPtr ABC_GetTimeSampling(AlembicIArchive* archive,uint32_t index)
+EXPORT Abc::TimeSamplingPtr ABC_GetTimeSampling(AlembicIArchive* archive,uint32_t index)
 {
     return archive->GetArchive()->getTimeSampling(index);
 }
 
 // Get Max Num Samples For Time Sampling
 //---------------------------------------------------
-EXPORT Alembic::Abc::index_t ABC_GetMaxNumSamplesForTimeSamplingIndex(AlembicIArchive* archive,uint32_t index)
+EXPORT Abc::index_t ABC_GetMaxNumSamplesForTimeSamplingIndex(AlembicIArchive* archive,uint32_t index)
 {
     return archive->GetArchive()->getMaxNumSamplesForTimeSamplingIndex(index);
 }
 
 // Get Start Frame
 //---------------------------------------------------
-EXPORT Alembic::Abc::chrono_t ABC_GetStartFrame(AlembicIArchive* archive)
+EXPORT Abc::chrono_t ABC_GetStartFrame(AlembicIArchive* archive)
 {
-    Alembic::Abc::IArchive* a = archive->GetArchive();
+    Abc::IArchive* a = archive->GetArchive();
     
-    Alembic::AbcCoreAbstract::TimeSamplingPtr sampler(a->getTimeSampling(1));
+    AbcA::TimeSamplingPtr sampler(a->getTimeSampling(1));
     return sampler->getSampleTime(0);
     
 }
 
 // Get End Frame
 //---------------------------------------------------
-EXPORT Alembic::Abc::chrono_t ABC_GetEndFrame(AlembicIArchive* archive)
+EXPORT Abc::chrono_t ABC_GetEndFrame(AlembicIArchive* archive)
 {
-    Alembic::AbcCoreAbstract::TimeSamplingPtr sampler = archive->GetArchive()->getTimeSampling(1);
-    Alembic::AbcCoreAbstract::index_t t = archive->GetArchive()->getMaxNumSamplesForTimeSamplingIndex(1);
+    AbcA::TimeSamplingPtr sampler = archive->GetArchive()->getTimeSampling(1);
+    AbcA::index_t t = archive->GetArchive()->getMaxNumSamplesForTimeSamplingIndex(1);
     return sampler->getSampleTime(t);
 }

@@ -3,11 +3,10 @@
 #include "PBAlembicPointCloud.h"
 
 using namespace std;
-using namespace Alembic::AbcGeom;
 
 EXPORT bool ABC_ObjectIsPointCloud(AlembicIObject* obj)
 {
-	return Alembic::AbcGeom::IPoints::matches(obj->GetIObject()->getMetaData());
+	return AbcG::IPoints::matches(obj->GetIObject()->getMetaData());
 	
 };
 
@@ -21,17 +20,17 @@ EXPORT void ABC_GetPointCloudSampleDescription(AlembicIObject* obj,float frame,A
 
 	if(!obj->GetIObject()->valid()||!ABC_ObjectIsPointCloud(obj))return;
     
-    Alembic::AbcGeom::IPoints points(*obj->GetIObject(),Alembic::Abc::kWrapExisting);
+    AbcG::IPoints points(*obj->GetIObject(),Abc::kWrapExisting);
 	if(!points.valid())return ;
     
 	// Get Sample Index
-	infos->_sampleindex = (Alembic::AbcCoreAbstract::index_t)int(frame)-1;
+	infos->_sampleindex = (AbcA::index_t)int(frame)-1;
 
    // Clamp if necessary
-   if(infos->_sampleindex >= (Alembic::AbcCoreAbstract::index_t)points.getSchema().getNumSamples())
-      infos->_sampleindex = Alembic::AbcCoreAbstract::index_t(points.getSchema().getNumSamples()) - 1;
+   if(infos->_sampleindex >= (AbcA::index_t)points.getSchema().getNumSamples())
+      infos->_sampleindex = AbcA::index_t(points.getSchema().getNumSamples()) - 1;
 	
-	Alembic::AbcGeom::IPointsSchema::Sample sample;
+	AbcG::IPointsSchema::Sample sample;
 	
 	points.getSchema().get(sample,infos->_sampleindex);
 	
@@ -41,27 +40,27 @@ EXPORT void ABC_GetPointCloudSampleDescription(AlembicIObject* obj,float frame,A
 
 EXPORT int ABC_UpdatePointCloudSample(AlembicIObject* obj,ABC_PointCloud_Sample_Infos* infos,ABC_PointCloud_Sample* io_sample)
 {
-	Alembic::AbcGeom::IPoints points(*obj->GetIObject(),Alembic::Abc::kWrapExisting);
-	Alembic::AbcGeom::ICompoundProperty argGeomParamsProp(points.getSchema().getArbGeomParams());
-	Alembic::AbcGeom::IPointsSchema::Sample sample;
+	AbcG::IPoints points(*obj->GetIObject(),Abc::kWrapExisting);
+	AbcG::ICompoundProperty argGeomParamsProp(points.getSchema().getArbGeomParams());
+	AbcG::IPointsSchema::Sample sample;
 	points.getSchema().get(sample,infos->_sampleindex);
 
-	Alembic::Abc::P3fArraySamplePtr pos = sample.getPositions();
+	Abc::P3fArraySamplePtr pos = sample.getPositions();
 	memcpy(io_sample->_position,&pos->get()[0],pos->size()*3*sizeof(float));
 
 	if(infos->_hasorientation)
 	{
-		Alembic::AbcGeom::ICompoundProperty argGeomParamsProp(points.getSchema().getArbGeomParams());
-		Alembic::AbcGeom::IC4fArrayProperty orientation(argGeomParamsProp,"Orientation");
-		Alembic::AbcGeom::C4fArraySamplePtr quat = orientation.getValue(0);
+		AbcG::ICompoundProperty argGeomParamsProp(points.getSchema().getArbGeomParams());
+		AbcG::IC4fArrayProperty orientation(argGeomParamsProp,"Orientation");
+		AbcG::C4fArraySamplePtr quat = orientation.getValue(0);
 		
 		memcpy(io_sample->_orientation,&quat->get()[0],quat->size()*sizeof(Imath::C4f));
 	}
 	if(infos->_hasscale)
 	{
 		
-		Alembic::AbcGeom::IV3fArrayProperty scale(argGeomParamsProp,"Scale");
-		Alembic::AbcGeom::V3fArraySamplePtr scl = scale.getValue(0);
+		AbcG::IV3fArrayProperty scale(argGeomParamsProp,"Scale");
+		AbcG::V3fArraySamplePtr scl = scale.getValue(0);
 		
 		memcpy(io_sample->_scale,&scl->get()[0],scl->size()*sizeof(Imath::V3f));
 	}

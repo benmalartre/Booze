@@ -6,8 +6,8 @@ using namespace std;
 
 EXPORT bool ABC_ObjectIsPolymesh(AlembicIObject* obj)
 {
-	//return Alembic::Abc::IArrayProperty::matches(obj->getMetaData());
-	return Alembic::AbcGeom::IPolyMesh::matches(obj->GetIObject()->getMetaData());;
+	//return Abc::IArrayProperty::matches(obj->getMetaData());
+	return AbcG::IPolyMesh::matches(obj->GetIObject()->getMetaData());;
 };
 
 EXPORT const char* ABC_TestPolymesh(AlembicIObject* obj,ABC_Polymesh_Topo_Sample_Infos* io_sample)
@@ -19,32 +19,32 @@ EXPORT void ABC_GetEnvelope(AlembicIObject* obj,ABC_Envelope_Sample* io_sample)
 {
 	if(!obj->GetIObject()->valid()||!ABC_ObjectIsPolymesh(obj))return;
 
-	Alembic::AbcGeom::IPolyMesh mesh(*obj->GetIObject(),Alembic::Abc::kWrapExisting);
+	AbcG::IPolyMesh mesh(*obj->GetIObject(),Abc::kWrapExisting);
 	if(!mesh.valid())return ;
 
-	Alembic::AbcGeom::ICompoundProperty argGeomParamsProp(mesh.getSchema().getArbGeomParams());
+	AbcG::ICompoundProperty argGeomParamsProp(mesh.getSchema().getArbGeomParams());
 
-	long offset;
+	uint64_t offset;
 	if(argGeomParamsProp.valid()){
 		offset = 0;	
-		 for(long i=0;i<(long)argGeomParamsProp.getNumProperties();i++){
-			 Alembic::AbcGeom::PropertyHeader h = argGeomParamsProp.getPropertyHeader(i);
+		 for(uint64_t i=0;i<(uint64_t)argGeomParamsProp.getNumProperties();i++){
+			 AbcG::PropertyHeader h = argGeomParamsProp.getPropertyHeader(i);
 
 			  if(h.getName() == "EnvelopeWeights"){
-					Alembic::AbcGeom::IC4fArrayProperty weights(argGeomParamsProp,h.getName());
-					Alembic::AbcGeom::C4fArraySamplePtr propPtr1 = weights.getValue(0);
-					long nbp = (long)propPtr1->size();
+					AbcG::IC4fArrayProperty weights(argGeomParamsProp,h.getName());
+					AbcG::C4fArraySamplePtr propPtr1 = weights.getValue(0);
+					uint64_t nbp = (uint64_t)propPtr1->size();
 					memcpy(io_sample->_weights,propPtr1->get(),nbp * sizeof(Imath::Color4f));
 			  }
 			  else if(h.getName() == "EnvelopeIndices"){
-				Alembic::AbcGeom::IC4cArrayProperty indices(argGeomParamsProp,h.getName());
-				Alembic::AbcGeom::C4cArraySamplePtr propPtr1 = indices.getValue(0);
-				long nbp = (long)propPtr1->size();
+				AbcG::IC4cArrayProperty indices(argGeomParamsProp,h.getName());
+				AbcG::C4cArraySamplePtr propPtr1 = indices.getValue(0);
+				uint64_t nbp = (uint64_t)propPtr1->size();
 				memcpy(io_sample->_indices,propPtr1->get(),nbp * sizeof(Imath::Color4c));
 				
 			  }
 			  else if(h.getName() == "EnvelopeNbDeformers"){
-				Alembic::AbcGeom::IUInt32Property nbdeformers(argGeomParamsProp,h.getName());
+				AbcG::IUInt32Property nbdeformers(argGeomParamsProp,h.getName());
 				io_sample->_nbdeformers = nbdeformers.getValue(0);
 			  }
 		 }
@@ -56,20 +56,20 @@ EXPORT void ABC_GetPolymeshTopoSampleDescription(AlembicIObject* obj,float frame
 {
 	if(!obj->GetIObject()->valid()||!ABC_ObjectIsPolymesh(obj))return;
 
-	Alembic::AbcGeom::IPolyMesh mesh(*obj->GetIObject(),Alembic::Abc::kWrapExisting);
+	AbcG::IPolyMesh mesh(*obj->GetIObject(),Abc::kWrapExisting);
 	if(!mesh.valid())return ;
 
 	
 	// Get Sample Index
-	Alembic::AbcCoreAbstract::index_t sampleIndex = (Alembic::AbcCoreAbstract::index_t)int(frame)-1;
+	AbcA::index_t sampleIndex = (AbcA::index_t)int(frame)-1;
 
    // Clamp if necessary
    if(infos->_sampleindex < 0)
       infos->_sampleindex = 0;
-   else if(infos->_sampleindex >= (Alembic::AbcCoreAbstract::index_t)mesh.getSchema().getNumSamples())
+   else if(infos->_sampleindex >= (AbcA::index_t)mesh.getSchema().getNumSamples())
       infos->_sampleindex = int(mesh.getSchema().getNumSamples()) - 1;
 	
-	Alembic::AbcGeom::IPolyMeshSchema::Sample sample;
+	AbcG::IPolyMeshSchema::Sample sample;
 	mesh.getSchema().get(sample,infos->_sampleindex);
 	
 	infos->_nbpoints = sample.getPositions()->size();
@@ -85,10 +85,10 @@ EXPORT void ABC_GetPolymeshTopoSampleDescription(AlembicIObject* obj,float frame
 
 	// check for normals
 	infos->_hasnormal = false;
-	Alembic::AbcGeom::IN3fGeomParam meshNormParam = mesh.getSchema().getNormalsParam();
+	AbcG::IN3fGeomParam meshNormParam = mesh.getSchema().getNormalsParam();
 	if(meshNormParam.valid())
 	{
-		Alembic::AbcGeom::N3fArraySamplePtr meshNorm = meshNormParam.getExpandedValue().getVals();
+		AbcG::N3fArraySamplePtr meshNorm = meshNormParam.getExpandedValue().getVals();
 		
 		//io_sample->_nbnorm = meshNorm->size();
 		if(meshNorm->size() == infos->_nbindices)
@@ -99,10 +99,10 @@ EXPORT void ABC_GetPolymeshTopoSampleDescription(AlembicIObject* obj,float frame
 	
 	// check for uvs
 	infos->_hasuvs = false;
-	Alembic::AbcGeom::IV2fGeomParam meshUVsParam = mesh.getSchema().getUVsParam();
+	AbcG::IV2fGeomParam meshUVsParam = mesh.getSchema().getUVsParam();
 	if(meshUVsParam.valid())
 	{
-		Alembic::AbcGeom::V2fArraySamplePtr meshUVs = meshUVsParam.getExpandedValue(0).getVals();
+		AbcG::V2fArraySamplePtr meshUVs = meshUVsParam.getExpandedValue(0).getVals();
 		if(meshUVs->size() == infos->_nbindices)
 		{
 			infos->_hasuvs = true;
@@ -114,10 +114,10 @@ EXPORT void ABC_GetPolymeshTopoSampleDescription(AlembicIObject* obj,float frame
 	
 	// check for color
 	infos->_hascolor = false;
-	Alembic::AbcGeom::ICompoundProperty argGeomParamsProp (mesh.getSchema().getArbGeomParams());
+	AbcG::ICompoundProperty argGeomParamsProp (mesh.getSchema().getArbGeomParams());
 	if(argGeomParamsProp.valid()){
-		 for(long i=0;i<(long)argGeomParamsProp.getNumProperties();i++){
-			 Alembic::AbcGeom::PropertyHeader h = argGeomParamsProp.getPropertyHeader(i);
+		 for(uint64_t i=0;i<(uint64_t)argGeomParamsProp.getNumProperties();i++){
+			 AbcG::PropertyHeader h = argGeomParamsProp.getPropertyHeader(i);
 
 			  if(h.getName() == "Colors"){
 				infos->_hascolor = true;
@@ -129,8 +129,8 @@ EXPORT void ABC_GetPolymeshTopoSampleDescription(AlembicIObject* obj,float frame
 	// check for envelope
 	infos->_hasenvelope = false;
 	if(argGeomParamsProp.valid()){
-		 for(long i=0;i<(long)argGeomParamsProp.getNumProperties();i++){
-			 Alembic::AbcGeom::PropertyHeader h = argGeomParamsProp.getPropertyHeader(i);
+		 for(uint64_t i=0;i<(uint64_t)argGeomParamsProp.getNumProperties();i++){
+			 AbcG::PropertyHeader h = argGeomParamsProp.getPropertyHeader(i);
 
 			  if(h.getName() == "EnvelopeWeights" || h.getName() == "EnvelopeIndices"){
 				infos->_hasenvelope = true;
@@ -142,36 +142,36 @@ EXPORT void ABC_GetPolymeshTopoSampleDescription(AlembicIObject* obj,float frame
 
 EXPORT int ABC_UpdatePolymeshTopoSample(AlembicIObject* obj,ABC_Polymesh_Topo_Sample_Infos* infos,ABC_Polymesh_Topo_Sample* io_sample)
 {
-	Alembic::AbcGeom::IPolyMesh mesh(*obj->GetIObject(),Alembic::Abc::kWrapExisting);
+	AbcG::IPolyMesh mesh(*obj->GetIObject(),Abc::kWrapExisting);
 
-	Alembic::AbcGeom::IPolyMeshSchema::Sample sample;
+	AbcG::IPolyMeshSchema::Sample sample;
 	mesh.getSchema().get(sample,infos->_sampleindex);
 
-	Alembic::AbcGeom::P3fArraySamplePtr meshPos = sample.getPositions();
-	Alembic::AbcGeom::Int32ArraySamplePtr meshFaceCount = sample.getFaceCounts();
-	Alembic::AbcGeom::Int32ArraySamplePtr meshFaceIndices = sample.getFaceIndices();
+	AbcG::P3fArraySamplePtr meshPos = sample.getPositions();
+	AbcG::Int32ArraySamplePtr meshFaceCount = sample.getFaceCounts();
+	AbcG::Int32ArraySamplePtr meshFaceIndices = sample.getFaceIndices();
 
 
 	std::vector<int> triToSample;
 	
-	int offset=0;
-	int offset1;
+	size_t offset=0;
+	size_t offset1;
 	memcpy(io_sample->_positions,meshPos->get(),meshPos->size() * sizeof(Imath::V3f));
 
-   int nbv;
-   int nbt;
-   int z=0;
-	int last;
+   	size_t nbv;
+   	size_t nbt;
+   	size_t z=0;
+	size_t last;
 
 
    // Build TriToSample Array
-   for(int x=0;x<meshFaceCount->size();x++)
+   for(size_t x=0;x<meshFaceCount->size();x++)
    {
 		nbv = meshFaceCount->get()[x];
 		io_sample->_facecount[x]=nbv;
 		nbt = nbv-2;
 		last = z+nbv-1;
-		for(int y=0;y<nbt;y++){
+		for(size_t y=0;y<nbt;y++){
 			triToSample.push_back(z+y);
 			triToSample.push_back(z+y+1);
 			triToSample.push_back(last);
@@ -187,10 +187,10 @@ EXPORT int ABC_UpdatePolymeshTopoSample(AlembicIObject* obj,ABC_Polymesh_Topo_Sa
 	*/
    memcpy(io_sample->_faceindices,meshFaceIndices->get(),meshFaceIndices->size() * sizeof(uint32_t));
 
-   Alembic::AbcGeom::IN3fGeomParam meshNormParam = mesh.getSchema().getNormalsParam();
+   AbcG::IN3fGeomParam meshNormParam = mesh.getSchema().getNormalsParam();
 	if(infos->_hasnormal==true && meshNormParam.valid())
 	{
-		Alembic::AbcGeom::N3fArraySamplePtr meshNorm = meshNormParam.getExpandedValue().getVals();
+		AbcG::N3fArraySamplePtr meshNorm = meshNormParam.getExpandedValue().getVals();
 		
 		//io_sample->_nbnorm = meshNorm->size();
 		if(meshNorm->size() == infos->_nbindices)
@@ -199,7 +199,7 @@ EXPORT int ABC_UpdatePolymeshTopoSample(AlembicIObject* obj,ABC_Polymesh_Topo_Sa
 			// let's apply it!
 			 offset = 0;
 			 int x;
-			 for(int i=0;i<infos->_nbsamples;i++){
+			 for(size_t i=0;i<infos->_nbsamples;i++){
 				 x = triToSample[i];
 				io_sample->_normals[offset++] = meshNorm->get()[x].x;
 				io_sample->_normals[offset++] = meshNorm->get()[x].y;
@@ -209,11 +209,11 @@ EXPORT int ABC_UpdatePolymeshTopoSample(AlembicIObject* obj,ABC_Polymesh_Topo_Sa
 	}
 	
 	offset = 0;
-	Alembic::AbcGeom::IV2fGeomParam meshUVsParam = mesh.getSchema().getUVsParam();
+	AbcG::IV2fGeomParam meshUVsParam = mesh.getSchema().getUVsParam();
 	if(infos->_hasuvs==true && meshUVsParam.valid())
 	{
 		
-		Alembic::AbcGeom::V2fArraySamplePtr meshUVs = meshUVsParam.getExpandedValue(0).getVals();
+		AbcG::V2fArraySamplePtr meshUVs = meshUVsParam.getExpandedValue(0).getVals();
 		if(meshUVs->size() == infos->_nbindices)
 		{
 			
@@ -236,16 +236,16 @@ EXPORT int ABC_UpdatePolymeshTopoSample(AlembicIObject* obj,ABC_Polymesh_Topo_Sa
 		
 	}
 
-	Alembic::AbcGeom::ICompoundProperty argGeomParamsProp(mesh.getSchema().getArbGeomParams());
+	AbcG::ICompoundProperty argGeomParamsProp(mesh.getSchema().getArbGeomParams());
 	if(infos->_hascolor==true && argGeomParamsProp.valid()){
 		offset = 0;	
-		 for(long i=0;i<(long)argGeomParamsProp.getNumProperties();i++){
-			 Alembic::AbcGeom::PropertyHeader h = argGeomParamsProp.getPropertyHeader(i);
+		 for(size_t i=0;i<(size_t)argGeomParamsProp.getNumProperties();i++){
+			 AbcG::PropertyHeader h = argGeomParamsProp.getPropertyHeader(i);
 
 			  if(h.getName() == "Colors"){
-				Alembic::AbcGeom::IC4fArrayProperty colors(argGeomParamsProp,h.getName());
-				Alembic::AbcGeom::C4fArraySamplePtr propPtr1 = colors.getValue(0);
-				long nbp = (long)propPtr1->size();
+				AbcG::IC4fArrayProperty colors(argGeomParamsProp,h.getName());
+				AbcG::C4fArraySamplePtr propPtr1 = colors.getValue(0);
+				size_t nbp = (size_t)propPtr1->size();
 				Imath::Color4f color;
 				
 				
@@ -270,12 +270,12 @@ EXPORT void ABC_UpdatePointPosition(AlembicIObject* obj,ABC_Polymesh_Topo_Sample
 
 EXPORT int ABC_UpdatePolymeshSample(AlembicIObject* obj,ABC_Polymesh_Topo_Sample_Infos* infos,ABC_Polymesh_Topo_Sample* io_sample)
 {
-	Alembic::AbcGeom::IPolyMesh mesh(*obj->GetIObject(),Alembic::Abc::kWrapExisting);
+	AbcG::IPolyMesh mesh(*obj->GetIObject(),Abc::kWrapExisting);
 
-	Alembic::AbcGeom::IPolyMeshSchema::Sample sample;
+	AbcG::IPolyMeshSchema::Sample sample;
 	mesh.getSchema().get(sample,infos->_sampleindex);
 
-	Alembic::AbcGeom::P3fArraySamplePtr meshPos = sample.getPositions();
+	AbcG::P3fArraySamplePtr meshPos = sample.getPositions();
 
 	int offset=0;
 	int offset1;
@@ -288,10 +288,10 @@ EXPORT int ABC_UpdatePolymeshSample(AlembicIObject* obj,ABC_Polymesh_Topo_Sample
    }
 	*/
 	memcpy(io_sample->_positions,&meshPos->get()[0],infos->_nbpoints*3*sizeof(float));
-   Alembic::AbcGeom::IN3fGeomParam meshNormParam = mesh.getSchema().getNormalsParam();
+   AbcG::IN3fGeomParam meshNormParam = mesh.getSchema().getNormalsParam();
 	if(meshNormParam.valid())
 	{
-		Alembic::AbcGeom::N3fArraySamplePtr meshNorm = meshNormParam.getExpandedValue().getVals();
+		AbcG::N3fArraySamplePtr meshNorm = meshNormParam.getExpandedValue().getVals();
 		
 		//io_sample->_nbnorm = meshNorm->size();
 		if(meshNorm->size() == infos->_nbindices)

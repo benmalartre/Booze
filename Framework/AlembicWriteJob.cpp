@@ -16,7 +16,7 @@ AlembicWriteJob::AlembicWriteJob(const std::string & in_FileName,const CRefArray
    _filename = in_FileName;
    mSelection = in_Selection;
 
-   for(LONG i=0;i<in_Frames.GetCount();i++)
+   for(uint64_t i=0;i<in_Frames.GetCount();i++)
       _frames.push_back(in_Frames[i]);
 }
 
@@ -109,7 +109,7 @@ ABCStatus AlembicWriteJob::Process()
 
    // create object for each
    std::vector<SIAlembicOObjectPtr> objects;
-   for(LONG i=0;i<_selection.GetCount();i++)
+   for(uint64_t i=0;i<_selection.GetCount();i++)
    {
       X3DObject xObj(_selection[i]);
 	  Application().LogMessage(L"Type : "+xObj.GetType());
@@ -144,12 +144,12 @@ ABCStatus AlembicWriteJob::Process()
    ProgressBar prog;
    prog = Application().GetUIToolkit().GetProgressBar();
    prog.PutMinimum(0);
-   prog.PutMaximum((LONG)(_frames.size() * objects.size()));
+   prog.PutMaximum((uint64_t)(_frames.size() * objects.size()));
    prog.PutValue(0);
    prog.PutCancelEnabled(true);
    prog.PutVisible(true);
 
-   Application().LogMessage(L"Frames Size : "+(CString)(ULONG)_frames.size());
+   Application().LogMessage(L"Frames Size : "+(CString)(uint64_t)_frames.size());
 
    for(unsigned int frame=0; frame < (unsigned int)_frames.size(); frame++)
    {

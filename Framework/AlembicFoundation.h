@@ -199,4 +199,9 @@ typedef enum ABCTopoVariance_ ABCTopoVariance;
 typedef enum ABCDataTraits_ ABCDataTraits;
 typedef enum ABCArchiveType_ ABCArchiveType;
 
+namespace Abc  = ::Alembic::Abc;;
+namespace AbcA = ::Alembic::AbcCoreAbstract;
+namespace AbcF = ::Alembic::AbcCoreFactory;
+namespace AbcG = ::Alembic::AbcGeom;
+
 #endif  // _BOOZE_FOUNDATION_H_

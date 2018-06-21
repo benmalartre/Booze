@@ -16,7 +16,7 @@ EXPORT bool ABC_GetAttributeSampleDescription(AlembicIProperty* prop,float frame
 	infos->_time = frame;
 	infos->_traits = prop->GetDataTraits();
 	infos->_type = prop->GetPropertyType();
-    infos->_nbitems = prop->GetNbItems((Alembic::Abc::chrono_t)frame);
+    infos->_nbitems = prop->GetNbItems((Abc::chrono_t)frame);
     return true;
 
 }
@@ -51,43 +51,43 @@ EXPORT void ABC_GetAttributeSample(AlembicIProperty* prop,ABC_Attribute_Sample_I
 				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(bool));
 				break;
 			case DataTraits_UChar:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Alembic::Abc::uint8_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Abc::uint8_t));
 				break;
 			case DataTraits_Char:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Alembic::Abc::int8_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Abc::int8_t));
 				break;
 			case DataTraits_UInt16:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Alembic::Abc::uint16_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Abc::uint16_t));
 				break;
 			case DataTraits_Int16:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Alembic::Abc::int16_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Abc::int16_t));
 				break;
 			case DataTraits_UInt32:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Alembic::Abc::uint32_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Abc::uint32_t));
 				break;
 			case DataTraits_Int32:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Alembic::Abc::int32_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Abc::int32_t));
 				break;
 			case DataTraits_UInt64:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Alembic::Abc::uint64_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Abc::uint64_t));
 				break;
 			case DataTraits_Int64:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Alembic::Abc::int64_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Abc::int64_t));
 				break;
 			case DataTraits_Half:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Alembic::Abc::float16_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Abc::float16_t));
 				break;
 			case DataTraits_Float:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Alembic::Abc::float32_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Abc::float32_t));
 				break;
 			case DataTraits_Double:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Alembic::Abc::float64_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Abc::float64_t));
 				break;
 			case DataTraits_String:
-				//memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Alembic::Abc::float32_t));
+				//memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Abc::float32_t));
 				break;
 			case DataTraits_WString:
-				//memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Alembic::Abc::float64_t));
+				//memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Abc::float64_t));
 				break;
 
 			case DataTraits_V2s:
@@ -226,50 +226,50 @@ EXPORT void ABC_GetAttributeSample(AlembicIProperty* prop,ABC_Attribute_Sample_I
 			break;
 		case PropertyType_Array:
 		{
-			Alembic::Abc::uint64_t nb = infos->_nbitems;
+			Abc::uint64_t nb = infos->_nbitems;
 			switch(prop->GetDataTraits())
 			{
 			case DataTraits_Bool:
 				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(bool));
 				break;
 			case DataTraits_UChar:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Alembic::Abc::uint8_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Abc::uint8_t));
 				break;
 			case DataTraits_Char:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Alembic::Abc::int8_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Abc::int8_t));
 				break;
 			case DataTraits_UInt16:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Alembic::Abc::uint16_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Abc::uint16_t));
 				break;
 			case DataTraits_Int16:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Alembic::Abc::int16_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Abc::int16_t));
 				break;
 			case DataTraits_UInt32:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Alembic::Abc::uint32_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Abc::uint32_t));
 				break;
 			case DataTraits_Int32:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Alembic::Abc::int32_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Abc::int32_t));
 				break;
 			case DataTraits_UInt64:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Alembic::Abc::uint64_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Abc::uint64_t));
 				break;
 			case DataTraits_Int64:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Alembic::Abc::int64_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Abc::int64_t));
 				break;
 			case DataTraits_Half:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Alembic::Abc::float16_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Abc::float16_t));
 				break;
 			case DataTraits_Float:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Alembic::Abc::float32_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Abc::float32_t));
 				break;
 			case DataTraits_Double:
-				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Alembic::Abc::float64_t));
+				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Abc::float64_t));
 				break;
 			case DataTraits_String:
-				//memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Alembic::Abc::float32_t));
+				//memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Abc::float32_t));
 				break;
 			case DataTraits_WString:
-				//memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Alembic::Abc::float64_t));
+				//memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Abc::float64_t));
 				break;
 
 			case DataTraits_V2s:
