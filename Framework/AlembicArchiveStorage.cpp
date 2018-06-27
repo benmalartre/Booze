@@ -86,7 +86,7 @@ AlembicIArchive::AlembicIArchive(std::string path)
      //double time_start = getTimeSec();
      
     _archive = factory.getArchive(path, coreType);
-
+	getStartEndTimes();
 }
 
 AlembicIArchive::~AlembicIArchive()
@@ -116,12 +116,15 @@ void AlembicIArchive::Open(std::string path)
      //double time_start = getTimeSec();
      
      _archive = factory.getArchive(path, coreType);
-     
-     if (_archive.valid())
-     {
-     printf("héhéhé");
-     }
+     getStartEndTimes();
+}
 
+void AlembicIArchive::getStartEndTimes()
+{
+	if (_archive.valid())
+     {
+		Abc::GetArchiveStartAndEndTime(_archive, _startTime, _endTime);
+     }
 }
 
 void AlembicIArchive::Close()

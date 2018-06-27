@@ -7,9 +7,6 @@
 #include "AlembicPolyMsh.h"
 */
 
-namespace AbcA = ::Alembic::AbcCoreAbstract::ALEMBIC_VERSION_NS;
-using namespace AbcA;
-
 /*
 AlembicWriteJob::AlembicWriteJob(const std::string & in_FileName,const CRefArray & in_Selection,const CDoubleArray & in_Frames)
 {

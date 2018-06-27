@@ -92,13 +92,6 @@ EXPORT uint64_t ABC_GetNumTimeSamplingInArchive(AlembicIArchive* archive)
 	return archive->GetNumTimeSamplings();
 }
 
-// Get Time Sampling at Index
-//---------------------------------------------------
-EXPORT Abc::TimeSamplingPtr ABC_GetTimeSampling(AlembicIArchive* archive,uint32_t index)
-{
-    return archive->GetArchive()->getTimeSampling(index);
-}
-
 // Get Max Num Samples For Time Sampling
 //---------------------------------------------------
 EXPORT Abc::index_t ABC_GetMaxNumSamplesForTimeSamplingIndex(AlembicIArchive* archive,uint32_t index)
@@ -108,20 +101,14 @@ EXPORT Abc::index_t ABC_GetMaxNumSamplesForTimeSamplingIndex(AlembicIArchive* ar
 
 // Get Start Frame
 //---------------------------------------------------
-EXPORT Abc::chrono_t ABC_GetStartFrame(AlembicIArchive* archive)
+EXPORT float ABC_GetStartFrame(AlembicIArchive* archive, uint64_t fps)
 {
-    Abc::IArchive* a = archive->GetArchive();
-    
-    AbcA::TimeSamplingPtr sampler(a->getTimeSampling(1));
-    return sampler->getSampleTime(0);
-    
+    return archive->getStartTime()*(float)fps;
 }
 
 // Get End Frame
 //---------------------------------------------------
-EXPORT Abc::chrono_t ABC_GetEndFrame(AlembicIArchive* archive)
+EXPORT float ABC_GetEndFrame(AlembicIArchive* archive, uint64_t fps)
 {
-    AbcA::TimeSamplingPtr sampler = archive->GetArchive()->getTimeSampling(1);
-    AbcA::index_t t = archive->GetArchive()->getMaxNumSamplesForTimeSamplingIndex(1);
-    return sampler->getSampleTime(t);
+    return archive->getEndTime()*(float)fps;
 }

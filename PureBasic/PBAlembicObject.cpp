@@ -28,7 +28,6 @@ EXPORT void ABC_SetGeometryScope(AlembicIObject* obj, ABCGeometryScope scope){
 // Init Object
 //----------------------------------------------------------
 EXPORT void ABC_InitObject(AlembicIObject* obj,ABCGeometricType type){
-    std::cout << "ABC_OBJECT INIT CALLED" <<std::endl;
 	obj->Init(type);
 }
 // Get Object From Archive
@@ -130,7 +129,7 @@ EXPORT const char* ABC_GetObjectHeader(AlembicIObject* obj)
 		return NULL;
 	
 	AbcA::ObjectHeader header = obj->GetIObject()->getHeader();
-	std::string str = header.getFullName();//getMetaData().serialize();
+	std::string str = header.getFullName();
 	 
 	if(!str.size())
 		return NULL;

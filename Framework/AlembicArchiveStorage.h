@@ -14,6 +14,9 @@ using namespace std;
 
 class AlembicIArchive
 {
+private:
+	double _startTime;
+	double _endTime;
 public:
 	std::vector<Alembic::Abc::IObject*> _objects;
 	Alembic::Abc::IArchive _archive;
@@ -32,6 +35,9 @@ public:
 	Alembic::Abc::IObject* GetObjectFromID(std::string identifier);
 	Alembic::Abc::IObject* GetObjectFromID(std::string identifier,std::string& debug);
 	Alembic::Abc::IObject* GetObjectFromID(uint64_t id);
+	void getStartEndTimes();
+	double getStartTime(){return _startTime;};
+	double getEndTime(){return _endTime;};
 };
 
 class AlembicOArchive

@@ -222,6 +222,9 @@ EXPORT void ABC_GetAttributeSample(AlembicIProperty* prop,ABC_Attribute_Sample_I
 			case DataTraits_N3d:
 				memcpy(io_sample->_datas,prop->GetSample(infos->_time),sizeof(Imath::V3d));
 				break;
+			default:
+				//DO NOTHING
+				break;
 			}
 			break;
 		case PropertyType_Array:
@@ -404,9 +407,16 @@ EXPORT void ABC_GetAttributeSample(AlembicIProperty* prop,ABC_Attribute_Sample_I
 			case DataTraits_N3d:
 				memcpy(io_sample->_datas,prop->GetSample(infos->_time),nb*sizeof(Imath::V3d));
 				break;
+			default:
+				// DO NOTHING
+				break;
 			}
 		}
 		break;
+		default:
+		{
+			// DO NOTHING
+		}
 	}
 }
 
