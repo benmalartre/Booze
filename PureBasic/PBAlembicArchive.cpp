@@ -1,4 +1,16 @@
 #include "PBAlembicRegister.h"
+
+// DOes the lib was compiled with hdf5 support
+//---------------------------------------------------
+EXPORT bool ABC_HasHDF5Support()
+{
+#ifdef ALEMBIC_WITH_HDF5
+	return true;
+#else
+	return false;
+#endif
+}
+
 // Create Archive Manager
 //---------------------------------------------------
 EXPORT AlembicArchiveManager* ABC_CreateArchiveManager()
@@ -15,6 +27,20 @@ EXPORT void  ABC_DeleteArchiveManager(AlembicArchiveManager* manager)
 		manager->DeleteAllArchives();
 		delete manager;
 	}
+}
+
+// Archive Valid
+//---------------------------------------------------
+EXPORT bool ABC_ArchiveValid(AlembicIArchive* archive)
+{
+	return archive->IsValid();
+}
+
+// Archive Format
+//---------------------------------------------------
+EXPORT const char* ABC_ArchiveFormat(AlembicIArchive* archive)
+{
+	return archive->GetFormat();
 }
 
 // Get Num Objects In Archive
@@ -62,6 +88,7 @@ EXPORT const char* ABC_GetInfosFromArchive(AlembicIArchive* archive)
     return infos.c_str();
 }
 
+
 // Open Archive
 //---------------------------------------------------
 EXPORT AlembicIArchive* ABC_OpenArchive(AlembicArchiveManager* manager,const char* filename)
@@ -103,12 +130,12 @@ EXPORT Abc::index_t ABC_GetMaxNumSamplesForTimeSamplingIndex(AlembicIArchive* ar
 //---------------------------------------------------
 EXPORT float ABC_GetStartFrame(AlembicIArchive* archive, uint64_t fps)
 {
-    return archive->getStartTime()*(float)fps;
+    return archive->GetStartTime()*(float)fps;
 }
 
 // Get End Frame
 //---------------------------------------------------
 EXPORT float ABC_GetEndFrame(AlembicIArchive* archive, uint64_t fps)
 {
-    return archive->getEndTime()*(float)fps;
+    return archive->GetEndTime()*(float)fps;
 }

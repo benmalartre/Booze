@@ -3,7 +3,9 @@
 
 #include <Alembic/AbcCoreAbstract/All.h>
 #include <Alembic/AbcCoreFactory/All.h>
+#ifdef ALEMBIC_WITH_HDF5
 #include <Alembic/AbcCoreHDF5/All.h>
+#endif
 
 #include "AlembicFoundation.h"
 #include "AlembicObject.h"
@@ -17,6 +19,8 @@ class AlembicIArchive
 private:
 	double _startTime;
 	double _endTime;
+	bool _valid;
+	std::string _format;
 public:
 	std::vector<Alembic::Abc::IObject*> _objects;
 	Alembic::Abc::IArchive _archive;
@@ -28,6 +32,8 @@ public:
 	void Close();
 	string GetName();
 	Alembic::Abc::IArchive* GetArchive();
+	bool IsValid(){ return _valid; };
+	const char* GetFormat(){ return _format.c_str(); };
 	void GetAllObjects();
 	void GetObjectChildren(Alembic::Abc::IObject* obj);
 	uint64_t GetNumObjects();
@@ -35,9 +41,9 @@ public:
 	Alembic::Abc::IObject* GetObjectFromID(std::string identifier);
 	Alembic::Abc::IObject* GetObjectFromID(std::string identifier,std::string& debug);
 	Alembic::Abc::IObject* GetObjectFromID(uint64_t id);
-	void getStartEndTimes();
-	double getStartTime(){return _startTime;};
-	double getEndTime(){return _endTime;};
+	void GetStartEndTimes();
+	double GetStartTime(){return _startTime;};
+	double GetEndTime(){return _endTime;};
 };
 
 class AlembicOArchive

@@ -15,10 +15,13 @@ AlembicIArchive* AlembicArchiveManager::GetArchiveFromID(std::string path)
 		{
 			fclose(file);
 			AlembicIArchive* archive = new AlembicIArchive(path);
-			AddArchive(archive);
-
-			// initialize objects list
-			archive->GetAllObjects();
+			if (archive->IsValid())
+			{
+				// add archive to global map
+				AddArchive(archive);
+				// initialize objects list
+				archive->GetAllObjects();
+			}
 			return archive;
 		}
 		return NULL;
@@ -75,18 +78,13 @@ uint64_t AlembicArchiveManager::GetNumOpenArchives()
 	return (uint64_t)_archives.size();
 }
 
+
+	
 // IArchive
 //----------------------------------------------------------
 AlembicIArchive::AlembicIArchive(std::string path)
 {
-	//_archive = new IArchive( Alembic::AbcCoreHDF5::ReadArchive(), path);
-     Alembic::AbcCoreFactory::IFactory factory;
-     Alembic::AbcCoreFactory::IFactory::CoreType coreType;
-     //factory.setOgawaNumStreams(ogawaStreams);
-     //double time_start = getTimeSec();
-     
-    _archive = factory.getArchive(path, coreType);
-	getStartEndTimes();
+	Open(path);
 }
 
 AlembicIArchive::~AlembicIArchive()
@@ -109,17 +107,31 @@ void AlembicIArchive::Open(std::string path)
 {
 	Close();
 
-     //_archive = new IArchive( Alembic::AbcCoreHDF5::ReadArchive(true), path);
-     Alembic::AbcCoreFactory::IFactory factory;
-     Alembic::AbcCoreFactory::IFactory::CoreType coreType;
-     //factory.setOgawaNumStreams(ogawaStreams);
-     //double time_start = getTimeSec();
-     
-     _archive = factory.getArchive(path, coreType);
-     getStartEndTimes();
+	//_archive = new IArchive( Alembic::AbcCoreHDF5::ReadArchive(), path);
+	AbcF::IFactory factory;
+	AbcF::IFactory::CoreType coreType;
+	//factory.setOgawaNumStreams(ogawaStreams);
+	//factory.setPolicy(Abc::ErrorHandler::kThrowPolicy);
+	_valid = false;
+	_archive = factory.getArchive(path, coreType);
+	if (coreType == AbcF::IFactory::kHDF5)
+	{
+		_format = "hdf5";
+#ifdef ALEMBIC_WITH_HDF5
+		_valid = true;
+#endif
+	}
+	else if (coreType == AbcF::IFactory::kOgawa)
+	{
+		_format = "ogawa";
+		_valid = true;
+	}
+	else _format = "unknown";
+	if (_valid) GetStartEndTimes();
+
 }
 
-void AlembicIArchive::getStartEndTimes()
+void AlembicIArchive::GetStartEndTimes()
 {
 	if (_archive.valid())
      {

@@ -117,12 +117,6 @@ EXPORT void ABC_Polymesh_ReadFrame()
 
 }
 
-EXPORT const char* ABC_TestString(char* input)
-{
-	std::string out=std::string(input);
-	return out.c_str();
-}
-
 EXPORT const char* ABC_GetObjectHeader(AlembicIObject* obj)
 {
 	if(!obj->GetIObject()->valid())
