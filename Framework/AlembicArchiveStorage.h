@@ -13,6 +13,7 @@
 
 
 using namespace std;
+extern bool ABC_HDF5_SUPPORT;
 
 class AlembicIArchive
 {

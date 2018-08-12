@@ -1,6 +1,12 @@
 #include "AlembicArchiveStorage.h"
 #include <map>
 
+#ifdef ALEMBIC_WITH_HDF5
+extern bool ABC_HDF5_SUPPORT = true;
+#else
+extern bool ABC_HDF5_SUPPORT = false;
+#endif
+
 // Archive Manager
 //--------------------------------------------------------
 AlembicIArchive* AlembicArchiveManager::GetArchiveFromID(std::string path)

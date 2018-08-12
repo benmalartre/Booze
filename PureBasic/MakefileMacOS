@@ -41,7 +41,7 @@ C++FLAGS = $(CFLAGS) \
 ILM_INCLUDES = /usr/local/include/OpenEXR
 ABC_INCLUDES = /usr/local/include/Alembic
 HDF_INCLUDES = /usr/local/include
-BOOZE_INCLUDES = /Users/benmalartre/Documents/RnD/booze/Framework
+BOOZE_INCLUDES = /Users/benmalartre/Documents/RnD/booze/PureBasic
 INCLUDES = -I$(ILM_INCLUDES) -I$(ABC_INCLUDES) -I$(HDF_INCLUDES) -I$(BOOZE_INCLUDES)
 
 # libraries
@@ -49,7 +49,6 @@ INCLUDES = -I$(ILM_INCLUDES) -I$(ABC_INCLUDES) -I$(HDF_INCLUDES) -I$(BOOZE_INCLU
 ILM_PATH = /usr/local/lib
 HDF_PATH = /usr/local/lib
 ABC_PATH = /usr/local/lib
-FRAMEWORK_PATH = /Users/benmalartre/Documents/RnD/booze/Framework
 
 LIBS = $(ILM_PATH)/libImath.a 
 LIBS += $(ILM_PATH)/libIlmThread.a 
@@ -60,9 +59,8 @@ LIBS += $(HDF_PATH)/libz.a
 LIBS += $(HDF_PATH)/libsz.a 
 LIBS += $(ABC_PATH)/libAlembic.a 
 LIBS += -lm 
-LIBS += $(FRAMEWORK_PATH)/libAbcFramework.a
 
-LIBS_PATH = -L$(ILM_PATH) -L$(HDF_PATH) -L$(ABC_PATH) -L$(FRAMEWORK_PATH) -L$(FRAMEWORK_PATH)
+LIBS_PATH = -L$(ILM_PATH) -L$(HDF_PATH) -L$(ABC_PATH)
 
 LDFLAGS += -shared -Wl,-search_paths_first -Wl,-headerpad_max_install_names $(LIBS)
 
@@ -74,12 +72,18 @@ MSG3 = "==  C++     $(C++)"
 
 # variable definitions
 #
-SOURCES = $(SRCDIR)/PBAlembicArchive.cpp 
-SOURCES += $(SRCDIR)/PBAlembicObject.cpp 
-SOURCES += $(SRCDIR)/PBAlembicXForm.cpp 
-SOURCES += $(SRCDIR)/PBAlembicPolymesh.cpp 
-SOURCES += $(SRCDIR)/PBAlembicPointCloud.cpp 
-SOURCES += $(SRCDIR)/PBAlembicAttribute.cpp 
+SOURCES = $(SRCDIR)/AlembicArchive.cpp 
+SOURCES += $(SRCDIR)/AlembicManager.cpp 
+SOURCES += $(SRCDIR)/AlembicUtil.cpp 
+SOURCES += $(SRCDIR)/AlembicObject.cpp 
+SOURCES += $(SRCDIR)/AlembicXForm.cpp 
+SOURCES += $(SRCDIR)/AlembicPolymesh.cpp 
+SOURCES += $(SRCDIR)/AlembicPoints.cpp 
+SOURCES += $(SRCDIR)/AlembicCurves.cpp 
+SOURCES += $(SRCDIR)/AlembicPointCloud.cpp 
+SOURCES += $(SRCDIR)/AlembicPointCloud.cpp 
+SOURCES += $(SRCDIR)/AlembicProperty.cpp 
+SOURCES += $(SRCDIR)/AlembicWriteJob.cpp 
 
 OBJECTS  := $(patsubst %.cpp,$(DSTDIR)/%.o,$(SOURCES))
 

@@ -41,12 +41,17 @@
 *.ncb
 *.sln
 *.suo
-*.vcproj
+*.vcxproj*
 *.user
 *.pdb
 *.idb
 *.htm
 *.manifest
+*.obj
+*.tlog
+*.log
+*.sdf
+*.opensdf
 
 # Qt Creator Files
 *.config

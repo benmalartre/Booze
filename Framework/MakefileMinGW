@@ -1,0 +1,130 @@
+# =============================================================
+# Alembic Framework MakefileMinGW
+# =============================================================
+
+LIBRARY_NAME = AbcFramework
+
+# make sure these are in your path
+#
+CC          = gcc
+C++         = g++
+LD          = g++
+
+SRCDIR := .
+DSTDIR := .
+
+# settings
+#
+CFLAGS = -DPLATFORM_WINDOWS \
+	 -DCC_GNU_ \
+	 -O3 \
+	 -D_LANGUAGE_C_PLUS_PLUS\
+	 -fPIC\
+	 -DNDEBUG\
+	 -static
+
+C++FLAGS = $(CFLAGS) \
+	   -std=c++11 \
+	   -fno-gnu-keywords \
+	   -Wno-deprecated \
+	   -fpermissive\
+	   -static\
+	   -mwindows\
+	   -DUSE_HDF5=0\
+	   -DALEMBIC_SHARED_LIBS=0
+
+# includes
+#
+#HDF_INCLUDES = /usr/local/include
+ILM_INCLUDES = D:\Projects\RnD\Alembic\ilmbase
+ABC_INCLUDES = D:\Projects\RnD\Alembic\alembic\lib
+
+INCLUDES = -I$(ILM_INCLUDES) -I$(ABC_INCLUDES) 
+#-I$(HDF_INCLUDES)
+
+# libraries
+#
+#HDF_PATH = -L/usr/local/lib
+ILM_PATH = D:\Projects\RnD\Alembic\ilmbase\lib
+ABC_PATH = D:\Projects\RnD\Alembic\alembic\build\lib\Alembic
+
+LIBS_PATH = -L$(ILM_PATH) -L$(ABC_PATH)
+#$(HDF_PATH)
+
+
+LIBS += -lHalf
+LIBS += -lIex
+LIBS += -lIexMath
+LIBS += -lImath
+LIBS += -lIlmThread
+#LIBS += -lhdf5
+#LIBS += -lhdf5_hl
+LIBS += -lAlembic
+LIBS += -lz
+LIBS += -lm 
+
+
+
+LDFLAGS += -static $(LIBS)
+
+# infos
+#
+MSG1 = "== Compile $(LIBRARY_NAME)"
+MSG2 = "==  CC      $(CC)"
+MSG3 = "==  C++     $(C++)"
+
+# variable definitions
+#
+SOURCES = $(SRCDIR)/AlembicUtil.cpp 
+SOURCES += $(SRCDIR)/AlembicArchiveStorage.cpp 
+SOURCES += $(SRCDIR)/AlembicMessage.cpp
+SOURCES += $(SRCDIR)/AlembicObject.cpp 
+SOURCES += $(SRCDIR)/AlembicProperty.cpp 
+SOURCES += $(SRCDIR)/AlembicWriteJob.cpp 
+
+OBJECTS  := $(patsubst %.cpp,$(DSTDIR)/%.o,$(SOURCES))
+
+STATIC_LIB := lib$(LIBRARY_NAME).a
+MAKEFILE := $(SRCDIR)/MakefileMinGW
+
+# target specific flags.
+#
+$(OBJECTS): CFLAGS   := $(CFLAGS)
+$(OBJECTS): C++FLAGS := $(C++FLAGS)
+$(OBJECTS): INCLUDES := $(INCLUDES)
+
+DEPENDS:     INCLUDES := $(INCLUDES)
+
+# rules definitions
+#
+.PHONY:	all depend clean print
+
+all:
+	+@$(MAKE) -f $(MAKEFILE) print
+	+@$(MAKE) -f $(MAKEFILE) $(STATIC_LIB)
+
+print:
+	@echo $(MSG1)
+	@echo $(MSG2)
+	@echo $(MSG3)
+
+%.o :	%.c
+	$(CC) -c $(INCLUDES) $(CFLAGS) $< -o $@
+
+%.o :	%.cpp
+	@echo INCLUDES : $(INCLUDES)
+	@echo "Compiling $< ..."
+	$(C++) -c $(INCLUDES) $(C++FLAGS) $(LIBS_PATH) $< -o $@ $(LIBS)
+
+%.i :	%.cpp
+	$(C++) -E $(INCLUDES) $(C++FLAGS) $*.cpp > $*.i
+
+$(STATIC_LIB): $(OBJECTS)
+	ar rcs $(STATIC_LIB) $(OBJECTS)
+	ranlib $(STATIC_LIB)
+
+depend:
+	makedepend $(INCLUDES) $(MDFLAGS) -f$(MAKEFILE) $(SOURCES)
+
+clean:
+	rm -rf *.o *.gah *.a
