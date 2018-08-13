@@ -116,7 +116,6 @@ void AlembicIArchive::ParseTree()
 	// walk object hierarchy and find valid objects
 	AbcG::IObject iObj = _archive.getTop();
 	Walk(iObj);
-	_numObjects = _identifiers.size();
 }
 
 void AlembicIArchive::AddObject(AlembicIObject* obj)
@@ -125,7 +124,12 @@ void AlembicIArchive::AddObject(AlembicIObject* obj)
 }
 uint64_t AlembicIArchive::GetNumObjects()
 {
-	return _numObjects;
+	return _objects.size();
+}
+
+uint64_t AlembicIArchive::GetNumIdentifiers()
+{
+	return _identifiers.size();
 }
 
 const char* AlembicIArchive::GetIdentifier(uint64_t i)
@@ -144,9 +148,13 @@ AbcG::IObject& AlembicIArchive::GetIObj(uint64_t i)
 //---------------------------------------------------
 AlembicIObject* AlembicIArchive::GetObjByName(const char* name)
 {
-	for (size_t i=0; i < _identifiers.size();i++)
-	if (_identifiers[i].first == std::string(name))return _objects[i];
-
+	size_t j = 0;
+	for (size_t i = 0; i < _identifiers.size(); i++)
+	{
+		if (_identifiers[i].first == std::string(name))return _objects[j];
+		if (_identifiers[i].second.valid())j++;
+	}
+	
 	return NULL;
 }
 

@@ -53,7 +53,6 @@ AlembicIArchive* AlembicArchiveManager::OpenArchive(const char* path)
 		return archive;
 	}
 	AlembicIArchive* archive = new AlembicIArchive();
-
 	_archives[std::string(path)] = archive;
 	return archive;
 }

@@ -27,6 +27,7 @@ public:
 	virtual bool IsValid(){return _valid;};
 	virtual const char* GetInfos();
 	virtual void AddObject(AlembicIObject* obj);
+	virtual uint64_t GetNumIdentifiers();
 	virtual uint64_t GetNumObjects();
 	virtual const char* GetIdentifier(uint64_t id);
 	virtual AbcG::IObject& GetIObj(uint64_t i);
@@ -49,7 +50,6 @@ private:
 	double _endTime;
 	bool _valid;
 	uint32_t _uses;
-	uint64_t _numObjects;
 	std::string _format;
 	std::string _filename;
 	std::vector<std::pair<std::string, AbcG::IObject>> _identifiers;
