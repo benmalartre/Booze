@@ -34,7 +34,10 @@ C++FLAGS = $(CFLAGS) \
 	   -stdlib=libc++ \
 	   -fno-gnu-keywords \
 	   -fpascal-strings  \
-	   -Wno-deprecated
+	   -Wno-deprecated \
+	   -Wpointer-arith \
+	   -Wwrite-strings \
+	   -Wno-long-long
 
 # includes
 #
@@ -74,15 +77,17 @@ MSG3 = "==  C++     $(C++)"
 #
 SOURCES = $(SRCDIR)/AlembicArchive.cpp 
 SOURCES += $(SRCDIR)/AlembicManager.cpp 
+SOURCES += $(SRCDIR)/AlembicMessage.cpp 
 SOURCES += $(SRCDIR)/AlembicUtil.cpp 
 SOURCES += $(SRCDIR)/AlembicObject.cpp 
 SOURCES += $(SRCDIR)/AlembicXForm.cpp 
+SOURCES += $(SRCDIR)/AlembicCamera.cpp 
 SOURCES += $(SRCDIR)/AlembicPolymesh.cpp 
 SOURCES += $(SRCDIR)/AlembicPoints.cpp 
 SOURCES += $(SRCDIR)/AlembicCurves.cpp 
-SOURCES += $(SRCDIR)/AlembicPointCloud.cpp 
-SOURCES += $(SRCDIR)/AlembicPointCloud.cpp 
+SOURCES += $(SRCDIR)/AlembicPoints.cpp 
 SOURCES += $(SRCDIR)/AlembicProperty.cpp 
+SOURCES += $(SRCDIR)/AlembicFaceSet.cpp 
 SOURCES += $(SRCDIR)/AlembicWriteJob.cpp 
 
 OBJECTS  := $(patsubst %.cpp,$(DSTDIR)/%.o,$(SOURCES))

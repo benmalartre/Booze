@@ -138,7 +138,7 @@ const char* AlembicIArchive::GetIdentifier(uint64_t i)
 	return NULL;
 }
 
-AbcG::IObject& AlembicIArchive::GetIObj(uint64_t i)
+const AbcG::IObject& AlembicIArchive::GetIObj(uint64_t i)
 {
 	if (i < _identifiers.size())return _identifiers[i].second;
 	return AbcG::IObject();
