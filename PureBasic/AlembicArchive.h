@@ -32,7 +32,7 @@ public:
 	virtual uint64_t GetNumIdentifiers();
 	virtual uint64_t GetNumObjects();
 	virtual const char* GetIdentifier(uint64_t id);
-	virtual AbcG::IObject& GetIObj(uint64_t i);
+	virtual const AbcG::IObject& GetIObj(uint64_t i);
 	virtual AlembicIObject* GetObj(uint64_t index){return _objects[index];};
 	virtual AlembicIObject* GetObjByName(const char* name);
 	virtual Abc::IArchive& Get(){ return _archive; };

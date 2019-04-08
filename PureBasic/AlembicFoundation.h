@@ -1,6 +1,10 @@
 #ifndef _BOOZE_FOUNDATION_H_
 #define _BOOZE_FOUNDATION_H_
-
+#ifndef _WIN32
+#include <stdint.h>
+#else
+#include "../stdint.h"
+#endif
 #include <Alembic/Abc/All.h>
 #include <Alembic/AbcCoreAbstract/All.h>
 #ifdef ALEMBIC_WITH_HDF5
