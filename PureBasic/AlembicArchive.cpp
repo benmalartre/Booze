@@ -212,6 +212,16 @@ void deleteOArchive(AlembicOArchive* archive)
 	delete archive;
 }
 
+AlembicOArchive::AlembicOArchive(const char* filename, float* frames, int numFrames)
+{
+	_archive = CreateArchiveWithInfo(
+		Alembic::AbcCoreOgawa::WriteArchive(),
+		filename,
+		"Alembic PureBasic 1.0 Plugin",
+		filename,
+		Alembic::Abc::ErrorHandler::kThrowPolicy);
+}
+
 bool AlembicOArchive::Open(const char* filename)
 {
 	return true;

@@ -9,6 +9,7 @@ BOOZE_NAMESPACE_OPEN_SCOPE
 
 class AlembicIArchive;
 class AlembicIProperty;
+class AlembicWriteJob;
 
 class AlembicIObject
 {
@@ -42,12 +43,15 @@ protected:
 	Alembic::Abc::MetaData _metadata;
 	std::vector<AlembicOProperty*> _props;
 	void* _sample;
+	AlembicWriteJob* _job;
 
 public:
+	AlembicOObject(AlembicWriteJob* job) :_job(job){};
 	void Set(AbcG::OObject& obj);
 	AbcG::OObject Get(){ return _object; };
 	const char* GetMetaDataStr(){ return _metadatastr.c_str(); };
 	Alembic::Abc::MetaData GetMetaData(){ return _metadata; };
+	AlembicWriteJob* GetWriteJob(){ return _job; };
 	virtual ABCStatus Save(double time){ return Status_OK; };
 };
 

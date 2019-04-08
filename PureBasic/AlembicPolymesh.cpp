@@ -536,4 +536,350 @@ BOOZE_EXPORT int ABC_UpdatePolymeshSample(AlembicIObject* obj, ABC_Polymesh_Topo
    return 0;
 }
 
+BOOZE_EXPORT bool ABC_SavePolymeshSample(
+	AlembicOPolymesh* mesh,
+	double time,
+	Imath::V3f* positions,
+	int numVertices,
+	int* faceIndices,
+	int* faceCount,
+	int numFaces)
+{
+	return true;
+}
+
+/*
+	SaveXFormSample(prim.GetParent3DObject().GetKinematics().GetGlobal().GetRef(), _xformschema, _xformsample, time);
+
+	// access the mesh
+	PolygonMesh mesh = prim.GetGeometry(time);
+	CVector3Array pos = mesh.GetVertices().GetPositionArray();
+	CPolygonFaceRefArray faces = mesh.GetPolygons();
+	LONG vertCount = pos.GetCount();
+	LONG faceCount = faces.GetCount();
+	LONG sampleCount = mesh.GetSamples().GetCount();
+
+	Alembic::AbcGeom::OPolyMeshSchema schema = _meshschema;
+	Alembic::Abc::OCompoundProperty argGeomParamsProp = _meshschema.getArbGeomParams();
+
+	app.LogMessage(L"Vertices count : " + (CString)vertCount);
+	app.LogMessage(L"Faces count : " + (CString)faceCount);
+	app.LogMessage(L"Samples count : " + (CString)sampleCount);
+
+	// allocate the points and normals
+	std::vector<Alembic::Abc::V3f> posVec(vertCount);
+	for (LONG i = 0; i<vertCount; i++)
+	{
+		posVec[i].x = (float)pos[i].GetX();
+		posVec[i].y = (float)pos[i].GetY();
+		posVec[i].z = (float)pos[i].GetZ();
+	}
+
+	LONG offset = 0;
+	std::vector<Alembic::Abc::N3f> normalVec;
+	std::vector<Alembic::Abc::V2f> uvVec;
+	SIAlembicWriteJob* job = this->GetAlembicJob();
+
+	if (job->GetOption("exportNormals") == "true")
+	{
+		Application().LogMessage(L"Export Normal Enabled");
+		CVector3Array normals = mesh.GetVertices().GetNormalArray();
+		if (job->GetOption("vertexNormals") == "true")
+		{
+			normalVec.resize(vertCount);
+			for (LONG i = 0; i<vertCount; i++)
+			{
+				normalVec[i].x = (float)normals[i].GetX();
+				normalVec[i].y = (float)normals[i].GetY();
+				normalVec[i].z = (float)normals[i].GetZ();
+			}
+		}
+		else
+		{
+			CGeometryAccessor accessor = mesh.GetGeometryAccessor(siConstructionModeSecondaryShape);
+			CFloatArray shadingNormals;
+			accessor.GetNodeNormals(shadingNormals);
+			normalVec.resize(shadingNormals.GetCount() / 3);
+
+			// we need to loop the faces, there is nothing we can do
+			LONG offset = 0;
+			for (LONG i = 0; i<faces.GetCount(); i++)
+			{
+				PolygonFace face(faces[i]);
+				CLongArray samples = face.GetSamples().GetIndexArray();
+				for (LONG j = samples.GetCount() - 1; j >= 0; j--)
+				{
+					LONG sampleIndex = samples[j];
+					normalVec[sampleIndex].x = (float)shadingNormals[offset++];
+					normalVec[sampleIndex].y = (float)shadingNormals[offset++];
+					normalVec[sampleIndex].z = (float)shadingNormals[offset++];
+				}
+			}
+		}
+	}
+
+	// allocate for the points and normals
+	Alembic::Abc::P3fArraySample posSample(&posVec.front(), posVec.size());
+
+	// if we are the first frame!
+	if (_numsamples == 0)
+	{
+		// we also need to store the face counts as well as face indices
+		std::vector<Alembic::Abc::int32_t> faceCountVec(faceCount);
+		std::vector<Alembic::Abc::int32_t> faceIndicesVec(sampleCount);
+		offset = 0;
+		for (LONG i = 0; i<faceCount; i++)
+		{
+			PolygonFace face(faces[i]);
+			CLongArray indices = face.GetVertices().GetIndexArray();
+			faceCountVec[i] = indices.GetCount();
+			for (LONG j = indices.GetCount() - 1; j >= 0; j--)
+				faceIndicesVec[offset++] = indices[j];
+		}
+
+		Alembic::Abc::Int32ArraySample faceCountSample(&faceCountVec.front(), faceCountVec.size());
+		Alembic::Abc::Int32ArraySample faceIndicesSample(&faceIndicesVec.front(), faceIndicesVec.size());
+
+		_meshsample.setPositions(posSample);
+		if (normalVec.size() > 0)
+		{
+			Alembic::AbcGeom::ON3fGeomParam::Sample normalSample(Alembic::Abc::N3fArraySample(&normalVec.front(), normalVec.size()), Alembic::AbcGeom::kFacevaryingScope);
+			_meshsample.setNormals(normalSample);
+		}
+		_meshsample.setFaceCounts(faceCountSample);
+		_meshsample.setFaceIndices(faceIndicesSample);
+
+		// also check if we need to store UV
+		CRefArray clusters = mesh.GetClusters();
+
+		if (job->GetOption("exportUVs") == "true")
+
+		{
+			CRef uvPropRef;
+			for (LONG i = 0; i<clusters.GetCount(); i++)
+			{
+				Cluster cluster(clusters[i]);
+				if (!cluster.GetType().IsEqualNoCase(L"sample"))
+					continue;
+				CRefArray props(cluster.GetLocalProperties());
+				for (LONG k = 0; k<props.GetCount(); k++)
+				{
+					ClusterProperty prop(props[k]);
+					if (prop.GetType().IsEqualNoCase(L"uvspace"))
+					{
+						uvPropRef = props[k];
+						break;
+					}
+				}
+				if (uvPropRef.IsValid())
+					break;
+			}
+			if (uvPropRef.IsValid())
+			{
+				Application().LogMessage(L"UV Prop Valid : Export It!!!");
+				// ok, great, we found UVs, let's set them up
+				uvVec.resize(sampleCount);
+				CDoubleArray uvValues = ClusterProperty(uvPropRef).GetElements().GetArray();
+
+				LONG offset = 0;
+				for (LONG i = 0; i<faces.GetCount(); i++)
+				{
+					PolygonFace face(faces[i]);
+					CLongArray samples = face.GetSamples().GetIndexArray();
+					for (LONG j = samples.GetCount() - 1; j >= 0; j--)
+					{
+						LONG sampleIndex = samples[j];
+						uvVec[sampleIndex].x = (float)uvValues[offset++];
+						uvVec[sampleIndex].y = (float)uvValues[offset++];
+						//offset++;
+					}
+				}
+
+				Alembic::AbcGeom::OV2fGeomParam::Sample uvSample(Alembic::Abc::V2fArraySample(&uvVec.front(), uvVec.size()), Alembic::AbcGeom::kFacevaryingScope);
+				_meshsample.setUVs(uvSample);
+			}
+		}
+		else{
+			Application().LogMessage(L"Export UV Disabled...");
+		}
+
+		// sweet, now let's have a look at face sets
+		std::vector<std::vector<Alembic::Abc::int32_t>> faceSetVecs;
+		if (job->GetOption("exportFaceSets") == "true")
+		{
+			for (LONG i = 0; i<clusters.GetCount(); i++)
+			{
+				Cluster cluster(clusters[i]);
+				if (!cluster.GetType().IsEqualNoCase(L"poly"))
+					continue;
+
+				CLongArray elements = cluster.GetElements().GetArray();
+				if (elements.GetCount() == 0)
+					continue;
+
+				std::string name(cluster.GetName().GetAsciiString());
+
+				faceSetVecs.push_back(std::vector<Alembic::Abc::int32_t>());
+				std::vector<Alembic::Abc::int32_t> & faceSetVec = faceSetVecs.back();
+				for (LONG j = 0; j<elements.GetCount(); j++)
+					faceSetVec.push_back(elements[j]);
+
+				Alembic::AbcGeom::OFaceSet faceSet = _meshschema.createFaceSet(name);
+				Alembic::AbcGeom::OFaceSetSchema::Sample faceSetSample(Alembic::Abc::Int32ArraySample(&faceSetVec.front(), faceSetVec.size()));
+				faceSet.getSchema().set(faceSetSample);
+			}
+		}
+
+		std::string export_color = job->GetOption("exportColors");
+		if (export_color == "1" || export_color == "2")
+		{
+			Application().LogMessage(L"Export Colorz!!!");
+
+
+			Alembic::Abc::OC4fArrayProperty colorProp(argGeomParamsProp, "Colors", this->AlembicOObject::GetMetaData(), job->GetAnimatedTs());
+
+			// Export ICE Color Attribute
+			if (export_color == "1"){
+				Application().LogMessage(L"Export ICE Color Attribute");
+				ICEAttribute color = prim.GetICEAttributeFromName("Color");
+
+
+				if (color.IsDefined() && color.IsValid()){
+					CICEAttributeDataArrayColor4f data;
+					color.GetDataArray(data);
+					std::vector<Alembic::Abc::C4f> outputColorArray;
+
+					for (ULONG i = 0; i<data.GetCount(); i++)
+					{
+						Alembic::Abc::C4f c;
+						c.r = data[i].GetR();
+						c.g = data[i].GetG();
+						c.b = data[i].GetB();
+						c.a = 1.0;
+						outputColorArray.push_back(c);
+
+					}
+
+					colorProp.set(Alembic::Abc::C4fArraySample(outputColorArray));
+
+				}
+				else{
+					Application().LogMessage(L"No COLOR ICE Attribute on " + prim.GetParent3DObject().GetFullName() + L" -----> Write Colors Skipped...");
+				}
+			}
+			// Export Vertex Color Map(if any...)
+			else{
+				Application().LogMessage(L"Export Vertex Color Map");
+				CGeometryAccessor accessor = mesh.GetGeometryAccessor(siConstructionModeSecondaryShape);
+				CRefArray  colors = accessor.GetVertexColors();
+				std::vector<Alembic::Abc::C4f> outputColorArray;
+
+				if (colors.GetCount()>0){
+					ClusterProperty cp = colors[0];
+					CBitArray elemSet;
+					CFloatArray colorValues;
+					cp.GetValues(colorValues, elemSet);
+
+					std::vector<Alembic::Abc::C4f> outputColorArray;
+
+					outputColorArray.resize(sampleCount);;
+
+					LONG offset = 0;
+					for (LONG i = 0; i<faces.GetCount(); i++)
+					{
+						PolygonFace face(faces[i]);
+						CLongArray samples = face.GetSamples().GetIndexArray();
+						for (LONG j = samples.GetCount() - 1; j >= 0; j--)
+						{
+							LONG sampleIndex = samples[j];
+							outputColorArray[sampleIndex].r = (float)colorValues[offset++];
+							outputColorArray[sampleIndex].g = (float)colorValues[offset++];
+							outputColorArray[sampleIndex].b = (float)colorValues[offset++];
+							outputColorArray[sampleIndex].a = (float)colorValues[offset++];
+						}
+					}
+
+					//}
+
+					colorProp.set(Alembic::Abc::C4fArraySample(outputColorArray));
+				}
+
+				else{
+					Application().LogMessage(L"No Vertex Color Map on " + prim.GetParent3DObject().GetFullName() + L" -----> Write Colors Skipped...");
+				}
+			}
+
+		}
+
+		if (job->GetOption("exportEnvelope") == "true")
+		{
+			// find envelope
+			CGeometryAccessor accessor = mesh.GetGeometryAccessor();
+			if (accessor.GetEnvelopeWeights().GetCount()>0)
+			{
+				EnvelopeWeight envelope = accessor.GetEnvelopeWeights().GetItem(0);
+				CRefArray deformers = envelope.GetDeformers();
+				CFloatArray weights;
+				envelope.GetValues(weights);
+
+				LONG out;
+				Application().GetUIToolkit().MsgBox(L"Weights Size : " + (CString)weights.GetCount(), XSI::siMsgInformation, L"Export Envelope", out);
+				Alembic::AbcGeom::OPolyMeshSchema schema = _meshschema;
+				Alembic::Abc::OCompoundProperty argGeomParamsProp = _meshschema.getArbGeomParams();
+				Alembic::AbcCoreAbstract::MetaData metadata = this->AlembicOObject::GetMetaData();
+				Alembic::Abc::OC4cArrayProperty indicesProp(argGeomParamsProp, "EnvelopeIndices", metadata, job->GetAnimatedTs());
+				Alembic::Abc::OC4fArrayProperty weightsProp(argGeomParamsProp, "EnvelopeWeights", metadata, job->GetAnimatedTs());
+				Alembic::Abc::OUInt32Property nbDeformersProp(argGeomParamsProp, "EnvelopeNbDeformers", metadata, job->GetAnimatedTs());
+
+				std::vector<Alembic::Abc::C4c> indicesArray;
+				std::vector<Alembic::Abc::C4f> weightsArray;
+
+				LONG nbp = weights.GetCount() / deformers.GetCount();
+				indicesArray.resize(nbp);
+				weightsArray.resize(nbp);
+
+				Alembic::Abc::C4c idx;
+				Alembic::Abc::C4f wgt;
+				CString s_idx;
+				CString s_wgt;
+				for (LONG i = 0; i<nbp; i++){
+					EncodeEnvelope(weights, indicesArray[i], weightsArray[i], i, deformers.GetCount());
+					s_idx = L"Vertex " + (CString)i + L" IDs :: (" + (CString)(LONG)indicesArray[i].r + L"," + (CString)(LONG)indicesArray[i].g + L"," + (CString)(LONG)indicesArray[i].b + L"," + (CString)(LONG)indicesArray[i].a + L")";
+					s_wgt = L"Weights " + (CString)i + L" Weights :: (" + (CString)weightsArray[i].r + L"," + (CString)weightsArray[i].g + L"," + (CString)weightsArray[i].b + L"," + (CString)weightsArray[i].a + L")";
+					Application().LogMessage(s_idx);
+					Application().LogMessage(s_wgt);
+
+				}
+
+				indicesProp.set(Alembic::Abc::C4cArraySample(indicesArray));
+				weightsProp.set(Alembic::Abc::C4fArraySample(weightsArray));
+				nbDeformersProp.set(Alembic::Abc::uint32_t(deformers.GetCount()));
+			}
+			
+			LONG out;
+			Application().GetUIToolkit().MsgBox(L"Export Envelope",XSI::siMsgInformation,L"hohoho",out);
+			
+		}
+
+		_meshschema.set(_meshsample);
+	}
+	else
+	{
+		_meshsample.reset();
+		_meshsample.setPositions(posSample);
+		if (normalVec.size() > 0)
+		{
+			Alembic::AbcGeom::ON3fGeomParam::Sample normalSample(Alembic::Abc::N3fArraySample(&normalVec.front(), normalVec.size()), Alembic::AbcGeom::kFacevaryingScope);
+			_meshsample.setNormals(normalSample);
+		}
+		_meshschema.set(_meshsample);
+
+	}
+	_numsamples++;
+
+
+	return Status_OK;
+}
+*/
+
 BOOZE_NAMESPACE_CLOSE_SCOPE

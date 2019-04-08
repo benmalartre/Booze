@@ -9,6 +9,8 @@ class AlembicOObject;
 class AlembicOArchive
 {
 public:
+	AlembicOArchive(){};
+	AlembicOArchive(const char* filename, float* frames, int numFrames = 0);
 	virtual bool Open(const char* filename);
 	virtual bool Close();
 	virtual bool IsValid();

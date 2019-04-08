@@ -4,20 +4,21 @@
 
 BOOZE_NAMESPACE_OPEN_SCOPE
 
-/*
-AlembicWriteJob::AlembicWriteJob(const std::string & in_FileName,const CRefArray & in_Selection,const CDoubleArray & in_Frames)
-{
-   _filename = in_FileName;
-   mSelection = in_Selection;
 
-   for(uint64_t i=0;i<in_Frames.GetCount();i++)
-      _frames.push_back(in_Frames[i]);
+AlembicWriteJob::AlembicWriteJob(const char* filename, float* frames, int numFrames)
+{
+   _filename = filename;
+   // init archive (use a locally scoped archive)
+   _archive = new AlembicOArchive(filename,frames, numFrames);
+
+   for(uint64_t i=0;i<numFrames;i++)
+      _frames.push_back(frames[i]);
 }
 
 AlembicWriteJob::~AlembicWriteJob()
 {
 }
-*/
+
 
 void AlembicWriteJob::SetOption(const char* in_Name, const char* in_Value)
 {
@@ -181,5 +182,24 @@ ABCStatus AlembicWriteJob::SetObjects()
     ABCStatus status = Status_OK;
     return status;
 }
+
+//========================================================
+// AlembicWriteJob
+//========================================================
+// Constructor
+//--------------------------------------------------------
+AlembicWriteJob* newWriteJob(const char* filename, float* frames, int numFrames)
+{
+	AlembicWriteJob* job = new AlembicWriteJob(filename, frames, numFrames);
+	return job;
+}
+
+// Destructor
+//--------------------------------------------------------
+void deleteWriteJob(AlembicWriteJob* job)
+{
+	delete job;
+}
+
 
 BOOZE_NAMESPACE_CLOSE_SCOPE

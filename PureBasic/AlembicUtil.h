@@ -91,6 +91,9 @@ void vectorLerp(double alpha, std::vector<T> & vec,
     }
 }
 
+#define RADIANTODEGREE 57.295779513
+#define DEGREETORADIAN 0.01745329252
+
 BOOZE_NAMESPACE_CLOSE_SCOPE
 
 #endif  // ABCIMPORT_UTIL_H_

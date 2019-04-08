@@ -1,6 +1,7 @@
+#include "AlembicUtil.h"
 #include "AlembicXForm.h"
 #include "AlembicObject.h"
-//#include "AlembicHelpers.h"
+
 BOOZE_NAMESPACE_OPEN_SCOPE
 
 AlembicIXForm::AlembicIXForm(AbcG::IObject& object) :AlembicIObject(object)
@@ -18,24 +19,64 @@ BOOZE_EXPORT bool ABC_ObjectIsXForm(AlembicIObject* obj)
 }
 
 
-/*
-void SaveXFormSample(XSI::CRef kinestateRef, Alembic::AbcGeom::OXformSchema & schema, Alembic::AbcGeom::XformSample & sample, double time)
+BOOZE_EXPORT void ABC_SaveXFormSample(float* xform, Alembic::AbcGeom::OXformSchema & schema, Alembic::AbcGeom::XformSample & sample, float time)
 {
-   CTransformation global = KinematicState(kinestateRef).GetTransform(time);
 
-   // store the transform
-   CVector3 trans = global.GetTranslation();
-   CVector3 axis;
-   double angle = global.GetRotationAxisAngle(axis);
-   CVector3 scale = global.GetScaling();
-   sample.setTranslation(Imath::V3d(trans.GetX(),trans.GetY(),trans.GetZ()));
-   sample.setRotation(Imath::V3d(axis.GetX(),axis.GetY(),axis.GetZ()),RadiansToDegrees(angle));
-   sample.setScale(Imath::V3d(scale.GetX(),scale.GetY(),scale.GetZ()));
+	// extract the x, y, z axes
+	Imath::V3f x(xform[0], xform[1], xform[2]);
+	Imath::V3f y(xform[4], xform[5], xform[6]);
+	Imath::V3f z(xform[8], xform[9], xform[10]);
+
+	// scale
+	Imath::V3f s(x.length(), y.length(), z.length());
+
+	// compute quaternion
+	float qx, qy, qz, qw, qw4;
+	float tr = xform[0] + xform[5] + xform[10];
+	float S;
+	if (tr > 0.0f){
+		S = sqrtf(tr + 1.0f)  * 2.0f;
+		qw = 0.25 * S;
+		qx = (xform[9] - xform[6]) / S;
+		qy = (xform[2] - xform[8]) / S;
+		qz = (xform[4] - xform[1]) / S;
+	}
+	else if (xform[0] > xform[5] && xform[0] > xform[10]){
+		S = sqrtf(1.0f + xform[0] - xform[5] - xform[10]) * 2.0f;
+		qw = (xform[9] - xform[6]) / S;
+		qx = 0.25f * S;
+		qy = (xform[1] + xform[4]) / S;
+		qz = (xform[2] + xform[8]) / S;
+	}
+	else if (xform[5] > xform[10]){
+		S = sqrtf(1.0f + xform[5] - xform[0] - xform[10]) * 2.0f;
+		qw = (xform[2] - xform[8]) / S;
+		qx = (xform[1] + xform[4]) / S;
+		qy = 0.25f * S;
+		qz = (xform[6] + xform[9]) / S;
+	}
+	else{
+		S = sqrtf(1.0f + xform[10] - xform[0] - xform[5]) * 2.0f;
+		qw = (xform[4] - xform[1]) / S;
+		qx = (xform[2] + xform[8]) / S;
+		qy = (xform[6] + xform[9]) / S;
+		qz = 0.25f * S;
+	}
+	// set the rotation!
+	Imath::Quatf r(qw, qx, qy, qz);
+
+	// finally set the position!
+	Imath::V3f t(xform[12], xform[13], xform[14]);
+
+   sample.setTranslation(t);
+   sample.setRotation(Imath::V3d(qx, qy, qz), qw * RADIANTODEGREE);
+   sample.setScale(s);
 
    // save the sample
    schema.set(sample);
 }
 
+/*
 XSIPLUGINCALLBACK CStatus Alembic_XForm_Init( CRef& in_ctxt )
 {
 	OperatorContext ctxt(in_ctxt);
