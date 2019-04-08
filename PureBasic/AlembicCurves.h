@@ -7,47 +7,35 @@ BOOZE_NAMESPACE_OPEN_SCOPE
 
 struct ABC_Curves_Sample_Infos
 {
-	uint64_t _numpoints;
-	uint64_t _numcurves;
-	uint64_t _sampleindex;
-	bool _hasWidth;
-	bool _hasUVs;
-	bool _hasNormals;
-	bool _hasWeights;
-	bool _hasOrders;
-	bool _hasKnots;
+	uint64_t m_numPoints;
+	uint64_t m_numCurves;
+	uint64_t m_sampleindex;
+	bool m_hasWidth;
+	bool m_hasUV;
+	bool m_hasNormal;
+	bool m_hasWeight;
+	bool m_hasOrder;
+	bool m_hasKnot;
 };
 
 struct ABC_Curves_Sample
 {
-	float* _positions;
-	uint32_t* _numVerticesPerCurve;
-	AbcG::CurveType _type;
-	AbcG::CurvePeriodicity _periodicity;
-	float* width;
-	float* uvs;
-	float* normals;
-	AbcG::BasisType _basis;
-	float* _weights;
-	char* _orders;
-	float* _knots;
+	float* m_position;
+	uint32_t* m_numVerticesPerCurve;
+	AbcG::CurveType m_type;
+	AbcG::CurvePeriodicity m_periodicity;
+	float* m_width;
+	float* m_uv;
+	float* m_normal;
+	AbcG::BasisType m_basis;
+	float* m_weight;
+	char* m_order;
+	float* m_knot;
 };
 
-class AlembicOCurves : public AlembicOObject
-{
-protected:
-   Alembic::AbcGeom::OCurvesSchema _curveschema;
-   Alembic::AbcGeom::OCurvesSchema::Sample _curvesample;
-   size_t _numsamples;
-   size_t _nbp;
-	size_t _nbcurves;
-
-public:
-	AlembicOCurves( AlembicWriteJob * in_Job);
-	virtual ABCStatus Save(double time, ABC_Curves_Sample_Infos* infos, ABC_Curves_Sample* sample);
-};
-
-
+//------------------------------------------------------------------------------------------------
+// Alembic Import
+//------------------------------------------------------------------------------------------------
 class AlembicICurves : public AlembicIObject
 {
 public:
@@ -55,12 +43,29 @@ public:
 	virtual bool Initialize();
 
 protected:
-	Alembic::AbcGeom::ICurvesSchema _curveschema;
-	Alembic::AbcGeom::ICompoundProperty _compoundprop;
-	Alembic::AbcGeom::ICurvesSchema::Sample _meshsample;
-	size_t mNumSamples;
-	size_t _nbp;
-	size_t _nbcurves;
+	Alembic::AbcGeom::ICurvesSchema m_curveschema;
+	Alembic::AbcGeom::ICompoundProperty m_compoundprop;
+	Alembic::AbcGeom::ICurvesSchema::Sample m_meshsample;
+	size_t m_numSamples;
+	size_t m_numPoints;
+	size_t m_numCurves;
+};
+
+//------------------------------------------------------------------------------------------------
+// Alembic Export
+//------------------------------------------------------------------------------------------------
+class AlembicOCurves : public AlembicOObject
+{
+protected:
+	Alembic::AbcGeom::OCurvesSchema m_curvesSchema;
+	Alembic::AbcGeom::OCurvesSchema::Sample m_curvesSample;
+	size_t m_numsamples;
+	size_t m_numPoints;
+	size_t m_numCurves;
+
+public:
+	AlembicOCurves(AlembicWriteJob* job, void* customData);
+	virtual ABCStatus Save(double time, ABC_Curves_Sample_Infos* infos, ABC_Curves_Sample* sample);
 };
 
 BOOZE_NAMESPACE_CLOSE_SCOPE

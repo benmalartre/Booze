@@ -6,32 +6,22 @@ BOOZE_NAMESPACE_OPEN_SCOPE
 
 AlembicICamera::AlembicICamera(AbcG::IObject& object) :AlembicIObject(object)
 {
-	_type = GeometricType_Camera;
+	m_type = GeometricType_Camera;
 }
 
 bool AlembicICamera::Initialize()
 {
-	AbcG::ICamera _camera(_object);
+	AbcG::ICamera _camera(m_object);
 	GetProperties();
 	return true;
 }
 
-/*
-AlembicOCurves::AlembicOCurves(AlembicWriteJob * in_job)
-:AlembicOObject(in_job)
-{
-	Primitive prim = GetRef();
-	CString xformName(prim.GetParent3DObject().GetName());
-	CString pName(xformName+L"Shape");
+//------------------------------------------------------------------------------------------------
+// Alembic Export
+//------------------------------------------------------------------------------------------------
+AlembicOCamera::AlembicOCamera(AlembicWriteJob* job, void* customData) : AlembicOObject(job, customData){
 
-	//Alembic::AbcGeom::OXform xform(GetAlembicJob()->GetArchive().getTop(),xformName.GetAsciiString(),GetAlembicJob()->GetAnimatedTs());
-	Alembic::AbcGeom::OCurves curves(xform,pName.GetAsciiString(),GetAlembicJob()->GetAnimatedTs());
-
-	_curveschema = curves.getSchema();
-	_numsamples = 0;
-
-}
-*/
+};
 
 ABCStatus AlembicOCamera::Save(double time, ABC_Camera_Sample_Infos* infos, ABC_Camera_Sample* sample)
 {

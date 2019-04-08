@@ -7,33 +7,33 @@ BOOZE_NAMESPACE_OPEN_SCOPE
 
 struct ABC_Property_Sample_Infos
 {
-	uint64_t _nbitems;
-	float _time;
-	ABCPropertyType _type;
-	ABCDataTraits _traits;
+	uint64_t m_numItems;
+	float m_time;
+	ABCPropertyType m_type;
+	ABCDataTraits m_traits;
 };
 
 struct ABC_Property_Sample
 {
-	void* _datas;
+	void* m_datas;
 };
 
 class AlembicOProperty
 {
 public:
 	AlembicOProperty(Alembic::Abc::OCompoundProperty& iParentProp, const ABCPropertyType type,const ABCDataTraits traits, const ABCGeometryScope scope, const std::string& name);
-	virtual std::string GetName()const{ return _name; };
-	virtual ABCPropertyType GetType()const{ return _type; };
-	virtual ABCDataTraits GetTraits()const{ return _traits; };
-	virtual Alembic::Abc::OScalarProperty GetScalar(){ return _scalar; };
-	virtual Alembic::Abc::OArrayProperty GetArray(){ return _array; };
+	virtual std::string GetName()const{ return m_name; };
+	virtual ABCPropertyType GetType()const{ return m_type; };
+	virtual ABCDataTraits GetTraits()const{ return m_traits; };
+	virtual Alembic::Abc::OScalarProperty GetScalar(){ return m_scalar; };
+	virtual Alembic::Abc::OArrayProperty GetArray(){ return m_array; };
 private:
-	Alembic::Abc::OScalarProperty _scalar;
-	Alembic::Abc::OArrayProperty _array;
+	Alembic::Abc::OScalarProperty m_scalar;
+	Alembic::Abc::OArrayProperty m_array;
 	
-	std::string _name;
-	ABCPropertyType _type;
-	ABCDataTraits _traits;
+	std::string m_name;
+	ABCPropertyType m_type;
+	ABCDataTraits m_traits;
 
 };
 
@@ -52,13 +52,13 @@ public:
 	virtual void GetSample(float time, ABC_Property_Sample_Infos* infos, ABC_Property_Sample* sample);
 	
 private:
-	Alembic::Abc::IScalarProperty _scalar;
-	Alembic::Abc::IArrayProperty _array;
-	Alembic::Abc::PropertyHeader _header;
-	std::string _name;
-	ABCPropertyType _type;
-	ABCDataTraits _traits;
-	std::string _msg;
+	Alembic::Abc::IScalarProperty m_scalar;
+	Alembic::Abc::IArrayProperty m_array;
+	Alembic::Abc::PropertyHeader m_header;
+	std::string m_name;
+	ABCPropertyType m_type;
+	ABCDataTraits m_traits;
+	std::string m_msg;
 };
 
 BOOZE_NAMESPACE_CLOSE_SCOPE

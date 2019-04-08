@@ -6,12 +6,12 @@ BOOZE_NAMESPACE_OPEN_SCOPE
 
 AlembicIFaceSet::AlembicIFaceSet(AbcG::IObject& object) :AlembicIObject(object)
 {
-	_type = GeometricType_FaceSet;
+	m_type = GeometricType_FaceSet;
 }
 
 bool AlembicIFaceSet::Initialize()
 {
-	AbcG::IFaceSet _faceset(_object);
+	AbcG::IFaceSet _faceset(m_object);
 	GetProperties();
 	return true;
 }

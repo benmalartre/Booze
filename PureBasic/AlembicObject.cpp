@@ -12,6 +12,10 @@
 
 BOOZE_NAMESPACE_OPEN_SCOPE
 
+void AlembicOObject::Set(Abc::OObject& obj){
+	m_object = obj;
+}
+
 BOOZE_EXPORT AlembicIObject* newIObject(AlembicIArchive* archive, uint64_t index)
 {
 	//AbcG::IObject iObj = archive->GetObj(index);
@@ -82,16 +86,16 @@ BOOZE_EXPORT void deleteIObject(AlembicIObject* object)
 }
 
 bool AlembicIObject::Initialize(){
-	_type = GeometricType_Unknown;
+	m_type = GeometricType_Unknown;
 	return false;
 }
 
 const char* AlembicIObject::GetName(){
-	return _object.getName().c_str();
+	return m_object.getName().c_str();
 }
 
 const char* AlembicIObject::GetFullName(){
-	return _object.getFullName().c_str();
+	return m_object.getFullName().c_str();
 }
 
 bool  AlembicIObject::HasProperty(const char* p_name){
@@ -106,7 +110,7 @@ void AlembicIObject::GetProperties()
 {
 	AbcG::ICompoundProperty p;
 	bool hasArbGeomParams = false;
-	switch (_type)
+	switch (m_type)
 	{
 		case GeometricType_PolyMesh:
 		{
@@ -142,7 +146,7 @@ void AlembicIObject::GetProperties()
 			Alembic::Abc::PropertyHeader header = p.getPropertyHeader(i);
 			AlembicIProperty* prop = new AlembicIProperty(header);
 			prop->Init(p);
-			_props.push_back(prop);
+			m_props.push_back(prop);
 		}
 	}
 	/*
@@ -162,8 +166,8 @@ void AlembicIObject::GetProperties()
 
 AlembicIProperty* AlembicIObject::GetProperty(uint64_t index)
 {
-	if (index<_props.size())
-		return _props[index];
+	if (index<m_props.size())
+		return m_props[index];
 	return NULL;
 }
 

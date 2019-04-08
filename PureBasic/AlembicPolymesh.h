@@ -7,43 +7,43 @@ BOOZE_NAMESPACE_OPEN_SCOPE
 
 struct ABC_Polymesh_Topo_Sample_Infos
 {
-	uint64_t _nbpoints;
-	uint64_t _nbfaces;
-	uint64_t _nbindices;
-	uint64_t _nbsamples;
-	uint64_t _sampleindex;
-	bool _hasvelocity;
-	bool _hasnormal;
-	bool _hascolor;
-	bool _hasuvs;
-	bool _hastangent;
-	bool _hasenvelope;
+	uint64_t m_numPoints;
+	uint64_t m_numFaces;
+	uint64_t m_numIndices;
+	uint64_t m_numSamples;
+	uint64_t m_sampleIndex;
+	bool m_hasVelocity;
+	bool m_hasNormal;
+	bool m_hasColor;
+	bool m_hasUvs;
+	bool m_hasTangent;
+	bool m_hasEnvelope;
 };
 
 struct ABC_Polymesh_Topo_Sample
 {
-	float * _positions;
-	float *	_velocities;
-	float * _normals;
-	float * _tangents;
-	float * _uvs;
-	float * _colors;
-	uint32_t*	_faceindices;
-	uint32_t*	_facecount;
+	float * m_positions;
+	float *	m_velocities;
+	float * m_normals;
+	float * m_tangents;
+	float * m_uvs;
+	float * m_colors;
+	uint32_t*	m_faceIndices;
+	uint32_t*	m_faceCount;
 
 };
 
 struct ABC_Polymesh_Sample_Infos
 {
-	uint64_t _nbpoints;
-	bool _hasvelocity;
-	uint64_t _sampleindex;
+	uint64_t m_numPoints;
+	bool m_hasVelocity;
+	uint64_t m_sampleIndex;
 };
 
 struct ABC_Polymesh_Sample
 {
-	float * _positions;
-	float *	_velocities;
+	float * m_positions;
+	float *	m_velocities;
 };
 
 /*
@@ -55,9 +55,9 @@ uint32_t* _nbdeformers;
 */
 struct ABC_Envelope_Sample
 {
-	uint64_t _nbdeformers;
-	char *	_indices;
-	float * _weights;
+	uint64_t m_numDeformers;
+	char *	m_indices;
+	float * m_weights;
 };
 
 
@@ -75,11 +75,11 @@ public:
 	virtual size_t UpdateSample(ABC_Polymesh_Topo_Sample_Infos* infos, ABC_Polymesh_Topo_Sample* io_sample);
 
 private:
-	AbcG::IPolyMeshSchema _meshschema;
-	AbcG::ICompoundProperty _compoundprop;
-	AbcG::IPolyMeshSchema::Sample _meshsample;
-	AbcG::MeshTopologyVariance _variance;
-	int mNumSamples;
+	AbcG::IPolyMeshSchema m_meshSchema;
+	AbcG::ICompoundProperty m_compoundProp;
+	AbcG::IPolyMeshSchema::Sample m_meshSample;
+	AbcG::MeshTopologyVariance m_variance;
+	int m_numSamples;
 };
 
 //------------------------------------------------------------------------------------------------
@@ -88,12 +88,12 @@ private:
 class AlembicOPolymesh : public AlembicOObject
 {
 protected:
-	Alembic::AbcGeom::OPolyMeshSchema _meshschema;
-	Alembic::AbcGeom::OPolyMeshSchema::Sample _meshsample;
-	int _numsamples;
+	Alembic::AbcGeom::OPolyMeshSchema m_meshSchema;
+	Alembic::AbcGeom::OPolyMeshSchema::Sample m_meshSample;
+	int m_numSamples;
 
 public:
-	AlembicOPolymesh(AlembicWriteJob * in_Job);
+	AlembicOPolymesh(AlembicWriteJob* job, void* customData);
 	virtual ABCStatus Save(double time);
 };
 

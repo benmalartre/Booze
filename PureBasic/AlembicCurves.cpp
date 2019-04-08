@@ -6,12 +6,12 @@ BOOZE_NAMESPACE_OPEN_SCOPE
 
 AlembicICurves::AlembicICurves(AbcG::IObject& object) :AlembicIObject(object)
 {
-	_type = GeometricType_Curves;
+	m_type = GeometricType_Curves;
 }
 
 bool AlembicICurves::Initialize()
 {
-	AbcG::ICurves curves(_object);
+	AbcG::ICurves curves(m_object);
 	GetProperties();
 	return true;
 }
@@ -32,6 +32,13 @@ AlembicOCurves::AlembicOCurves(AlembicWriteJob * in_job)
 
 }
 */
+
+//------------------------------------------------------------------------------------------------
+// Alembic Export
+//------------------------------------------------------------------------------------------------
+AlembicOCurves::AlembicOCurves(AlembicWriteJob* job, void* customData) : AlembicOObject(job, customData){
+
+};
 
 ABCStatus AlembicOCurves::Save(double time, ABC_Curves_Sample_Infos* infos, ABC_Curves_Sample* sample)
 {

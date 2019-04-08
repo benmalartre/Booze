@@ -13,28 +13,27 @@ struct XForm_Sample
 };
 
 
-/*
 class AlembicOXForm : public AlembicOObject
 {
 protected:
-	Alembic::AbcGeom::OXformSchema _xformschema;
-	Alembic::AbcGeom::XformSample _xformsample;
-	int _numsamples;
+	Alembic::AbcGeom::OXformSchema m_xformschema;
+	Alembic::AbcGeom::XformSample m_xformsample;
+	int m_numsamples;
 
 public:
-	AlembicOXForm(){};
+	AlembicOXForm();
 	AlembicOXForm(AlembicWriteJob * in_Job);
 	~AlembicOXForm(){};
 	ABCStatus Save(double time){ return Status_OK; };
 };
-*/
+
 
 class AlembicIXForm : public AlembicIObject
 {
 protected:
-	Alembic::AbcGeom::IXform _xform;
-	Alembic::AbcGeom::IXformSchema _xformschema;
-	Alembic::AbcGeom::XformSample _xformsample;
+	Alembic::AbcGeom::IXform m_xform;
+	Alembic::AbcGeom::IXformSchema m_xformschema;
+	Alembic::AbcGeom::XformSample m_xformsample;
 	int mNumSamples;
 
 public:

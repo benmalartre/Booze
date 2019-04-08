@@ -7,24 +7,24 @@ BOOZE_NAMESPACE_OPEN_SCOPE
 
 struct ABC_FaceSet_Sample_Infos
 {
-	uint64_t _nbfaces;
-	uint64_t _nbfacesvertices;
-	uint64_t _sampleindex;
+	uint64_t m_numFaces;
+	uint64_t m_numFaceVertices;
+	uint64_t m_sampleIndex;
 };
 
 struct ABC_FaceSet_Sample
 {
-	float * _positions;
+	float * m_position;
 };
 
 class AlembicOFaceSet : public AlembicOObject
 {
 protected:
-	Alembic::AbcGeom::OFaceSetSchema __facesetchema;
-	Alembic::AbcGeom::OFaceSetSchema::Sample _facesetample;
-	size_t _numsamples;
-	size_t _nbf;
-	size_t _nbfv;
+	Alembic::AbcGeom::OFaceSetSchema m_faceSetSchema;
+	Alembic::AbcGeom::OFaceSetSchema::Sample m_faceSetSample;
+	size_t m_numSamples;
+	size_t m_numFaces;
+	size_t m_numFaceVertices;
 
 public:
 	AlembicOFaceSet( AlembicWriteJob * in_Job);
@@ -39,11 +39,11 @@ public:
 	virtual bool Initialize();
 
 protected:
-	Alembic::AbcGeom::IFaceSetSchema _facesetchema;
-	Alembic::AbcGeom::IFaceSetSchema::Sample _facesetsample;
-	size_t mNumSamples;
-	size_t _nbf;
-	size_t _nbfv;
+	Alembic::AbcGeom::IFaceSetSchema m_faceSetSchema;
+	Alembic::AbcGeom::IFaceSetSchema::Sample m_faceSetSample;
+	size_t m_numSamples;
+	size_t m_numFaces;
+	size_t m_numFaceVertices;
 };
 
 BOOZE_NAMESPACE_CLOSE_SCOPE

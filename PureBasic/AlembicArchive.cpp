@@ -1,5 +1,11 @@
 #include "AlembicArchive.h"
 #include "AlembicObject.h"
+#include "AlembicXForm.h"
+#include "AlembicCamera.h"
+#include "AlembicPolymesh.h"
+#include "AlembicPoints.h"
+#include "AlembicCurves.h"
+#include "AlembicWriteJob.h"
 #include <map>
 #include <functional>
 
@@ -40,30 +46,30 @@ bool AlembicIArchive::Open(const char* filename)
 	AbcF::IFactory factory;
 	factory.setPolicy(Abc::ErrorHandler::kQuietNoopPolicy);
 	AbcF::IFactory::CoreType coreType;
-	_archive = factory.getArchive(std::string(filename), coreType);
-	_valid = _archive.valid();
+	m_archive = factory.getArchive(std::string(filename), coreType);
+	m_valid = m_archive.valid();
 	if (coreType == AbcF::IFactory::kHDF5)
 	{
-		_format = "hdf5";
+		m_format = "hdf5";
 #ifdef ALEMBIC_WITH_HDF5
-		_valid = true;
+		m_valid = true;
 #endif
 	}
 	else if (coreType == AbcF::IFactory::kOgawa)
 	{
-		_format = "ogawa";
-		_valid = true;
+		m_format = "ogawa";
+		m_valid = true;
 	}
-	else _format = "unknown";
+	else m_format = "unknown";
 
-	_uses = 1;
-	_filename = std::string(filename);
-	if (_valid)
+	m_uses = 1;
+	m_filename = std::string(filename);
+	if (m_valid)
 	{
 		ParseTree();
-		Abc::GetArchiveStartAndEndTime(_archive, _startTime, _endTime);
+		Abc::GetArchiveStartAndEndTime(m_archive, m_startTime, m_endTime);
 	}
-	return _valid;
+	return m_valid;
 }
 
 const char* AlembicIArchive::GetInfos()
@@ -71,7 +77,7 @@ const char* AlembicIArchive::GetInfos()
 
 	std::string infos;
 
-	if (_archive)
+	if (m_archive)
 	{
 		infos = Alembic::AbcCoreAbstract::GetLibraryVersion() + "|";
 		std::string appName;
@@ -79,7 +85,7 @@ const char* AlembicIArchive::GetInfos()
 		Alembic::Util::uint32_t libraryVersion;
 		std::string whenWritten;
 		std::string userDescription;
-		GetArchiveInfo(_archive,
+		GetArchiveInfo(m_archive,
 			appName,
 			libraryVersionString,
 			libraryVersion,
@@ -95,17 +101,18 @@ const char* AlembicIArchive::GetInfos()
 		}
 		else
 		{
-			infos += _archive.getName();
+			infos += m_archive.getName();
 			infos += "|(file doesn't have any ArchiveInfo)|";
 		}
 	}
-
+	else infos = "invalid archive...";
+	return infos.c_str();
 }
 
 void AlembicIArchive::Walk(AbcG::IObject iObj)
 {
 	std::string path = iObj.getFullName();
-	_identifiers.push_back(std::make_pair(path, iObj));
+	m_identifiers.push_back(std::make_pair(path, iObj));
 	for (size_t i = 0; i < iObj.getNumChildren(); i++) {
 		Walk(AbcG::IObject(iObj, iObj.getChildHeader(i).getName()));
 	};
@@ -114,33 +121,33 @@ void AlembicIArchive::Walk(AbcG::IObject iObj)
 void AlembicIArchive::ParseTree()
 {
 	// walk object hierarchy and find valid objects
-	AbcG::IObject iObj = _archive.getTop();
+	AbcG::IObject iObj = m_archive.getTop();
 	Walk(iObj);
 }
 
 void AlembicIArchive::AddObject(AlembicIObject* obj)
 {
-	_objects.push_back(obj);
+	m_objects.push_back(obj);
 }
 uint64_t AlembicIArchive::GetNumObjects()
 {
-	return _objects.size();
+	return m_objects.size();
 }
 
 uint64_t AlembicIArchive::GetNumIdentifiers()
 {
-	return _identifiers.size();
+	return m_identifiers.size();
 }
 
 const char* AlembicIArchive::GetIdentifier(uint64_t i)
 {
-	if (i < _identifiers.size())return _identifiers[i].first.c_str();
+	if (i < m_identifiers.size())return m_identifiers[i].first.c_str();
 	return NULL;
 }
 
 const AbcG::IObject& AlembicIArchive::GetIObj(uint64_t i)
 {
-	if (i < _identifiers.size())return _identifiers[i].second;
+	if (i < m_identifiers.size())return m_identifiers[i].second;
 	return AbcG::IObject();
 }
 
@@ -149,10 +156,10 @@ const AbcG::IObject& AlembicIArchive::GetIObj(uint64_t i)
 AlembicIObject* AlembicIArchive::GetObjByName(const char* name)
 {
 	size_t j = 0;
-	for (size_t i = 0; i < _identifiers.size(); i++)
+	for (size_t i = 0; i < m_identifiers.size(); i++)
 	{
-		if (_identifiers[i].first == std::string(name))return _objects[j];
-		if (_identifiers[i].second.valid())j++;
+		if (m_identifiers[i].first == std::string(name))return m_objects[j];
+		if (m_identifiers[i].second.valid())j++;
 	}
 	
 	return NULL;
@@ -162,14 +169,14 @@ AlembicIObject* AlembicIArchive::GetObjByName(const char* name)
 //---------------------------------------------------
 uint64_t AlembicIArchive::GetNumTimeSampling()
 {
-	return _archive.getNumTimeSamplings();
+	return m_archive.getNumTimeSamplings();
 }
 
 // Get Max Num Samples For Time Sampling
 //---------------------------------------------------
 Abc::index_t AlembicIArchive::GetMaxNumSamplesForTimeSamplingIndex( uint32_t index)
 {
-	return _archive.getMaxNumSamplesForTimeSamplingIndex(index);
+	return m_archive.getMaxNumSamplesForTimeSamplingIndex(index);
 }
 
 /*
@@ -199,9 +206,9 @@ bool AlembicIArchive::Close()
 //========================================================
 // Constructor
 //--------------------------------------------------------
-AlembicOArchive* newOArchive()
+AlembicOArchive* newOArchive(AlembicWriteJob* job)
 {
-	AlembicOArchive* archive = new AlembicOArchive();
+	AlembicOArchive* archive = new AlembicOArchive(job);
 	return archive;
 }
 
@@ -212,14 +219,22 @@ void deleteOArchive(AlembicOArchive* archive)
 	delete archive;
 }
 
-AlembicOArchive::AlembicOArchive(const char* filename, float* frames, int numFrames)
+AlembicOArchive::AlembicOArchive(AlembicWriteJob* job)
 {
-	_archive = CreateArchiveWithInfo(
+	m_job = job;
+	m_archive = CreateArchiveWithInfo(
 		Alembic::AbcCoreOgawa::WriteArchive(),
-		filename,
+		job->GetFileName(),
 		"Alembic PureBasic 1.0 Plugin",
-		filename,
+		job->GetFileName(),
 		Alembic::Abc::ErrorHandler::kThrowPolicy);
+	m_valid = m_archive.valid();
+	if (m_valid){
+		Abc::OObject topArchive = m_archive.getTop();
+		m_top = new AlembicOObject(job, NULL);
+		m_top->Set(topArchive);
+	}
+	
 }
 
 bool AlembicOArchive::Open(const char* filename)
@@ -232,9 +247,61 @@ bool AlembicOArchive::Close()
 	return true;
 }
 
-bool AlembicOArchive::IsValid()
+
+int AlembicOArchive::GetNumObjects()
 {
-	return true;
+	return m_objects.size();
+}
+
+AlembicOObject* AlembicOArchive::AddObject(AlembicOObject* parent, const char* name, ABCGeometricType type, void* customData){
+	switch (type){
+	case GeometricType_Camera:
+	{
+		AlembicOCamera* camera = new AlembicOCamera(GetJob(), customData);
+		camera->Set(Alembic::AbcGeom::OCamera(parent->Get(), (string)name));
+		m_objects.push_back(camera);
+		return camera;
+	}
+			
+	case GeometricType_Curves:
+	{
+		AlembicOCurves* curves = new AlembicOCurves(GetJob(), customData);
+		curves->Set(Alembic::AbcGeom::OCamera(parent->Get(), (string)name));
+		m_objects.push_back(curves);
+		return curves;
+	}
+			
+	case GeometricType_FaceSet:
+	{
+		break;
+	}
+
+	case GeometricType_Light:
+	{
+		break;
+	}
+			
+	case GeometricType_Points:
+	{
+		AlembicOPoints* points = new AlembicOPoints(GetJob(), customData);
+		points->Set(Alembic::AbcGeom::OPolyMesh(parent->Get(), (string)name));
+		m_objects.push_back(points);
+		return points;
+	}
+			
+	case GeometricType_PolyMesh:
+	{
+		AlembicOObject* mesh = new AlembicOPolymesh(GetJob(), customData);
+		mesh->Set(Alembic::AbcGeom::OPolyMesh(parent->Get(), (string)name));
+		m_objects.push_back(mesh);
+		return mesh;
+	}
+			
+	}
+	return NULL;
+	
+	//AlembicOObject* obj = new AlembicOObject(GetJob(), customData);
+	//return obj;
 }
 
 BOOZE_NAMESPACE_CLOSE_SCOPE

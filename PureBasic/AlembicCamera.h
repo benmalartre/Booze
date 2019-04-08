@@ -22,7 +22,7 @@ protected:
 	//Alembic::AbcGeom::OCameraSchema::Sample _sample;
 
 public:
-	AlembicOCamera(AlembicWriteJob * in_Job);
+	AlembicOCamera(AlembicWriteJob * in_Job, void* customData);
 	virtual ABCStatus Save(double time, ABC_Camera_Sample_Infos* infos, ABC_Camera_Sample* sample);
 };
 
@@ -34,8 +34,8 @@ public:
 	virtual bool Initialize();
 
 protected:
-	Alembic::AbcGeom::ICameraSchema _schema;
-	//Alembic::AbcGeom::ICameraSchema::Sample _sample;
+	Alembic::AbcGeom::ICameraSchema m_schema;
+	//Alembic::AbcGeom::ICameraSchema::Sample m_sample;
 };
 
 BOOZE_NAMESPACE_CLOSE_SCOPE

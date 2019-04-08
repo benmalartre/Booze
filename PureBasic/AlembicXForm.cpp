@@ -6,7 +6,7 @@ BOOZE_NAMESPACE_OPEN_SCOPE
 
 AlembicIXForm::AlembicIXForm(AbcG::IObject& object) :AlembicIObject(object)
 {
-	_type = GeometricType_XForm;
+	m_type = GeometricType_XForm;
 }
 
 bool AlembicIXForm::Initialize(){

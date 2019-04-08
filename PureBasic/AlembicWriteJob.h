@@ -8,22 +8,21 @@ class AlembicOArchive;
 class AlembicWriteJob
 {
 protected:
-	std::string _filename;
-    std::vector<float> _frames;
-    AlembicOArchive* _archive;
-    unsigned int _Ts;
-	std::map<std::string,std::string> _options;
+	std::string m_filename;
+    std::vector<float> m_frames;
+    AlembicOArchive* m_archive;
+    unsigned int m_Ts;
+	std::map<std::string,std::string> m_options;
 
 public:
-	AlembicWriteJob();
 	AlembicWriteJob(const char* in_FileName, float* in_Frames, int numFrames);
 	~AlembicWriteJob();
 
-	virtual AlembicOArchive* GetArchive() { return _archive; };
-	virtual const std::vector<float> & GetFrames() { return _frames; };
-	virtual void SetFileName(const  char* filename) { _filename = filename; };
-	virtual const char* GetFileName() { return _filename.c_str(); };
-	virtual unsigned int GetAnimatedTs() { return _Ts; };
+	virtual AlembicOArchive* GetArchive() { return m_archive; };
+	virtual const std::vector<float> & GetFrames() { return m_frames; };
+	virtual void SetFileName(const  char* filename) { m_filename = filename; };
+	virtual const char* GetFileName() { return m_filename.c_str(); };
+	virtual unsigned int GetAnimatedTs() { return m_Ts; };
 	virtual void SetOption(const char* in_Name, const char* in_Value);
 	virtual bool HasOption(const char* in_Name);
 	virtual const char* GetOption(const char* in_Name);

@@ -7,7 +7,7 @@
 class AlembicMessage
 {
 protected:
-	std::string _msg;
+	std::string m_msg;
 	
 public:
 	AlembicMessage(){};

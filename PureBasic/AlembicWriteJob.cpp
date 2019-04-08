@@ -7,12 +7,12 @@ BOOZE_NAMESPACE_OPEN_SCOPE
 
 AlembicWriteJob::AlembicWriteJob(const char* filename, float* frames, int numFrames)
 {
-   _filename = filename;
+   m_filename = filename;
    // init archive (use a locally scoped archive)
-   _archive = new AlembicOArchive(filename,frames, numFrames);
+   m_archive = new AlembicOArchive(this);
 
    for(uint64_t i=0;i<numFrames;i++)
-      _frames.push_back(frames[i]);
+      m_frames.push_back(frames[i]);
 }
 
 AlembicWriteJob::~AlembicWriteJob()
@@ -22,23 +22,23 @@ AlembicWriteJob::~AlembicWriteJob()
 
 void AlembicWriteJob::SetOption(const char* in_Name, const char* in_Value)
 {
-	std::map<std::string,std::string>::iterator it = _options.find(in_Name);
-	if(it == _options.end())
-		_options.insert(std::pair<std::string,std::string>(in_Name,in_Value));
+	std::map<std::string,std::string>::iterator it = m_options.find(in_Name);
+	if(it == m_options.end())
+		m_options.insert(std::pair<std::string,std::string>(in_Name,in_Value));
 	else
 		it->second = in_Value;
 }
 
 bool AlembicWriteJob::HasOption(const char*in_Name)
 {
-	std::map<std::string,std::string>::iterator it = _options.find(in_Name);
-   return it != _options.end();
+	std::map<std::string,std::string>::iterator it = m_options.find(in_Name);
+   return it != m_options.end();
 }
 
 const char* AlembicWriteJob::GetOption(const char* in_Name)
 {
-	std::map<std::string,std::string>::iterator it = _options.find(in_Name);
-   if(it != _options.end())
+	std::map<std::string,std::string>::iterator it = m_options.find(in_Name);
+   if(it != m_options.end())
       return it->second.c_str();
    return std::string("False").c_str();
 }

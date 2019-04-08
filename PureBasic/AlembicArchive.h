@@ -6,56 +6,64 @@
 BOOZE_NAMESPACE_OPEN_SCOPE
 
 class AlembicOObject;
+class AlembicWriteJob;
 class AlembicOArchive
 {
 public:
-	AlembicOArchive(){};
-	AlembicOArchive(const char* filename, float* frames, int numFrames = 0);
+	AlembicOArchive(AlembicWriteJob* job);
 	virtual bool Open(const char* filename);
 	virtual bool Close();
-	virtual bool IsValid();
+	virtual bool IsValid(){ return m_valid; };
+	virtual AlembicOObject* AddObject(AlembicOObject* parent, const char* name, ABCGeometricType type, void* ptr);
+	virtual AlembicOObject* GetTop(){ return m_top; };
+	virtual AlembicWriteJob* GetJob(){ return m_job; };
+	virtual int GetNumObjects();
+
 private:
-	std::vector<AlembicOObject*> _objects;
-	Abc::OArchive _archive;
+	std::vector<AlembicOObject*> m_objects;
+	Abc::OArchive m_archive;
+	AlembicOObject* m_top;
+	AlembicWriteJob* m_job;
+	bool m_valid;
 };
 
 class AlembicIObject;
 class AlembicIArchive
 {
 public:
-	AlembicIArchive() :_uses(0){};
+	AlembicIArchive() :m_uses(0){};
 	virtual bool Open(const char* filename);
 	virtual bool Close();
-	virtual bool IsValid(){return _valid;};
+	virtual bool IsValid(){return m_valid;};
 	virtual const char* GetInfos();
 	virtual void AddObject(AlembicIObject* obj);
 	virtual uint64_t GetNumIdentifiers();
 	virtual uint64_t GetNumObjects();
 	virtual const char* GetIdentifier(uint64_t id);
 	virtual const AbcG::IObject& GetIObj(uint64_t i);
-	virtual AlembicIObject* GetObj(uint64_t index){return _objects[index];};
+	virtual AlembicIObject* GetObj(uint64_t index){return m_objects[index];};
 	virtual AlembicIObject* GetObjByName(const char* name);
-	virtual Abc::IArchive& Get(){ return _archive; };
-	virtual void IncrementUses(){ _uses++; };
-	virtual void DecrementUses(){ _uses--; };
-	virtual uint32_t NumUses(){ return _uses; };
-	virtual double GetStartTime(){return _startTime;};
-	virtual double GetEndTime(){ return _endTime; };
+	virtual Abc::IArchive& Get(){ return m_archive; };
+	virtual void IncrementUses(){ m_uses++; };
+	virtual void DecrementUses(){ m_uses--; };
+	virtual uint32_t NumUses(){ return m_uses; };
+	virtual double GetStartTime(){return m_startTime;};
+	virtual double GetEndTime(){ return m_endTime; };
 	virtual uint64_t GetNumTimeSampling();
 	virtual Abc::index_t GetMaxNumSamplesForTimeSamplingIndex(uint32_t index);
 
 private:
 	void Walk(AbcG::IObject iObj);
 	void ParseTree();
-	Abc::IArchive _archive;
-	double _startTime;
-	double _endTime;
-	bool _valid;
-	uint32_t _uses;
-	std::string _format;
-	std::string _filename;
-	std::vector<std::pair<std::string, AbcG::IObject>> _identifiers;
-	std::vector<AlembicIObject*> _objects;
+	Abc::IArchive m_archive;
+	double m_startTime;
+	double m_endTime;
+	bool m_valid;
+	uint32_t m_uses;
+	std::string m_format;
+	std::string m_filename;
+	std::vector<std::pair<std::string, AbcG::IObject>> m_identifiers;
+	std::vector<AlembicIObject*> m_objects;
 };
 
 BOOZE_EXPORT AlembicIArchive* newIArchive();

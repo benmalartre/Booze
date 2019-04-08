@@ -7,25 +7,24 @@ BOOZE_NAMESPACE_OPEN_SCOPE
 
 struct ABC_Points_Sample_Infos
 {
-	uint64_t _nbpoints;
-	uint64_t _sampleindex;
-	bool _hasvelocity;
-	bool _hassize;
-	bool _hasorientation;
-	bool _hasscale;
-	bool _hascolor;
+	uint64_t m_numPoints;
+	uint64_t m_sampleIndex;
+	bool m_hasVelocity;
+	bool m_hasSize;
+	bool m_hasOrientation;
+	bool m_hasScale;
+	bool m_hasColor;
 };
 
 struct ABC_Points_Sample
 {
-	uint64_t* _id;
-	float * _position;
-	float *	_velocity;
-	float * _size;
-	float *	_orientation;
-	float * _scale;
-	float * _color;
-
+	uint64_t* m_id;
+	float * m_position;
+	float *	m_velocity;
+	float * m_size;
+	float *	m_orientation;
+	float * m_scale;
+	float * m_color;
 };
 
 
@@ -37,20 +36,20 @@ Alembic::AbcGeom::OPolyMeshSchema::Sample _meshsample;
 int _numsamples;
 
 public:
-	AlembicOPoints( AlembicWriteJob * in_Job);
-	virtual ABCStatus Save(double time);
+	AlembicOPoints( AlembicWriteJob * in_job, void* customData);
+	virtual ABCStatus Save(float time);
 };
 
 
 class AlembicIPoints : public AlembicIObject
 {
 private:
-	AbcG::IXformSchema _xformschema;
-	AbcG::IPolyMeshSchema _meshschema;
-	AbcG::ICompoundProperty _compoundprop;
-	AbcG::XformSample _xformsample;
-	AbcG::IPolyMeshSchema::Sample _pointssample;
-	int mNumSamples;
+	AbcG::IXformSchema m_xformSchema;
+	AbcG::IPolyMeshSchema m_meshSchema;
+	AbcG::ICompoundProperty m_compoundProp;
+	AbcG::XformSample m_xformSample;
+	AbcG::IPolyMeshSchema::Sample m_pointsSample;
+	int m_numSamples;
 public:
 	AlembicIPoints(AbcG::IObject& iObj);
 	virtual bool Initialize();

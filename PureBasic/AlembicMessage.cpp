@@ -7,7 +7,7 @@
 
 void AlembicMessage::Set(std::string& msg)
 {
-	this->_msg = msg;
+	this->m_msg = msg;
 }
 
 void AlembicMessage::Log()

@@ -26,7 +26,7 @@ namespace AbcG = ::Alembic::AbcGeom;
 using namespace std;
 extern bool ABC_HDF5_SUPPORT;
 
-enum ABCStatus_
+enum ABCStatusEnum
 {
     Status_OK,
     Status_Fail,
@@ -34,7 +34,7 @@ enum ABCStatus_
     Status_Empty
 };
 
-enum ABCGeometricType_
+enum ABCGeometricTypeEnum
 {
 	GeometricType_Unknown,
     GeometricType_XForm,
@@ -48,7 +48,7 @@ enum ABCGeometricType_
 	GeometricType_Light
 };
 
-enum ABCPodType_
+enum ABCPodTypeEnum
 {
     PodType_Boolean,
     PodType_UInt8,
@@ -69,7 +69,7 @@ enum ABCPodType_
     PodType_Unknown
 };
 
-enum ABCPropertyType_
+enum ABCPropertyTypeEnum
 {
   	PropertyType_Compound,      //; 0 < A compound property which may contain other properties */
   	PropertyType_Scalar,        //; 1 < A single value property */
@@ -77,7 +77,7 @@ enum ABCPropertyType_
   	PropertyType_Unknown = 127  //  < Unknown To the framework */
 };
 
-enum ABCGeometryScope_
+enum ABCGeometryScopeEnum
 {
     GeometryScope_Constant,
     GeometryScope_Uniform,
@@ -87,14 +87,14 @@ enum ABCGeometryScope_
     GeometryScope_Unknown = 127
 };
 
-enum ABCTopoVariance_
+enum ABCTopoVarianceEnum
 {
     TopoVariance_Constant,
     TopoVariance_Homogenous,
     TopoVariance_Heterogenous
 };
 
-enum ABCDataTraits_
+enum ABCDataTraitsEnum
 {
 	DataTraits_Bool = 0,
 	DataTraits_UChar,
@@ -171,21 +171,21 @@ enum ABCDataTraits_
 	DataTraits_Unknown
 };
 
-enum ABCArchiveType_
+enum ABCArchiveTypeEnum
 {
 	  ArchiveType_HDF5,			/*! Archive is an HDF5 archive */
 	  ArchiveType_Ogawa,		/*! Archive is an Ogawa archive */
 	  ArchiveType_Unknown = 127	/*! Don't know what archive type it is */
 };
 
-typedef enum ABCStatus_ ABCStatus;
-typedef enum ABCGeometricType_ ABCGeometricType;
-typedef enum ABCPodType_ ABCPodType;
-typedef enum ABCPropertyType_ ABCPropertyType;
-typedef enum ABCGeometryScope_ ABCGeometryScope;
-typedef enum ABCTopoVariance_ ABCTopoVariance;
-typedef enum ABCDataTraits_ ABCDataTraits;
-typedef enum ABCArchiveType_ ABCArchiveType;
+typedef enum ABCStatusEnum ABCStatus;
+typedef enum ABCGeometricTypeEnum ABCGeometricType;
+typedef enum ABCPodTypeEnum ABCPodType;
+typedef enum ABCPropertyTypeEnum ABCPropertyType;
+typedef enum ABCGeometryScopeEnum ABCGeometryScope;
+typedef enum ABCTopoVarianceEnum ABCTopoVariance;
+typedef enum ABCDataTraitsEnum ABCDataTraits;
+typedef enum ABCArchiveTypeEnum ABCArchiveType;
 
 #define BOOZE_NAMESPACE_OPEN_SCOPE   namespace BOOZE {
 #define BOOZE_NAMESPACE_CLOSE_SCOPE  }  
