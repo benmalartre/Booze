@@ -1,5 +1,6 @@
 //#include "AlembicXForm.h"
 #include "AlembicPoints.h"
+#include "AlembicWriteJob.h"
 
 BOOZE_NAMESPACE_OPEN_SCOPE
 
@@ -76,8 +77,17 @@ size_t AlembicIPoints::UpdateSample(ABC_Points_Sample_Infos* infos, ABC_Points_S
 //------------------------------------------------------------------------------------------------
 // Alembic Export
 //------------------------------------------------------------------------------------------------
-AlembicOPoints::AlembicOPoints(AlembicWriteJob* job, void* customData) : AlembicOObject(job, customData){
+AlembicOPoints::AlembicOPoints(AlembicWriteJob* job, AlembicOObject* parent, void* customData, const char* name) 
+: AlembicOObject(job, parent, customData, GeometricType_Points){
+	std::string xformName = name;
+	std::string shapeName = name;
+	shapeName += "Shape";
 
+	Alembic::AbcGeom::OXform xformObj(parent->Get(), xformName, job->GetAnimatedTs());
+	Alembic::AbcGeom::OPoints pointsObj(xformObj, shapeName, job->GetAnimatedTs());
+
+	m_xform = xformObj.getSchema();
+	m_points = pointsObj.getSchema();
 };
 
 ABCStatus AlembicOPoints::Save(float time)

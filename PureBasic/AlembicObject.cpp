@@ -12,10 +12,6 @@
 
 BOOZE_NAMESPACE_OPEN_SCOPE
 
-void AlembicOObject::Set(Abc::OObject& obj){
-	m_object = obj;
-}
-
 BOOZE_EXPORT AlembicIObject* newIObject(AlembicIArchive* archive, uint64_t index)
 {
 	//AbcG::IObject iObj = archive->GetObj(index);

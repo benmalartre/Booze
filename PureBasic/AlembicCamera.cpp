@@ -19,8 +19,16 @@ bool AlembicICamera::Initialize()
 //------------------------------------------------------------------------------------------------
 // Alembic Export
 //------------------------------------------------------------------------------------------------
-AlembicOCamera::AlembicOCamera(AlembicWriteJob* job, void* customData) : AlembicOObject(job, customData){
+AlembicOCamera::AlembicOCamera(AlembicWriteJob * job, AlembicOObject* parent, void* customData, const char* name)
+: AlembicOObject(job, parent, customData, GeometricType_Camera){
+	std::string xformName = name;
+	std::string shapeName = name;
+	shapeName += "Shape";
 
+	Alembic::AbcGeom::OXform xformObj(parent->Get(), xformName, job->GetAnimatedTs());
+	Alembic::AbcGeom::OCamera cameraObj(xformObj, shapeName, job->GetAnimatedTs());
+
+	m_camera = cameraObj.getSchema();
 };
 
 ABCStatus AlembicOCamera::Save(double time, ABC_Camera_Sample_Infos* infos, ABC_Camera_Sample* sample)

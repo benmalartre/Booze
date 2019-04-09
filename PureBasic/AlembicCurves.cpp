@@ -36,8 +36,16 @@ AlembicOCurves::AlembicOCurves(AlembicWriteJob * in_job)
 //------------------------------------------------------------------------------------------------
 // Alembic Export
 //------------------------------------------------------------------------------------------------
-AlembicOCurves::AlembicOCurves(AlembicWriteJob* job, void* customData) : AlembicOObject(job, customData){
+AlembicOCurves::AlembicOCurves(AlembicWriteJob* job, AlembicOObject* parent, void* customData, const char* name)
+: AlembicOObject(job, parent, customData, GeometricType_Curves){
+	std::string xformName = name;
+	std::string shapeName = name;
+	shapeName += "Shape";
 
+	Alembic::AbcGeom::OXform xformObj(parent->Get(), xformName, job->GetAnimatedTs());
+	Alembic::AbcGeom::OCurves curvesObj(xformObj, shapeName, job->GetAnimatedTs());
+
+	m_curves = curvesObj.getSchema();
 };
 
 ABCStatus AlembicOCurves::Save(double time, ABC_Curves_Sample_Infos* infos, ABC_Curves_Sample* sample)

@@ -75,9 +75,10 @@ public:
 	virtual size_t UpdateSample(ABC_Polymesh_Topo_Sample_Infos* infos, ABC_Polymesh_Topo_Sample* io_sample);
 
 private:
-	AbcG::IPolyMeshSchema m_meshSchema;
-	AbcG::ICompoundProperty m_compoundProp;
-	AbcG::IPolyMeshSchema::Sample m_meshSample;
+	AbcG::IXformSchema m_xform;
+	AbcG::IPolyMeshSchema m_mesh;
+	AbcG::ICompoundProperty m_compound;
+	AbcG::IPolyMeshSchema::Sample m_sample;
 	AbcG::MeshTopologyVariance m_variance;
 	int m_numSamples;
 };
@@ -88,13 +89,18 @@ private:
 class AlembicOPolymesh : public AlembicOObject
 {
 protected:
-	Alembic::AbcGeom::OPolyMeshSchema m_meshSchema;
-	Alembic::AbcGeom::OPolyMeshSchema::Sample m_meshSample;
+	AbcG::OXformSchema m_xform;
+	AbcG::OPolyMeshSchema m_mesh;
+	AbcG::OPolyMeshSchema::Sample m_sample;
 	int m_numSamples;
 
 public:
-	AlembicOPolymesh(AlembicWriteJob* job, void* customData);
-	virtual ABCStatus Save(double time);
+	AlembicOPolymesh(AlembicWriteJob* job, AlembicOObject* parent, void* customData, const char* name);
+	virtual void AlembicOPolymesh::SetPositions(Imath::V3f* positions, int32_t numVertices);
+	virtual void AlembicOPolymesh::SetDescription(int32_t* faceIndices, int32_t* faceCounts, int32_t numFaces);
+
+	ABCStatus	Save();
+	void		Set(Abc::OObject& obj);
 };
 
 BOOZE_NAMESPACE_CLOSE_SCOPE

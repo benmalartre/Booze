@@ -8,6 +8,7 @@ BOOZE_NAMESPACE_OPEN_SCOPE
 AlembicWriteJob::AlembicWriteJob(const char* filename, float* frames, int numFrames)
 {
    m_filename = filename;
+   m_current = NULL;
    // init archive (use a locally scoped archive)
    m_archive = new AlembicOArchive(this);
 
@@ -16,9 +17,18 @@ AlembicWriteJob::AlembicWriteJob(const char* filename, float* frames, int numFra
 }
 
 AlembicWriteJob::~AlembicWriteJob()
-{
+{	
+	m_archive->Close();
+
 }
 
+void AlembicWriteJob::SetFramerate(float framerate)
+{
+	m_timePerSample = 1.0 / framerate;
+	// create the sampling
+	AbcA::TimeSampling sampling(m_timePerSample, 0.0);
+	m_Ts = m_archive->Get().addTimeSampling(sampling);
+}
 
 void AlembicWriteJob::SetOption(const char* in_Name, const char* in_Value)
 {

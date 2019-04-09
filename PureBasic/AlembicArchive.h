@@ -2,6 +2,7 @@
 #define _BOOZE_ARCHIVE_STORAGE_H_
 
 #include "AlembicFoundation.h"
+#include <map>
 
 BOOZE_NAMESPACE_OPEN_SCOPE
 
@@ -15,16 +16,21 @@ public:
 	virtual bool Close();
 	virtual bool IsValid(){ return m_valid; };
 	virtual AlembicOObject* AddObject(AlembicOObject* parent, const char* name, ABCGeometricType type, void* ptr);
+	virtual Abc::OArchive Get(){ return m_archive; };
 	virtual AlembicOObject* GetTop(){ return m_top; };
 	virtual AlembicWriteJob* GetJob(){ return m_job; };
 	virtual int GetNumObjects();
+	virtual AlembicOObject* GetObjectByIndex(unsigned index){ return m_objects[index]; };
+	virtual AlembicOObject* GetObjectByName(const char* name);
 
 private:
-	std::vector<AlembicOObject*> m_objects;
+	
 	Abc::OArchive m_archive;
 	AlembicOObject* m_top;
 	AlembicWriteJob* m_job;
 	bool m_valid;
+	std::vector<AlembicOObject*> m_objects;
+	std::map<string, int> m_map;
 };
 
 class AlembicIObject;

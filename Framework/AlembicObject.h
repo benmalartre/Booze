@@ -14,7 +14,7 @@ protected:
 	
 public:
 	std::vector<AlembicOProperty> _props;
-	AlembicOObject(){};
+	AlembicOObject(AlembicWriteJob* job, void* customData, const char* name, ABCGeometricType type);
 	~AlembicOObject(){};
 
 	void SetOObject(Alembic::Abc::OObject* obj);

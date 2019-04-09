@@ -15,18 +15,9 @@ struct ABC_Camera_Sample
 
 };
 
-class AlembicOCamera : public AlembicOObject
-{
-protected:
-	Alembic::AbcGeom::OCameraSchema _schema;
-	//Alembic::AbcGeom::OCameraSchema::Sample _sample;
-
-public:
-	AlembicOCamera(AlembicWriteJob * in_Job, void* customData);
-	virtual ABCStatus Save(double time, ABC_Camera_Sample_Infos* infos, ABC_Camera_Sample* sample);
-};
-
-
+//------------------------------------------------------------------------------------------------
+// Alembic Import
+//------------------------------------------------------------------------------------------------
 class AlembicICamera : public AlembicIObject
 {
 public:
@@ -34,9 +25,23 @@ public:
 	virtual bool Initialize();
 
 protected:
-	Alembic::AbcGeom::ICameraSchema m_schema;
-	//Alembic::AbcGeom::ICameraSchema::Sample m_sample;
+	Alembic::AbcGeom::ICameraSchema m_camera;
 };
+
+//------------------------------------------------------------------------------------------------
+// Alembic Export
+//------------------------------------------------------------------------------------------------
+class AlembicOCamera : public AlembicOObject
+{
+protected:
+	Alembic::AbcGeom::OCameraSchema m_camera;
+	//Alembic::AbcGeom::OCameraSchema::Sample _sample;
+
+public:
+	AlembicOCamera(AlembicWriteJob * in_Job, AlembicOObject* parent, void* customData, const char* name);
+	virtual ABCStatus Save(double time, ABC_Camera_Sample_Infos* infos, ABC_Camera_Sample* sample);
+};
+
 
 BOOZE_NAMESPACE_CLOSE_SCOPE
 

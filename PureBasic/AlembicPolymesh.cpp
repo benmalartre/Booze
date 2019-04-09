@@ -1,5 +1,6 @@
 //#include "AlembicXForm.h"
 #include "AlembicPolymesh.h"
+#include "AlembicWriteJob.h"
 
 BOOZE_NAMESPACE_OPEN_SCOPE
 
@@ -539,11 +540,61 @@ BOOZE_EXPORT int ABC_UpdatePolymeshSample(AlembicIObject* obj, ABC_Polymesh_Topo
 //------------------------------------------------------------------------------------------------
 // Alembic Export
 //------------------------------------------------------------------------------------------------
-AlembicOPolymesh::AlembicOPolymesh(AlembicWriteJob* job, void* customData) : AlembicOObject(job, customData){
+AlembicOPolymesh::AlembicOPolymesh(AlembicWriteJob* job, AlembicOObject* parent, void* customData, const char* name)
+: AlembicOObject(job, parent, customData, GeometricType_PolyMesh){
 
+	std::string xformName = name;
+	std::string shapeName = name; 
+	shapeName+="Shape";
+
+	Alembic::AbcGeom::OXform xform(parent->Get(), xformName, job->GetAnimatedTs());
+	Alembic::AbcGeom::OPolyMesh mesh(xform, shapeName, job->GetAnimatedTs());
+
+	m_xform = xform.getSchema();
+	m_mesh = mesh.getSchema();
+	m_numSamples = 0;
 };
 
-ABCStatus AlembicOPolymesh::Save(double time){
+void AlembicOPolymesh::SetPositions(Imath::V3f* positions, int32_t numVertices)
+{
+	m_sample.setPositions(AbcG::V3fArraySample(positions, numVertices));
+}
+
+void AlembicOPolymesh::SetDescription(int32_t* faceIndices, int32_t* faceCounts, int32_t numFaces)
+{
+	int numIndices = 0;
+	for (unsigned i = 0; i<numFaces; i++)numIndices += faceCounts[i];
+	m_sample.setFaceIndices(AbcG::Int32ArraySample(faceIndices, numIndices));
+	m_sample.setFaceCounts(AbcG::Int32ArraySample(faceCounts, numFaces));
+}
+
+/*
+ABCStatus AlembicOPolymesh::Set(
+	Imath::V3f* positions,
+	int numVertices,
+	int* faceIndices,
+	int* faceCounts,
+	int numFaces)
+{
+	int numIndices = 0;
+	for (unsigned i = 0; i<numFaces; i++)numIndices += faceCounts[i];
+	m_meshSample.setPositions(AbcG::V3fArraySample(positions, numVertices));
+	if (numFaces > 0 && numIndices > 0){
+		m_meshSample.setFaceIndices(AbcG::Int32ArraySample(faceIndices, numIndices));
+		m_meshSample.setFaceCounts(AbcG::Int32ArraySample(faceCounts, numFaces));
+	}
+
+	return Status_OK;
+}
+*/
+ABCStatus AlembicOPolymesh::Save(){
+	m_mesh.set(m_sample);
+
+	// not actually the right data; just making it up
+	AbcG::Box3d cbox;
+	cbox.extendBy(AbcG::V3d(1.0, -1.0, 0.0));
+	cbox.extendBy(AbcG::V3d(-1.0, 1.0, 3.0));
+	m_mesh.getChildBoundsProperty().set(cbox);
 	return Status_OK;
 }
 
@@ -552,13 +603,69 @@ BOOZE_EXPORT bool ABC_SavePolymeshSample(
 	double time,
 	Imath::V3f* positions,
 	int numVertices,
-	int* faceIndices,
-	int* faceCount,
-	int numFaces)
+	int* faceIndices=NULL,
+	int* faceCount=NULL,
+	int numFaces=0)
 {
+
+	/*
+	OPolyMeshSchema::Sample mesh_samp(
+		V3fArraySample((const V3f *)g_verts, g_numVerts),
+		Int32ArraySample(g_indices, g_numIndices),
+		Int32ArraySample(g_counts, g_numCounts),
+		uvsamp, nsamp);
+*/
 	return true;
 }
 
+/*
+// Create a PolyMesh class.
+OPolyMesh meshyObj(OObject(archive, kTop), "meshy");
+OPolyMeshSchema &mesh = meshyObj.getSchema();
+
+// some apps can arbitrarily name their primary UVs, this function allows
+// you to do that, and must be done before the first time you set UVs
+// on the schema
+mesh.setUVSourceName("test");
+
+// UVs and Normals use GeomParams, which can be written or read
+// as indexed or not, as you'd like.
+OV2fGeomParam::Sample uvsamp(V2fArraySample((const V2f *)g_uvs,
+	g_numUVs),
+	kFacevaryingScope);
+// indexed normals
+ON3fGeomParam::Sample nsamp(N3fArraySample((const N3f *)g_normals,
+	g_numNormals),
+	kFacevaryingScope);
+
+// Set a mesh sample.
+// We're creating the sample inline here,
+// but we could create a static sample and leave it around,
+// only modifying the parts that have changed.
+OPolyMeshSchema::Sample mesh_samp(
+	V3fArraySample((const V3f *)g_verts, g_numVerts),
+	Int32ArraySample(g_indices, g_numIndices),
+	Int32ArraySample(g_counts, g_numCounts),
+	uvsamp, nsamp);
+
+// not actually the right data; just making it up
+Box3d cbox;
+cbox.extendBy(V3d(1.0, -1.0, 0.0));
+cbox.extendBy(V3d(-1.0, 1.0, 3.0));
+
+// Set the sample twice
+mesh.set(mesh_samp);
+mesh.set(mesh_samp);
+
+// do it twice to make sure getChildBoundsProperty works correctly
+mesh.getChildBoundsProperty().set(cbox);
+mesh.getChildBoundsProperty().set(cbox);
+
+// Alembic objects close themselves automatically when they go out
+// of scope. So - we don't have to do anything to finish
+// them off!
+std::cout << "Writing: " << archive.getName() << std::endl;
+*/
 /*
 	SaveXFormSample(prim.GetParent3DObject().GetKinematics().GetGlobal().GetRef(), _xformschema, _xformsample, time);
 

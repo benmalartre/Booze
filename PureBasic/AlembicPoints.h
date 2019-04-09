@@ -27,28 +27,17 @@ struct ABC_Points_Sample
 	float * m_color;
 };
 
-
-class AlembicOPoints : public AlembicOObject
-{
-protected:
-Alembic::AbcGeom::OPolyMeshSchema _meshschema;
-Alembic::AbcGeom::OPolyMeshSchema::Sample _meshsample;
-int _numsamples;
-
-public:
-	AlembicOPoints( AlembicWriteJob * in_job, void* customData);
-	virtual ABCStatus Save(float time);
-};
-
-
+//------------------------------------------------------------------------------------------------
+// Alembic Import
+//------------------------------------------------------------------------------------------------
 class AlembicIPoints : public AlembicIObject
 {
 private:
-	AbcG::IXformSchema m_xformSchema;
-	AbcG::IPolyMeshSchema m_meshSchema;
-	AbcG::ICompoundProperty m_compoundProp;
+	AbcG::IXformSchema m_xform;
+	AbcG::IPolyMeshSchema m_mesh;
+	AbcG::ICompoundProperty m_compound;
 	AbcG::XformSample m_xformSample;
-	AbcG::IPolyMeshSchema::Sample m_pointsSample;
+	AbcG::IPolyMeshSchema::Sample m_sample;
 	int m_numSamples;
 public:
 	AlembicIPoints(AbcG::IObject& iObj);
@@ -57,51 +46,21 @@ public:
 	virtual size_t UpdateSample(ABC_Points_Sample_Infos* infos, ABC_Points_Sample* io_sample);
 };
 
+//------------------------------------------------------------------------------------------------
+// Alembic Export
+//------------------------------------------------------------------------------------------------
+class AlembicOPoints : public AlembicOObject
+{
+protected:
+AbcG::OXformSchema m_xform;
+AbcG::OPointsSchema m_points;
+AbcG::OPointsSchema::Sample m_sample;
+int m_numSamples;
+
+public:
+	AlembicOPoints( AlembicWriteJob * in_job, AlembicOObject* parent, void* customData, const char* name);
+	virtual ABCStatus Save(float time);
+};
+
 BOOZE_NAMESPACE_CLOSE_SCOPE
 #endif
-
-/*
-#ifndef _ALEMBIC_POINTCLOUD_H_
-#define _ALEMBIC_POINTCLOUD_H_
-
-#include "AlembicObject.h"
-class AlembicOPointCloud : public AlembicOObject
-{
-protected:
-	Alembic::AbcGeom::OXform	_xform;
-   Alembic::AbcGeom::OXformSchema _xformschema;
-   Alembic::AbcGeom::OPointsSchema _pointsschema;
-   Alembic::AbcGeom::XformSample _xformsample;
-   Alembic::AbcGeom::OPointsSchema::Sample _pointssample;
-   int _numsamples;
-
-public:
-	AlembicOPointCloud(){};
-   AlembicOPointCloud( AlembicWriteJob * in_Job);
-   ~AlembicOPointCloud(){};
-   virtual ABCStatus Save(double time){return Status_OK;};
-};
-
-
-class AlembicIPointCloud : public AlembicIObject
-{
-protected:
-	Alembic::AbcGeom::OXform	_xform;
-	Alembic::AbcGeom::IXformSchema _xformschema;
-   Alembic::AbcGeom::IPointsSchema _pointsschema;
-   Alembic::AbcGeom::XformSample _xformsample;
-   Alembic::AbcGeom::IPointsSchema::Sample _pointssample;
-   int _numsamples;
-   int _nbp;
-
-
-public:
-	AlembicIPointCloud(){};
-	AlembicIPointCloud(Alembic::Abc::IObject* obj){_abcobject = obj;};
-	~AlembicIPointCloud(){};
-	virtual void Clean(){};
-	virtual void Update(){};
-};
-
-#endif
-*/

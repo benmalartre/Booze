@@ -18,10 +18,10 @@
 
 #include "AlembicExport.h"
 
-namespace Abc = ::Alembic::Abc;;
-namespace AbcA = ::Alembic::AbcCoreAbstract;
-namespace AbcF = ::Alembic::AbcCoreFactory;
-namespace AbcG = ::Alembic::AbcGeom;
+namespace Abc = Alembic::Abc;;
+namespace AbcA = Alembic::AbcCoreAbstract;
+namespace AbcF = Alembic::AbcCoreFactory;
+namespace AbcG = Alembic::AbcGeom;
 
 using namespace std;
 extern bool ABC_HDF5_SUPPORT;

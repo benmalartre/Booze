@@ -5,6 +5,9 @@
 
 BOOZE_NAMESPACE_OPEN_SCOPE
 
+//------------------------------------------------------------------------------------------------
+// Buffer Structures
+//------------------------------------------------------------------------------------------------
 struct ABC_Property_Sample_Infos
 {
 	uint64_t m_numItems;
@@ -18,6 +21,36 @@ struct ABC_Property_Sample
 	void* m_datas;
 };
 
+//------------------------------------------------------------------------------------------------
+// Alembic Import
+//------------------------------------------------------------------------------------------------
+class AlembicIProperty
+{
+public:
+	AlembicIProperty(Alembic::Abc::PropertyHeader& header);
+	virtual void Init(Alembic::Abc::ICompoundProperty& iParentProp);
+	virtual bool IsConstant();
+	virtual const char*	GetName() const;
+	virtual ABCPropertyType	GetPropertyType() const;
+	virtual ABCDataTraits GetDataTraits() const;
+	virtual Alembic::Abc::int64_t GetNbItems(Alembic::Abc::chrono_t T) const;
+	virtual const char* GetInterpretation() const;
+	virtual bool GetSampleDescription(float time, ABC_Property_Sample_Infos* infos);
+	virtual void GetSample(float time, ABC_Property_Sample_Infos* infos, ABC_Property_Sample* sample);
+
+private:
+	Alembic::Abc::IScalarProperty m_scalar;
+	Alembic::Abc::IArrayProperty m_array;
+	Alembic::Abc::PropertyHeader m_header;
+	std::string m_name;
+	ABCPropertyType m_type;
+	ABCDataTraits m_traits;
+	std::string m_msg;
+};
+
+//------------------------------------------------------------------------------------------------
+// Alembic Export
+//------------------------------------------------------------------------------------------------
 class AlembicOProperty
 {
 public:
@@ -35,30 +68,6 @@ private:
 	ABCPropertyType m_type;
 	ABCDataTraits m_traits;
 
-};
-
-class AlembicIProperty
-{
-public:
-	AlembicIProperty(Alembic::Abc::PropertyHeader& header);
-	virtual void Init(Alembic::Abc::ICompoundProperty& iParentProp);
-	virtual bool IsConstant();
-	virtual const char*	GetName() const;
-	virtual ABCPropertyType	GetPropertyType() const;
-	virtual ABCDataTraits GetDataTraits() const;
-	virtual Alembic::Abc::int64_t GetNbItems(Alembic::Abc::chrono_t T) const;
-	virtual const char* GetInterpretation() const;
-	virtual bool GetSampleDescription(float time, ABC_Property_Sample_Infos* infos);
-	virtual void GetSample(float time, ABC_Property_Sample_Infos* infos, ABC_Property_Sample* sample);
-	
-private:
-	Alembic::Abc::IScalarProperty m_scalar;
-	Alembic::Abc::IArrayProperty m_array;
-	Alembic::Abc::PropertyHeader m_header;
-	std::string m_name;
-	ABCPropertyType m_type;
-	ABCDataTraits m_traits;
-	std::string m_msg;
 };
 
 BOOZE_NAMESPACE_CLOSE_SCOPE

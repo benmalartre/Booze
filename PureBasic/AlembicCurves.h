@@ -43,9 +43,10 @@ public:
 	virtual bool Initialize();
 
 protected:
-	Alembic::AbcGeom::ICurvesSchema m_curveschema;
-	Alembic::AbcGeom::ICompoundProperty m_compoundprop;
-	Alembic::AbcGeom::ICurvesSchema::Sample m_meshsample;
+	AbcG::IXformSchema m_xform;
+	AbcG::ICurvesSchema m_curves;
+	AbcG::ICompoundProperty m_compound;
+	AbcG::ICurvesSchema::Sample m_sample;
 	size_t m_numSamples;
 	size_t m_numPoints;
 	size_t m_numCurves;
@@ -57,14 +58,15 @@ protected:
 class AlembicOCurves : public AlembicOObject
 {
 protected:
-	Alembic::AbcGeom::OCurvesSchema m_curvesSchema;
-	Alembic::AbcGeom::OCurvesSchema::Sample m_curvesSample;
+	AbcG::OXformSchema m_xform;
+	AbcG::OCurvesSchema m_curves;
+	AbcG::OCurvesSchema::Sample m_sample;
 	size_t m_numsamples;
 	size_t m_numPoints;
 	size_t m_numCurves;
 
 public:
-	AlembicOCurves(AlembicWriteJob* job, void* customData);
+	AlembicOCurves(AlembicWriteJob* job, AlembicOObject* parent, void* customData, const char* name);
 	virtual ABCStatus Save(double time, ABC_Curves_Sample_Infos* infos, ABC_Curves_Sample* sample);
 };
 

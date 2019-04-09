@@ -3,7 +3,13 @@
 #include "AlembicObject.h"
 
 BOOZE_NAMESPACE_OPEN_SCOPE
+//------------------------------------------------------------------------------------------------
+// Utils
+//------------------------------------------------------------------------------------------------
 
+//------------------------------------------------------------------------------------------------
+// Alembic Export
+//------------------------------------------------------------------------------------------------
 AlembicIXForm::AlembicIXForm(AbcG::IObject& object) :AlembicIObject(object)
 {
 	m_type = GeometricType_XForm;
@@ -13,11 +19,20 @@ bool AlembicIXForm::Initialize(){
 	return true;
 }
 
-BOOZE_EXPORT bool ABC_ObjectIsXForm(AlembicIObject* obj)
+BOOZE_EXPORT bool ABC_ObjectIsIXForm(AlembicIObject* obj)
 {
 	return Alembic::AbcGeom::IXform::matches(obj->Get().getMetaData());
 }
 
+
+//------------------------------------------------------------------------------------------------
+// Alembic Export
+//------------------------------------------------------------------------------------------------
+BOOZE_EXPORT const char* ABC_TestXForm(AlembicIObject* obj, XForm_Sample* io_sample)
+{
+	//return ABC_PassStringToPureBasic(std::string("Hey!!"));
+	return NULL;
+}
 
 BOOZE_EXPORT void ABC_SaveXFormSample(float* xform, Alembic::AbcGeom::OXformSchema & schema, Alembic::AbcGeom::XformSample & sample, float time)
 {
@@ -76,26 +91,9 @@ BOOZE_EXPORT void ABC_SaveXFormSample(float* xform, Alembic::AbcGeom::OXformSche
    schema.set(sample);
 }
 
-/*
-XSIPLUGINCALLBACK CStatus Alembic_XForm_Init( CRef& in_ctxt )
-{
-	OperatorContext ctxt(in_ctxt);
-	CString path = ctxt.GetParameterValue(L"path");
-	CString identifier = ctxt.GetParameterValue(L"identifier");
-	IAlembicArchive* archive = abc_archive_manager.GetArchiveFromID(path.GetAsciiString());
-	Alembic::Abc::IObject* obj = archive->GetObjectFromID(identifier.GetAsciiString());
-	ctxt.PutUserData((CValue::siPtrType)obj);
-}
-*/
-BOOZE_EXPORT const char* ABC_TestXForm(AlembicIObject* obj, XForm_Sample* io_sample)
-{
-	//return ABC_PassStringToPureBasic(std::string("Hey!!"));
-	return NULL;
-}
-
 BOOZE_EXPORT void ABC_GetXFormSample(AlembicIObject* obj, float frame, XForm_Sample* io_sample)
 {
-	if(!obj->Get().valid()||!ABC_ObjectIsXForm(obj))
+	if(!obj->Get().valid()||!ABC_ObjectIsIXForm(obj))
 		return;
 
 	Alembic::AbcGeom::IXform xform(obj->Get(),Alembic::Abc::kWrapExisting);
@@ -125,17 +123,6 @@ BOOZE_EXPORT void ABC_GetXFormSample(AlembicIObject* obj, float frame, XForm_Sam
    io_sample->scl[0] = sample.getScale().x;
    io_sample->scl[1] = sample.getScale().y;
    io_sample->scl[2] = sample.getScale().z;
-
-/*
-   CTransformation transform;
-   transform.SetTranslationFromValues(sample.getTranslation().x,sample.getTranslation().y,sample.getTranslation().z);
-   transform.SetRotationFromAxisAngle(
-      CVector3(sample.getAxis().x,sample.getAxis().y,sample.getAxis().z),DegreesToRadians(sample.getAngle()));
-   transform.SetScalingFromValues(sample.getScale().x,sample.getScale().y,sample.getScale().z);
-
-   KinematicState state(ctxt.GetOutputTarget());
-   state.PutTransform(transform);
-*/
 }
 
 BOOZE_NAMESPACE_CLOSE_SCOPE

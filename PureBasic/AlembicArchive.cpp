@@ -11,11 +11,11 @@
 
 BOOZE_NAMESPACE_OPEN_SCOPE
 
-//========================================================
+//=================================================================================================
 // IArchive
-//========================================================
+//=================================================================================================
 // Constructor
-//--------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 AlembicIArchive* newIArchive()
 {
 	AlembicIArchive* archive = new AlembicIArchive();
@@ -23,12 +23,14 @@ AlembicIArchive* newIArchive()
 }
 
 // Destructor
-//--------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 void deleteIArchive(AlembicIArchive* archive)
 {
 	delete archive;
 }
 
+// Open Archive
+//-------------------------------------------------------------------------------------------------
 bool AlembicIArchive::Open(const char* filename)
 {
 	Close();
@@ -72,6 +74,8 @@ bool AlembicIArchive::Open(const char* filename)
 	return m_valid;
 }
 
+// Get Infos
+//-------------------------------------------------------------------------------------------------
 const char* AlembicIArchive::GetInfos()
 {
 
@@ -152,7 +156,7 @@ const AbcG::IObject& AlembicIArchive::GetIObj(uint64_t i)
 }
 
 // Get Object by Name
-//---------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 AlembicIObject* AlembicIArchive::GetObjByName(const char* name)
 {
 	size_t j = 0;
@@ -166,14 +170,14 @@ AlembicIObject* AlembicIArchive::GetObjByName(const char* name)
 }
 
 // Get Num Time Sampling
-//---------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 uint64_t AlembicIArchive::GetNumTimeSampling()
 {
 	return m_archive.getNumTimeSamplings();
 }
 
 // Get Max Num Samples For Time Sampling
-//---------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 Abc::index_t AlembicIArchive::GetMaxNumSamplesForTimeSamplingIndex( uint32_t index)
 {
 	return m_archive.getMaxNumSamplesForTimeSamplingIndex(index);
@@ -181,31 +185,31 @@ Abc::index_t AlembicIArchive::GetMaxNumSamplesForTimeSamplingIndex( uint32_t ind
 
 /*
 // Get Start Frame
-//---------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 float AlembicIArchive::GetStartTime( uint64_t fps)
 {
 	return _startTime*(float)fps;
 }
 
 // Get End Frame
-//---------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 float AlembicIArchive::GetEndTime(uint64_t fps)
 {
 	return _endTime*(float)fps;
 }
 */
 // Close ARchive
-//---------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 bool AlembicIArchive::Close()
 {
 	return false;
 }
 
-//========================================================
+//=================================================================================================
 // OArchive
-//========================================================
+//=================================================================================================
 // Constructor
-//--------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 AlembicOArchive* newOArchive(AlembicWriteJob* job)
 {
 	AlembicOArchive* archive = new AlembicOArchive(job);
@@ -229,10 +233,10 @@ AlembicOArchive::AlembicOArchive(AlembicWriteJob* job)
 		job->GetFileName(),
 		Alembic::Abc::ErrorHandler::kThrowPolicy);
 	m_valid = m_archive.valid();
+
 	if (m_valid){
 		Abc::OObject topArchive = m_archive.getTop();
-		m_top = new AlembicOObject(job, NULL);
-		m_top->Set(topArchive);
+		m_top = new AlembicOObject(job, NULL, NULL, GeometricType_XForm);
 	}
 	
 }
@@ -247,26 +251,31 @@ bool AlembicOArchive::Close()
 	return true;
 }
 
-
 int AlembicOArchive::GetNumObjects()
 {
 	return m_objects.size();
+}
+
+AlembicOObject* AlembicOArchive::GetObjectByName(const char* name)
+{
+	std::map<string, int>::iterator it;
+	it = m_map.find(name);
+	if (it != m_map.end())return m_objects[it->second];
+	return NULL;
 }
 
 AlembicOObject* AlembicOArchive::AddObject(AlembicOObject* parent, const char* name, ABCGeometricType type, void* customData){
 	switch (type){
 	case GeometricType_Camera:
 	{
-		AlembicOCamera* camera = new AlembicOCamera(GetJob(), customData);
-		camera->Set(Alembic::AbcGeom::OCamera(parent->Get(), (string)name));
+		AlembicOCamera* camera = new AlembicOCamera(GetJob(), parent, customData, name);
 		m_objects.push_back(camera);
 		return camera;
 	}
 			
 	case GeometricType_Curves:
 	{
-		AlembicOCurves* curves = new AlembicOCurves(GetJob(), customData);
-		curves->Set(Alembic::AbcGeom::OCamera(parent->Get(), (string)name));
+		AlembicOCurves* curves = new AlembicOCurves(GetJob(), parent, customData, name);
 		m_objects.push_back(curves);
 		return curves;
 	}
@@ -283,25 +292,20 @@ AlembicOObject* AlembicOArchive::AddObject(AlembicOObject* parent, const char* n
 			
 	case GeometricType_Points:
 	{
-		AlembicOPoints* points = new AlembicOPoints(GetJob(), customData);
-		points->Set(Alembic::AbcGeom::OPolyMesh(parent->Get(), (string)name));
+		AlembicOPoints* points = new AlembicOPoints(GetJob(), parent, customData, name);
 		m_objects.push_back(points);
 		return points;
 	}
 			
 	case GeometricType_PolyMesh:
 	{
-		AlembicOObject* mesh = new AlembicOPolymesh(GetJob(), customData);
-		mesh->Set(Alembic::AbcGeom::OPolyMesh(parent->Get(), (string)name));
+		AlembicOObject* mesh = new AlembicOPolymesh(GetJob(), parent, customData, name);
 		m_objects.push_back(mesh);
 		return mesh;
 	}
 			
 	}
 	return NULL;
-	
-	//AlembicOObject* obj = new AlembicOObject(GetJob(), customData);
-	//return obj;
 }
 
 BOOZE_NAMESPACE_CLOSE_SCOPE
