@@ -52,6 +52,8 @@
 *.log
 *.sdf
 *.opensdf
+*Debug/
+*x64/
 
 # Qt Creator Files
 *.config
