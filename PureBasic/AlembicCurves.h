@@ -68,7 +68,11 @@ protected:
 
 public:
 	AlembicOCurves(AlembicOArchive* archive, AlembicOObject* parent, void* customData, const char* name);
-	virtual void					save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent) override;
+
+	~AlembicOCurves(){ /*if (m_curves)delete m_curves.get();*/ };
+	void					save(AbcA::TimeSamplingPtr time) override;
+	AbcG::OObject			get(){ return *m_curves; };
+	ABCOObjectPtr			getPtr() override { return m_curves; };
 };
 
 BOOZE_NAMESPACE_CLOSE_SCOPE

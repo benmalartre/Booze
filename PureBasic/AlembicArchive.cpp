@@ -246,6 +246,7 @@ AlembicOArchive::AlembicOArchive(AlembicWriteJob* job)
 
 AlembicOArchive::~AlembicOArchive()
 {
+	
 	close();
 }
 
@@ -256,13 +257,9 @@ bool AlembicOArchive::open(const char* filename)
 
 bool AlembicOArchive::close()
 {
-	for (std::map<string, int>::iterator it = m_map.begin(); it != m_map.end(); ++it)
-	{
-		delete m_objects[it->second];
+	for (int32_t i = m_objects.size() - 1; i >= 0; i--){
+		delete m_objects[i];
 	}
-	m_map.clear();
-	m_objects.clear();
-	if(m_root)delete m_root;
 	return true;
 }
 
@@ -279,24 +276,23 @@ AlembicOObject* AlembicOArchive::getObjectByName(const char* name)
 	return NULL;
 }
 
+#define ARCHIVE_ADD_OBJECT(TYPE, NAME) \
+	TYPE* NAME = new TYPE(this, parent, customData, name); \
+if (parent)parent->addChild(NAME); \
+	m_objects.push_back(NAME); \
+	return NAME;\
+
 AlembicOObject* AlembicOArchive::addObject(AlembicOObject* parent, char* name, ABCGeometricType type, void* customData){
-	
 	
 	switch (type){
 		case GeometricType_Camera:
 		{
-			AlembicOCamera* camera = new AlembicOCamera(this, parent, customData, name);
-			if (parent)m_objects.push_back(camera);
-			parent->addChild(camera);
-			return camera;
+									 ARCHIVE_ADD_OBJECT(AlembicOCamera, camera);
 		}
 			
 		case GeometricType_Curves:
 		{
-			AlembicOCurves* curves = new AlembicOCurves(this, parent,customData, name);
-			if (parent)parent->addChild(curves);
-			m_objects.push_back(curves);
-			return curves;
+									 ARCHIVE_ADD_OBJECT(AlembicOCurves, curves);
 		}
 			
 		case GeometricType_FaceSet:
@@ -311,26 +307,17 @@ AlembicOObject* AlembicOArchive::addObject(AlembicOObject* parent, char* name, A
 			
 		case GeometricType_Points:
 		{
-			AlembicOPoints* points = new AlembicOPoints(this, parent, customData, name);
-			if (parent)parent->addChild(points);
-			m_objects.push_back(points);
-			return points;
+									 ARCHIVE_ADD_OBJECT(AlembicOPoints, points);
 		}
 			
 		case GeometricType_PolyMesh:
 		{
-			AlembicOObject* mesh = new AlembicOPolymesh(this, parent, customData, name);
-			if (parent)parent->addChild(mesh);
-			m_objects.push_back(mesh);
-			return mesh;
+									   ARCHIVE_ADD_OBJECT(AlembicOPolymesh, mesh);
 		}
 
 		case GeometricType_XForm:
 		{
-			AlembicOXForm* xform = new AlembicOXForm( this, parent, customData, name);
-			if (parent)parent->addChild(xform);
-			m_objects.push_back(xform);
-			return xform; 
+									ARCHIVE_ADD_OBJECT(AlembicOXForm, xform);
 		}
 			
 	}

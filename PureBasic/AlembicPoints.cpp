@@ -82,7 +82,7 @@ AlembicOPoints::AlembicOPoints(AlembicOArchive* archive, AlembicOObject* parent,
 
 };
 
-void AlembicOPoints::save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent)
+void AlembicOPoints::save(AbcA::TimeSamplingPtr timet)
 {
 
 }

@@ -23,9 +23,12 @@ AlembicORoot::AlembicORoot(AlembicOArchive* archive, void* customData, const cha
 : AlembicOObject(archive, NULL, customData, name, GeometricType_Root){
 };
 
-void AlembicORoot::save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent)
+void AlembicORoot::save(AbcA::TimeSamplingPtr time)
 {
-	
+	for (int i = 0; i < m_children.size(); ++i)
+	{
+		m_children[i]->save(time);
+	}
 }
 
 

@@ -68,7 +68,8 @@ class AlembicIPolymesh : public AlembicIObject
 {
 public:
 	AlembicIPolymesh(AbcG::IObject& iObj);
-	bool Initialize();
+	virtual	~AlembicIPolymesh(){};
+	virtual bool					initialize();
 	virtual void					getTopoSampleDescription(float time, ABC_Polymesh_Topo_Sample_Infos* infos);
 	virtual int						updateTopoSample(ABC_Polymesh_Topo_Sample_Infos* infos, ABC_Polymesh_Topo_Sample* io_sample);
 	virtual void					updatePointPosition(ABC_Polymesh_Sample_Infos* infos, ABC_Polymesh_Sample* io_sample);
@@ -101,14 +102,18 @@ private:
 
 public:
 	AlembicOPolymesh(AlembicOArchive* archive, AlembicOObject* parent, void* customData, const char* name);
-	~AlembicOPolymesh();
+	
+
 	virtual void					set(Imath::V3f* positions, int numVertices, int* faceIndices, int* faceCounts, int numFaces);
 	virtual void					setPositions(Imath::V3f* positions, int numVertices);
 	virtual void					setDescription(int* faceIndices, int* faceCounts, int numFaces);
 
-	virtual void					save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent) override;
+	virtual ~AlembicOPolymesh(){};
+	void							save(AbcA::TimeSamplingPtr time) override;
+	AbcG::OObject					get()override{ return *m_mesh; };
+	ABCOObjectPtr					getPtr() override { return (ABCOObjectPtr&)m_mesh; };
 
-	void test(AbcG::OPolyMeshSchema& schema, Imath::V3f& offset){
+	void							test(AbcG::OPolyMeshSchema& schema, Imath::V3f& offset){
 		/*
 		// some apps can arbitrarily name their primary UVs, this function allows
 		// you to do that, and must be done before the first time you set UVs

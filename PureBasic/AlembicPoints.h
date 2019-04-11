@@ -44,6 +44,7 @@ public:
 	virtual bool			initialize();
 	virtual void			getSampleDescription(float frame, ABC_Points_Sample_Infos* infos);
 	virtual size_t			updateSample(ABC_Points_Sample_Infos* infos, ABC_Points_Sample* io_sample);
+
 };
 
 //------------------------------------------------------------------------------------------------
@@ -61,7 +62,11 @@ protected:
 
 public:
 	AlembicOPoints(AlembicOArchive* archive, AlembicOObject* parent, void* customData, const char* name);
-	virtual void					save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent) override;
+
+	~AlembicOPoints(){ if (m_points)delete m_points.get(); };
+	void						save(AbcA::TimeSamplingPtr time) override;
+	AbcG::OObject				get()override{ return *m_points; };
+	ABCOObjectPtr				getPtr() override { return m_points; };
 };
 
 BOOZE_NAMESPACE_CLOSE_SCOPE

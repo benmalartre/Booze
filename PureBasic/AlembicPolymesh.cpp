@@ -9,7 +9,7 @@ AlembicIPolymesh::AlembicIPolymesh(AbcG::IObject& object) :AlembicIObject(object
 	m_type = GeometricType_PolyMesh;
 }
 
-bool AlembicIPolymesh::Initialize()
+bool AlembicIPolymesh::initialize()
 {
 	AbcG::IPolyMesh mesh(m_object);
 	m_variance = mesh.getSchema().getTopologyVariance();
@@ -542,19 +542,18 @@ BOOZE_EXPORT int ABC_UpdatePolymeshSample(AlembicIObject* obj, ABC_Polymesh_Topo
 //------------------------------------------------------------------------------------------------
 AlembicOPolymesh::AlembicOPolymesh(AlembicOArchive* archive, AlembicOObject* parent, void* customData, const char* name)
 : AlembicOObject(archive, parent, customData, name, GeometricType_PolyMesh){
-	
+	ABCOPolymeshPtr msh(new AbcG::OPolyMesh(parent->get(), name, getJob()->getTimeSampling()->getPtr()));
+	m_mesh = msh;
+
+	//test(m_mesh->getSchema(), Imath::V3f(0, 0, 0));
 };
 
-AlembicOPolymesh::~AlembicOPolymesh()
-{
-	
-}
 
 
 void AlembicOPolymesh::set(Imath::V3f* positions, int32_t numVertices, int32_t* faceIndices, int32_t* faceCounts, int32_t numFaces)
 {
 	int32_t numIndices = 0;
-
+	
 	// positions
 	m_positions.resize(numVertices);
 	memcpy(&m_positions[0][0], &positions[0][0], numVertices*sizeof(Imath::V3f));
@@ -585,13 +584,13 @@ void AlembicOPolymesh::set(Imath::V3f* positions, int32_t numVertices, int32_t* 
 	m_infos.m_hasTangent = false;
 	m_infos.m_hasUvs = false;
 	m_infos.m_hasVelocity = false;
+	
 }
 
 void AlembicOPolymesh::setPositions(Imath::V3f* positions, int32_t numVertices)
 {
 	if (numVertices != m_positions.size())m_positions.resize(numVertices);
-	for (int32_t i = 0; i < numVertices; i++)m_positions[i] = positions[i];
-	//memcpy(&m_positions[0][0], &positions[0][0], numVertices*sizeof(Imath::V3f));
+	memcpy(&m_positions[0][0], &positions[0][0], numVertices*sizeof(Imath::V3f));
 
 	m_sample.m_positions = &m_positions[0][0];
 	m_infos.m_numPoints = numVertices;
@@ -621,16 +620,9 @@ void AlembicOPolymesh::setDescription(int32_t* faceIndices, int32_t* faceCounts,
 	m_infos.m_numSamples = numIndices;
 }
 
-/*
-MessageBox on windows :)	
-#include <winuser.h>
-MessageBox(0, L"plouf", L"paf", 0);
-*/
-
-void AlembicOPolymesh::save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent){
-
-	AbcG::OPolyMesh mesh(parent, m_name, time);
-	AbcG::OPolyMeshSchema schema = mesh.getSchema();
+void AlembicOPolymesh::save(AbcA::TimeSamplingPtr time){
+	ABCOPolymeshPtr meshPtr = AbcU::dynamic_pointer_cast< AbcG::OPolyMesh >(getPtr());
+	AbcG::OPolyMeshSchema& schema = meshPtr->getSchema();
 	
 	AbcG::OPolyMeshSchema::Sample sample(
 		AbcG::V3fArraySample((Imath::V3f*)m_sample.m_positions, m_infos.m_numPoints),
@@ -643,7 +635,7 @@ void AlembicOPolymesh::save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent){
 	cbox.extendBy(AbcG::V3d(1.0, -1.0, 0.0));
 	cbox.extendBy(AbcG::V3d(-1.0, 1.0, 3.0));
 
-	for (int i = 0; i < m_children.size(); ++i)m_children[i]->save(time, mesh);
+	for (int i = 0; i < m_children.size(); ++i)m_children[i]->save(time);
 	
 	//test(schema, Imath::V3f(0,0,0));
 }

@@ -24,7 +24,7 @@ AlembicOCamera::AlembicOCamera(AlembicOArchive* archive, AlembicOObject* parent,
 
 };
 
-void AlembicOCamera::save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent)
+void AlembicOCamera::save(AbcA::TimeSamplingPtr time)
 {
 	/*
 	Application app;

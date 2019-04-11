@@ -843,7 +843,7 @@ void AlembicIProperty::getSample(float time, ABC_Property_Sample_Infos* infos, A
 	switch(m_type){
 		case PropertyType_Scalar:
 		{
-			void* out;
+			void* out=NULL;
 			m_scalar.get(out,selector);
 			memcpy(sample->m_datas, out, m_scalar.getDataType().getNumBytes());
 			break;

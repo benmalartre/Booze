@@ -150,6 +150,7 @@
     <ClCompile Include="AlembicPolymesh.cpp" />
     <ClCompile Include="AlembicProperty.cpp" />
     <ClCompile Include="AlembicRoot.cpp" />
+    <ClCompile Include="AlembicTimeSampling.cpp" />
     <ClCompile Include="AlembicUtil.cpp" />
     <ClCompile Include="AlembicWriteJob.cpp" />
     <ClCompile Include="AlembicXForm.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="AlembicPolymesh.h" />
     <ClInclude Include="AlembicProperty.h" />
     <ClInclude Include="AlembicRoot.h" />
+    <ClInclude Include="AlembicTimeSampling.h" />
     <ClInclude Include="AlembicUtil.h" />
     <ClInclude Include="AlembicWriteJob.h" />
     <ClInclude Include="AlembicXForm.h" />

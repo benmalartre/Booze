@@ -4,6 +4,7 @@
 #include "AlembicFoundation.h"
 #include "AlembicArchive.h"
 #include "AlembicProperty.h"
+#include "AlembicTimeSampling.h"
 
 BOOZE_NAMESPACE_OPEN_SCOPE
 
@@ -37,6 +38,7 @@ protected:
 // ===============================================================================================
 //	ALEMBIC EXPORT  :  AlembicOObject
 // ===============================================================================================
+typedef AbcU::shared_ptr< AbcG::OObject> ABCOObjectPtr;
 class AlembicOArchive;
 class AlembicWriteJob;
 class AlembicOObject
@@ -50,19 +52,16 @@ public:
 		m_name(name){
 	};
 
-	~AlembicOObject(){};
-
-
+	virtual ~AlembicOObject(){};
 	virtual Alembic::Abc::MetaData&	getMetaData(){ return m_metadata; };
 	virtual void*					getCustomData(){ return m_data; };
+	virtual	AbcG::OObject			get() = 0;
+	virtual	ABCOObjectPtr			getPtr() = 0;
 	virtual AlembicOArchive*		getArchive(){ return m_archive; };
+	virtual AlembicTimeSampling*	getTimeSampling();
 	virtual AlembicWriteJob*		getJob(){ return m_archive->getJob(); };
-	//virtual	void					init(AbcG::OObject& parent);
-	virtual void					save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent);
+	virtual void					save(AbcA::TimeSamplingPtr time)=0;
 	virtual void					addChild(AlembicOObject* obj){m_children.push_back(obj);};
-
-	
-	void							setArchive(AlembicOArchive*archive){ m_archive = archive; };
 
 protected:
 	AlembicOArchive*				m_archive;

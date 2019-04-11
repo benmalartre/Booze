@@ -15,7 +15,8 @@ public:
 	virtual bool initialize();
 
 protected:
-	Alembic::AbcGeom::IXformSchema			m_xform;
+	
+	Alembic::AbcGeom::IXformSchema			m_schema;
 };
 
 //------------------------------------------------------------------------------------------------
@@ -24,10 +25,17 @@ protected:
 typedef AbcU::shared_ptr< AbcG::OObject> ABCORootPtr;
 class AlembicORoot : public AlembicOObject
 {
-
 public:
 	AlembicORoot(AlembicOArchive* archive, void* customData, const char* name);
-	virtual void							save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent) override;
+
+	~AlembicORoot(){ };
+	void									save(AbcA::TimeSamplingPtr time) override;
+
+	AbcG::OObject							get(){ return m_archive->get().getTop(); };
+	ABCOObjectPtr							getPtr(){ return NULL; };
+
+protected:
+
 };
 
 

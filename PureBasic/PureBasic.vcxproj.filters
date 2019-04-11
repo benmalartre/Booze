@@ -60,6 +60,9 @@
     <ClCompile Include="AlembicRoot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AlembicTimeSampling.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AlembicArchive.h">
@@ -104,11 +107,14 @@
     <ClInclude Include="AlembicWriteJob.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AlembicXForm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AlembicRoot.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AlembicTimeSampling.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AlembicXForm.h">
+      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

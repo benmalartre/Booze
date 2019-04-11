@@ -8,6 +8,7 @@
 #include "AlembicFaceSet.h"
 #include "AlembicCamera.h"
 #include "AlembicFaceSet.h"
+#include "AlembicWriteJob.h"
 //#include "AlembicLight.h"
 
 BOOZE_NAMESPACE_OPEN_SCOPE
@@ -284,13 +285,10 @@ AlembicIProperty* AlembicIObject::GetProperty(uint64_t id)
 }
 */
 
-
-void AlembicOObject::save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent){
-	for (int i = 0; i < m_children.size(); ++i)
-	{
-		m_children[i]->save(time, parent);
-	}
+AlembicTimeSampling* AlembicOObject::getTimeSampling(){
+	return getJob()->getTimeSampling();
 }
+
 
 
 BOOZE_NAMESPACE_CLOSE_SCOPE

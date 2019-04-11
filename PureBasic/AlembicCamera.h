@@ -40,7 +40,11 @@ protected:
 
 public:
 	AlembicOCamera(AlembicOArchive* archive, AlembicOObject* parent, void* customData, const char* name);
-	virtual void							save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent) override;
+	
+	~AlembicOCamera(){ if (m_camera)delete m_camera.get(); };
+	void							save(AbcA::TimeSamplingPtr time) override;
+	AbcG::OObject					get(){ return *m_camera; };
+	ABCOObjectPtr					getPtr() override { return m_camera; };
 };
 
 

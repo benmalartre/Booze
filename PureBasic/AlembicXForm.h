@@ -36,20 +36,22 @@ typedef AbcU::shared_ptr< AbcG::OXform> ABCOXformPtr;
 class AlembicOXForm : public AlembicOObject
 {
 protected:
-	
+	ABCOXformPtr						m_xform;
 	Alembic::AbcGeom::OXformSchema		m_schema;
 	Alembic::AbcGeom::XformSample		m_sample;
 	int									m_numSamples;
 	Imath::M44f							m_m;
-	ABCOXformPtr						m_xform;
 
 public:
 	AlembicOXForm(AlembicOArchive* archive, AlembicOObject* parent, void* customData, const char* name);
-	~AlembicOXForm(){};
 	
 	virtual	void						setTransform(Imath::M44f& xform){ m_m = xform; };
 	virtual const Imath::M44f&			getTransform(){ return m_m; };
-	virtual void						save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent) override;	
+
+	virtual ~AlembicOXForm(){ };
+	void								save(AbcA::TimeSamplingPtr time) override;
+	AbcG::OObject						get()override{ return *m_xform; };
+	ABCOObjectPtr						getPtr() override { return (ABCOObjectPtr&)m_xform; };
 };
 
 

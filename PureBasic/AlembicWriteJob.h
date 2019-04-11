@@ -2,6 +2,8 @@
 #define _BOOZE_WRITE_JOB_H_
 
 #include "AlembicFoundation.h"
+#include "AlembicTimeSampling.h"
+
 #define DEFAULT_FRAMERATE 24
 
 BOOZE_NAMESPACE_OPEN_SCOPE
@@ -17,13 +19,14 @@ protected:
 	std::map<std::string,std::string>			m_options;
 	float										m_timePerSample;
 	AlembicOObject*								m_current;
-	AbcA::TimeSamplingPtr						m_timeSampling;
+	AlembicTimeSampling*						m_timeSampling;
 
 
 public:
 	AlembicWriteJob(const char* fileName, float* frames, int numFrames);
 	~AlembicWriteJob();
 
+	virtual AlembicTimeSampling*			getTimeSampling(){ return m_timeSampling; };
 	virtual AlembicOArchive*				getArchive() { return m_archive; };
 	virtual const std::vector<float> &		getFrames() { return m_frames; };
 	virtual void							setFileName(const  char* filename) { m_filename = filename; };

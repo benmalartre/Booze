@@ -28,36 +28,35 @@ BOOZE_EXPORT bool ABC_ObjectIsIXForm(AlembicIObject* obj)
 	return Alembic::AbcGeom::IXform::matches(obj->get().getMetaData());
 }
 
-//------------------------------------------------------------------------------------------------
+//================================================================================================
 // Alembic Export
+//================================================================================================
+// Constructor
 //------------------------------------------------------------------------------------------------
 AlembicOXForm::AlembicOXForm(AlembicOArchive* archive, AlembicOObject* parent, void* customData, const char* name)
 : AlembicOObject(archive, parent, customData, name, GeometricType_XForm){
-	/*
-	AbcG::OXform xfo(archive->get().getTop(), name);
+	ABCOXformPtr xfo(new AbcG::OXform(parent->get(), name, getJob()->getTimeSampling()->getPtr()));
+	m_xform = xfo;
+}
+
+// Save
+//------------------------------------------------------------------------------------------------
+void AlembicOXForm::save(AbcA::TimeSamplingPtr time){
 
 	// add a couple of ops
 	AbcG::XformOp transop(AbcG::kTranslateOperation, AbcG::kTranslateHint);
 	AbcG::XformOp scaleop(AbcG::kScaleOperation, AbcG::kScaleHint);
 
-	AbcG::XformSample samp;
-	samp.addOp(transop, AbcG::V3f(1.0, 2.0, 3.0));
-	samp.addOp(scaleop, AbcG::V3f(2.0, 4.0, 6.0));
+	AbcG::XformSample sample;
+	sample.addOp(transop, AbcG::V3f((float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX));
+	float s = (float)rand() / (float)RAND_MAX * 0.5f + 0.5f;
+	sample.addOp(scaleop, AbcG::V3f(s, s, s));
 
-	AbcG::OXformSchema schema = xfo.getSchema();
+	AbcU::shared_ptr< AbcG::OXform > xfoPtr = AbcU::dynamic_pointer_cast< AbcG::OXform >(getPtr());
+	Alembic::AbcGeom::OXformSchema &schema = xfoPtr->getSchema();
 
-	schema.set(samp);
+	schema.set(sample);
 
-	//m_object.reset(new AbcG::OXform(m_archive->get().getTop(), name));
-	//m_schema = m_xform->getSchema();
-	//m_object = m_xform;
-	*/
-
-	AbcU::shared_ptr< AbcG::OObject > xform = makeXform(archive->get().getTop(), name);
-
-}
-
-void AlembicOXForm::save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent){
 	/*
 	MessageBox(NULL, L"SAVE", L"SAVE", MB_OK);
 	ABCOXformPtr xfoPtr = AbcU::dynamic_pointer_cast< AbcG::OXform> (m_object);
@@ -70,9 +69,9 @@ void AlembicOXForm::save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent){
 	
 	// save the sample
 	schema.set(sample);
-
-	for (int i = 0; i < m_children.size(); ++i)m_children[i]->save(time, xfo);
 	*/
+	for (int i = 0; i < m_children.size(); ++i)m_children[i]->save(time);
+	
 }
 
 

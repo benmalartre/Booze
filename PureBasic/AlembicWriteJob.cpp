@@ -15,7 +15,7 @@ AlembicWriteJob::AlembicWriteJob(const char* filename, float* frames, int numFra
    // init archive (use a locally scoped archive)
    m_archive = new AlembicOArchive(this);
    AlembicORoot* root = (AlembicORoot*)m_archive->getRoot();
-   
+
    m_frames.resize(numFrames);
    memcpy(&m_frames[0], &frames[0], numFrames * sizeof(float));
 
@@ -24,7 +24,6 @@ AlembicWriteJob::AlembicWriteJob(const char* filename, float* frames, int numFra
 AlembicWriteJob::~AlembicWriteJob()
 {	
 	if (m_archive){
-		m_archive->close();
 		delete m_archive;
 	}
 	m_frames.clear();
@@ -45,17 +44,17 @@ int32_t AlembicWriteJob::timeToIndex(float time){
 
 void AlembicWriteJob::save(float time){
 	AlembicOObject* root = m_archive->getRoot();
-	root->save(m_timeSampling, m_archive->get().getTop());
+	root->save(m_timeSampling->getPtr());
 }
 
 void AlembicWriteJob::setFramerate(float framerate)
 {
 	// create the sampling
 	m_timePerSample = 1.0 / framerate;
-	m_timeSampling = AbcA::TimeSamplingPtr(new AbcA::TimeSampling(1.0 / m_timePerSample, 1.0));
+	m_timeSampling = new AlembicTimeSampling(TIME_SAMPLING_UNIFORM, m_timePerSample);
 
 	// create the bounding box
-	Abc::OBox3dProperty boxProp = AbcG::CreateOArchiveBounds(m_archive->get(), m_timeSampling);
+	Abc::OBox3dProperty boxProp = AbcG::CreateOArchiveBounds(m_archive->get(), m_timeSampling->getPtr());
 	
 }
 

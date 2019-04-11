@@ -40,7 +40,7 @@ AlembicOCurves::AlembicOCurves(AlembicOArchive* archive, AlembicOObject* parent,
 : AlembicOObject(archive, parent, customData, name, GeometricType_Curves){
 };
 
-void AlembicOCurves::save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent)
+void AlembicOCurves::save(AbcA::TimeSamplingPtr time)
 {
 	/*
 	Application app;
