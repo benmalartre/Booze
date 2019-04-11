@@ -59,3 +59,5 @@ windows
 *x64/*
 *.pys
 *ipch*
+*vcxproj*
+*.sln*
