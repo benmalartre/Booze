@@ -24,6 +24,7 @@ AlembicWriteJob::AlembicWriteJob(const char* filename, float* frames, int numFra
 AlembicWriteJob::~AlembicWriteJob()
 {	
 	if (m_archive){
+		std::cout << "delete ARCHIVE" << std::endl;
 		delete m_archive;
 	}
 	m_frames.clear();

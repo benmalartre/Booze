@@ -246,7 +246,7 @@ AlembicOArchive::AlembicOArchive(AlembicWriteJob* job)
 
 AlembicOArchive::~AlembicOArchive()
 {
-	
+	std::cout << "delete archive" << std::endl;
 	close();
 }
 
@@ -257,7 +257,10 @@ bool AlembicOArchive::open(const char* filename)
 
 bool AlembicOArchive::close()
 {
+	std::cout << "delete objects" << std::endl;
 	for (int32_t i = m_objects.size() - 1; i >= 0; i--){
+		std::cout << "object" << i << " : ";
+		std::cout << m_objects[i]->get().getName() << std::endl;
 		delete m_objects[i];
 	}
 	return true;

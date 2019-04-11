@@ -21,7 +21,7 @@ public:
 	AlembicTimeSampling(TimeSamplingType type, float timePerCycle, float startTime=0.0);
 	virtual AbcA::TimeSampling				get(){ return* m_sampling; };
 	virtual AbcA::TimeSamplingPtr			getPtr(){ return m_sampling; };
-	virtual int32_t							numStoredTimes();
+	virtual size_t							numStoredTimes();
 	virtual double*							getStoredTimes();
 
 
@@ -29,6 +29,7 @@ protected:
 	AbcA::TimeSamplingPtr					m_sampling;
 };
 
-
+BOOZE_EXPORT AlembicTimeSampling*			newTimeSampling(float frameRate, float startFrame);
+BOOZE_EXPORT void							deleteTimeSampling(AlembicTimeSampling* sampling);
 
 BOOZE_NAMESPACE_CLOSE_SCOPE

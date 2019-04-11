@@ -56,8 +56,12 @@
 
 # windows
 windows
-*x64/*
+*/x64/*
+*/Debug/*
 *.pys
 *ipch*
 *vcxproj*
 *.sln*
+*.opensdf
+*.sdf
+*.suo
