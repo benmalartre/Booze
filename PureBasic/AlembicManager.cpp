@@ -49,7 +49,7 @@ AlembicIArchive* AlembicArchiveManager::OpenArchive(const char* path)
 	if (it != _archives.end())
 	{
 		AlembicIArchive* archive = it->second;
-		archive->IncrementUses();
+		archive->incrementUses();
 		return archive;
 	}
 	AlembicIArchive* archive = new AlembicIArchive();
@@ -66,10 +66,10 @@ bool AlembicArchiveManager::CloseArchive(const char* path)
 	if (it != _archives.end())
 	{
 		AlembicIArchive* archive = it->second;
-		archive->DecrementUses();
-		if (!archive->NumUses())
+		archive->decrementUses();
+		if (!archive->numUses())
 		{
-			archive->Close();
+			archive->close();
 			_archives.erase(it);
 			delete archive;
 			return true;

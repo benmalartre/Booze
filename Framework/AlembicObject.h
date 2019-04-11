@@ -21,7 +21,7 @@ public:
 	Alembic::Abc::OObject* GetOObject(){return _abcobject;};
 	std::string GetMetaDataStr(){return _metadatastr;};
 	Alembic::Abc::MetaData GetMetaData(){return _metadata;};
-	virtual ABCStatus Save(double time){return Status_OK;};
+	virtual ABCStatus Save(float time, AbcG::OObject& parent){return Status_OK;};
 };
 
 class AlembicIObject

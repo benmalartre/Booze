@@ -9,10 +9,10 @@ AlembicICurves::AlembicICurves(AbcG::IObject& object) :AlembicIObject(object)
 	m_type = GeometricType_Curves;
 }
 
-bool AlembicICurves::Initialize()
+bool AlembicICurves::initialize()
 {
 	AbcG::ICurves curves(m_object);
-	GetProperties();
+	getProperties();
 	return true;
 }
 
@@ -36,19 +36,11 @@ AlembicOCurves::AlembicOCurves(AlembicWriteJob * in_job)
 //------------------------------------------------------------------------------------------------
 // Alembic Export
 //------------------------------------------------------------------------------------------------
-AlembicOCurves::AlembicOCurves(AlembicWriteJob* job, AlembicOObject* parent, void* customData, const char* name)
-: AlembicOObject(job, parent, customData, GeometricType_Curves){
-	std::string xformName = name;
-	std::string shapeName = name;
-	shapeName += "Shape";
-
-	Alembic::AbcGeom::OXform xformObj(parent->Get(), xformName, job->GetAnimatedTs());
-	Alembic::AbcGeom::OCurves curvesObj(xformObj, shapeName, job->GetAnimatedTs());
-
-	m_curves = curvesObj.getSchema();
+AlembicOCurves::AlembicOCurves(AlembicOArchive* archive, AlembicOObject* parent, void* customData, const char* name)
+: AlembicOObject(archive, parent, customData, name, GeometricType_Curves){
 };
 
-ABCStatus AlembicOCurves::Save(double time, ABC_Curves_Sample_Infos* infos, ABC_Curves_Sample* sample)
+void AlembicOCurves::save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent)
 {
 	/*
 	Application app;
@@ -148,7 +140,6 @@ ABCStatus AlembicOCurves::Save(double time, ABC_Curves_Sample_Infos* infos, ABC_
 
 	_numsamples++;
 	*/
-	return Status_OK;
 }
 
 /*

@@ -17,33 +17,39 @@ struct ABC_FaceSet_Sample
 	float * m_position;
 };
 
-class AlembicOFaceSet : public AlembicOObject
-{
-protected:
-	Alembic::AbcGeom::OFaceSetSchema m_faceSetSchema;
-	Alembic::AbcGeom::OFaceSetSchema::Sample m_faceSetSample;
-	size_t m_numSamples;
-	size_t m_numFaces;
-	size_t m_numFaceVertices;
-
-public:
-	AlembicOFaceSet( AlembicWriteJob * in_Job);
-	virtual ABCStatus Save(double time, ABC_FaceSet_Sample_Infos* infos, ABC_FaceSet_Sample* sample);
-};
-
-
+//------------------------------------------------------------------------------------------------
+// Alembic Import
+//------------------------------------------------------------------------------------------------
 class AlembicIFaceSet : public AlembicIObject
 {
 public:
 	AlembicIFaceSet(AbcG::IObject& iObj);
-	virtual bool Initialize();
+	virtual bool								initialize();
 
 protected:
-	Alembic::AbcGeom::IFaceSetSchema m_faceSetSchema;
-	Alembic::AbcGeom::IFaceSetSchema::Sample m_faceSetSample;
-	size_t m_numSamples;
-	size_t m_numFaces;
-	size_t m_numFaceVertices;
+	Alembic::AbcGeom::IFaceSetSchema			m_faceSetSchema;
+	Alembic::AbcGeom::IFaceSetSchema::Sample	m_faceSetSample;
+	size_t										m_numSamples;
+	size_t										m_numFaces;
+	size_t										m_numFaceVertices;
+};
+
+//------------------------------------------------------------------------------------------------
+// Alembic Export
+//------------------------------------------------------------------------------------------------
+class AlembicOFaceSet : public AlembicOObject
+{
+protected:
+	Alembic::AbcGeom::OFaceSet					m_faceset;
+	Alembic::AbcGeom::OFaceSetSchema			m_schema;
+	Alembic::AbcGeom::OFaceSetSchema::Sample	m_sample;
+	size_t										m_numSamples;
+	size_t										m_numFaces;
+	size_t										m_numFaceVertices;
+
+public:
+	AlembicOFaceSet( AlembicWriteJob * in_Job);
+	virtual ABCStatus							save(float time);
 };
 
 BOOZE_NAMESPACE_CLOSE_SCOPE

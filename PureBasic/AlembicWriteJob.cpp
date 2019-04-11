@@ -1,9 +1,12 @@
 //#include "AlembicMessage.h"
 #include "AlembicWriteJob.h"
+#include "AlembicRoot.h"
 #include "AlembicObject.h"
+#include "AlembicPolymesh.h"
+#include "AlembicXForm.h"
 
+#include <WinUser.h>
 BOOZE_NAMESPACE_OPEN_SCOPE
-
 
 AlembicWriteJob::AlembicWriteJob(const char* filename, float* frames, int numFrames)
 {
@@ -11,26 +14,52 @@ AlembicWriteJob::AlembicWriteJob(const char* filename, float* frames, int numFra
    m_current = NULL;
    // init archive (use a locally scoped archive)
    m_archive = new AlembicOArchive(this);
+   AlembicORoot* root = (AlembicORoot*)m_archive->getRoot();
+   
+   m_frames.resize(numFrames);
+   memcpy(&m_frames[0], &frames[0], numFrames * sizeof(float));
 
-   for(uint64_t i=0;i<numFrames;i++)
-      m_frames.push_back(frames[i]);
 }
 
 AlembicWriteJob::~AlembicWriteJob()
 {	
-	m_archive->Close();
-
+	if (m_archive){
+		m_archive->close();
+		delete m_archive;
+	}
+	m_frames.clear();
 }
 
-void AlembicWriteJob::SetFramerate(float framerate)
+int32_t AlembicWriteJob::timeToIndex(float time){
+	int32_t numFrames = endFrame() - startFrame();
+	if (numFrames > 1)
+	{
+		float sf = startFrame();
+		float ef = endFrame();
+		if (time < sf)return 0;
+		else if (time>ef)return numFrames - 1;
+		//else return (endFrame() - startFrame()) / (time - startFrame()) * numFrames;
+	}
+	return 0;
+}
+
+void AlembicWriteJob::save(float time){
+	AlembicOObject* root = m_archive->getRoot();
+	root->save(m_timeSampling, m_archive->get().getTop());
+}
+
+void AlembicWriteJob::setFramerate(float framerate)
 {
-	m_timePerSample = 1.0 / framerate;
 	// create the sampling
-	AbcA::TimeSampling sampling(m_timePerSample, 0.0);
-	m_Ts = m_archive->Get().addTimeSampling(sampling);
+	m_timePerSample = 1.0 / framerate;
+	m_timeSampling = AbcA::TimeSamplingPtr(new AbcA::TimeSampling(1.0 / m_timePerSample, 1.0));
+
+	// create the bounding box
+	Abc::OBox3dProperty boxProp = AbcG::CreateOArchiveBounds(m_archive->get(), m_timeSampling);
+	
 }
 
-void AlembicWriteJob::SetOption(const char* in_Name, const char* in_Value)
+void AlembicWriteJob::setOption(const char* in_Name, const char* in_Value)
 {
 	std::map<std::string,std::string>::iterator it = m_options.find(in_Name);
 	if(it == m_options.end())
@@ -39,13 +68,13 @@ void AlembicWriteJob::SetOption(const char* in_Name, const char* in_Value)
 		it->second = in_Value;
 }
 
-bool AlembicWriteJob::HasOption(const char*in_Name)
+bool AlembicWriteJob::hasOption(const char*in_Name)
 {
 	std::map<std::string,std::string>::iterator it = m_options.find(in_Name);
    return it != m_options.end();
 }
 
-const char* AlembicWriteJob::GetOption(const char* in_Name)
+const char* AlembicWriteJob::getOption(const char* in_Name)
 {
 	std::map<std::string,std::string>::iterator it = m_options.find(in_Name);
    if(it != m_options.end())
@@ -53,7 +82,7 @@ const char* AlembicWriteJob::GetOption(const char* in_Name)
    return std::string("False").c_str();
 }
 
-ABCStatus AlembicWriteJob::Process()
+ABCStatus AlembicWriteJob::process()
 {
 	/*
 	std::string filename = "Test_Alembic";//GetFileName();
@@ -181,13 +210,13 @@ ABCStatus AlembicWriteJob::Process()
 }	
 
 
-ABCStatus AlembicWriteJob::SetFrames()
+ABCStatus AlembicWriteJob::setFrames()
 {
     ABCStatus status = Status_OK;
 	return status;
 }	
 
-ABCStatus AlembicWriteJob::SetObjects()
+ABCStatus AlembicWriteJob::setObjects()
 {	
     ABCStatus status = Status_OK;
     return status;

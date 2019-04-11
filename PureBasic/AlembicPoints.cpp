@@ -9,19 +9,19 @@ AlembicIPoints::AlembicIPoints(AbcG::IObject& object) :AlembicIObject(object)
 	m_type = GeometricType_Points;
 }
 
-bool AlembicIPoints::Initialize()
+bool AlembicIPoints::initialize()
 {
 	AbcG::IPoints points(m_object);
-	GetProperties();
+	getProperties();
 	return true;
 }
 
 BOOZE_EXPORT bool ABC_ObjectIsPointCloud(AlembicIObject* obj)
 {
-	return AbcG::IPoints::matches(obj->Get().getMetaData());
+	return AbcG::IPoints::matches(obj->get().getMetaData());
 };
 
-void AlembicIPoints::GetSampleDescription( float frame, ABC_Points_Sample_Infos* infos)
+void AlembicIPoints::getSampleDescription( float frame, ABC_Points_Sample_Infos* infos)
 {
 
 	if(!m_object.valid()||!m_type==GeometricType_Points)return;
@@ -44,7 +44,7 @@ void AlembicIPoints::GetSampleDescription( float frame, ABC_Points_Sample_Infos*
 	
 }
 
-size_t AlembicIPoints::UpdateSample(ABC_Points_Sample_Infos* infos, ABC_Points_Sample* io_sample)
+size_t AlembicIPoints::updateSample(ABC_Points_Sample_Infos* infos, ABC_Points_Sample* io_sample)
 {
 	AbcG::IPoints points(m_object,Abc::kWrapExisting);
 	AbcG::ICompoundProperty argGeomParamsProp(points.getSchema().getArbGeomParams());
@@ -77,22 +77,14 @@ size_t AlembicIPoints::UpdateSample(ABC_Points_Sample_Infos* infos, ABC_Points_S
 //------------------------------------------------------------------------------------------------
 // Alembic Export
 //------------------------------------------------------------------------------------------------
-AlembicOPoints::AlembicOPoints(AlembicWriteJob* job, AlembicOObject* parent, void* customData, const char* name) 
-: AlembicOObject(job, parent, customData, GeometricType_Points){
-	std::string xformName = name;
-	std::string shapeName = name;
-	shapeName += "Shape";
+AlembicOPoints::AlembicOPoints(AlembicOArchive* archive, AlembicOObject* parent, void* customData, const char* name)
+: AlembicOObject( archive, parent, customData, name, GeometricType_Points){
 
-	Alembic::AbcGeom::OXform xformObj(parent->Get(), xformName, job->GetAnimatedTs());
-	Alembic::AbcGeom::OPoints pointsObj(xformObj, shapeName, job->GetAnimatedTs());
-
-	m_xform = xformObj.getSchema();
-	m_points = pointsObj.getSchema();
 };
 
-ABCStatus AlembicOPoints::Save(float time)
+void AlembicOPoints::save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent)
 {
-	return Status_OK;
+
 }
 
 BOOZE_NAMESPACE_CLOSE_SCOPE

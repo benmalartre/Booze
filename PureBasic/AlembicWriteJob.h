@@ -7,35 +7,40 @@
 BOOZE_NAMESPACE_OPEN_SCOPE
 class AlembicOArchive;
 class AlembicOObject;
+
 class AlembicWriteJob
 {
 protected:
-	std::string m_filename;
-    std::vector<float> m_frames;
-    AlembicOArchive* m_archive;
-    unsigned int m_Ts;
-	std::map<std::string,std::string> m_options;
-	float m_timePerSample;
-	AlembicOObject* m_current;
+	std::string									m_filename;
+    std::vector<float>							m_frames;
+    AlembicOArchive*							m_archive;
+	std::map<std::string,std::string>			m_options;
+	float										m_timePerSample;
+	AlembicOObject*								m_current;
+	AbcA::TimeSamplingPtr						m_timeSampling;
 
 
 public:
-	AlembicWriteJob(const char* in_FileName, float* in_Frames, int numFrames);
+	AlembicWriteJob(const char* fileName, float* frames, int numFrames);
 	~AlembicWriteJob();
 
-	virtual AlembicOArchive* GetArchive() { return m_archive; };
-	virtual const std::vector<float> & GetFrames() { return m_frames; };
-	virtual void SetFileName(const  char* filename) { m_filename = filename; };
-	virtual const char* GetFileName() { return m_filename.c_str(); };
-	virtual unsigned int GetAnimatedTs() { return m_Ts; };
-	virtual void SetFramerate(float framerate);
-	virtual void SetOption(const char* in_Name, const char* in_Value);
-	virtual bool HasOption(const char* in_Name);
-	virtual const char* GetOption(const char* in_Name);
+	virtual AlembicOArchive*				getArchive() { return m_archive; };
+	virtual const std::vector<float> &		getFrames() { return m_frames; };
+	virtual void							setFileName(const  char* filename) { m_filename = filename; };
+	virtual const char*						getFileName() { return m_filename.c_str(); };
+	virtual void							setFramerate(float framerate);
+	virtual void							setOption(const char* in_Name, const char* in_Value);
+	virtual bool							hasOption(const char* in_Name);
+	virtual const char*						getOption(const char* in_Name);
+	virtual void							save(float time);
+	virtual ABCStatus						setObjects();
+	virtual ABCStatus						setFrames();
+	virtual ABCStatus						process();
 
-	virtual ABCStatus SetObjects();
-	virtual ABCStatus SetFrames();
-	virtual ABCStatus Process();
+	inline float							startFrame(){ return m_frames.front(); };
+	inline float							endFrame(){ return m_frames.back(); };
+
+	int32_t									timeToIndex( float time );
 };
 
 BOOZE_EXPORT AlembicWriteJob* newWriteJob(const char* filename, float* frames, int numFrames=0);

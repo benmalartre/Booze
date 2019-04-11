@@ -8,7 +8,7 @@
 BOOZE_NAMESPACE_OPEN_SCOPE
 
 // ===============================================================================================
-//	AlembicIObject
+//	ALEMBIC IMPORT  :  AlembicIObject
 // ===============================================================================================
 class AlembicIArchive;
 class AlembicIProperty;
@@ -17,15 +17,15 @@ class AlembicIObject
 {
 public:
 	AlembicIObject(Abc::IObject& object):m_object(object){};
-	virtual bool				Initialize();
-	virtual const char*			GetName();
-	virtual const char*			GetFullName();
-	virtual ABCGeometricType	GetType(){return m_type;};
-	virtual Abc::IObject&		Get(){ return m_object; };
-	virtual void				GetProperties();
-	virtual bool				HasProperty(const char* p_name);
-	virtual uint64_t			GetNumProperties(){return (uint64_t)m_props.size();};
-	virtual AlembicIProperty*	GetProperty(uint64_t index);
+	virtual bool					initialize();
+	virtual const char*				getName();
+	virtual const char*				getFullName();
+	virtual ABCGeometricType		getType(){return m_type;};
+	virtual Abc::IObject&			get(){ return m_object; };
+	virtual void					getProperties();
+	virtual bool					hasProperty(const char* p_name);
+	virtual uint64_t				getNumProperties(){return (uint64_t)m_props.size();};
+	virtual AlembicIProperty*		getProperty(uint64_t index);
 
 protected:
 	Abc::IObject					m_object;
@@ -35,33 +35,45 @@ protected:
 };
 
 // ===============================================================================================
-//	AlembicIObject
+//	ALEMBIC EXPORT  :  AlembicOObject
 // ===============================================================================================
 class AlembicOArchive;
 class AlembicWriteJob;
 class AlembicOObject
 {
 public:
-	AlembicOObject(AlembicWriteJob* job, AlembicOObject* parent, void* customData, ABCGeometricType type) :
-		m_job(job),
-		m_customData(customData), 
+	AlembicOObject(AlembicOArchive* archive, AlembicOObject* parent, void* data, const char* name, ABCGeometricType type) :
+		m_archive(archive),
+		m_data(data), 
 		m_type(type),
-		m_parent(parent){};
+		m_parent(parent),
+		m_name(name){
+	};
 
-	virtual AbcG::OObject			Get(){ return m_object; };
-	virtual Alembic::Abc::MetaData	GetMetaData(){ return m_metadata; };
-	virtual void*					GetCustomData(){ return m_customData; };
-	virtual AlembicWriteJob*		GetWriteJob(){ return m_job; };
-	virtual ABCStatus				Save(double time){ return Status_OK; };
+	~AlembicOObject(){};
+
+
+	virtual Alembic::Abc::MetaData&	getMetaData(){ return m_metadata; };
+	virtual void*					getCustomData(){ return m_data; };
+	virtual AlembicOArchive*		getArchive(){ return m_archive; };
+	virtual AlembicWriteJob*		getJob(){ return m_archive->getJob(); };
+	//virtual	void					init(AbcG::OObject& parent);
+	virtual void					save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent);
+	virtual void					addChild(AlembicOObject* obj){m_children.push_back(obj);};
+
+	
+	void							setArchive(AlembicOArchive*archive){ m_archive = archive; };
+
 protected:
+	AlembicOArchive*				m_archive;
 	AlembicOObject*					m_parent;
 	ABCGeometricType				m_type;
-	Alembic::Abc::OObject			m_object;
-	Alembic::Abc::MetaData			m_metadata;
+	Abc::MetaData					m_metadata;
 	std::vector<AlembicOProperty*>	m_props;
+	std::vector<AlembicOObject*>	m_children;
 	void*							m_sample;
-	AlembicWriteJob*				m_job;
-	void*							m_customData;
+	void*							m_data;
+	std::string						m_name;
 };
 
 // ===============================================================================================

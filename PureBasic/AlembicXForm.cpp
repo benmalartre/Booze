@@ -1,6 +1,10 @@
 #include "AlembicUtil.h"
 #include "AlembicXForm.h"
 #include "AlembicObject.h"
+#include "AlembicWriteJob.h"
+
+#include "Alembic/AbcGeom/XformOp.h"
+#include "Alembic/AbcGeom/XformSample.h"
 
 BOOZE_NAMESPACE_OPEN_SCOPE
 //------------------------------------------------------------------------------------------------
@@ -15,73 +19,111 @@ AlembicIXForm::AlembicIXForm(AbcG::IObject& object) :AlembicIObject(object)
 	m_type = GeometricType_XForm;
 }
 
-bool AlembicIXForm::Initialize(){
+bool AlembicIXForm::initialize(){
 	return true;
 }
 
 BOOZE_EXPORT bool ABC_ObjectIsIXForm(AlembicIObject* obj)
 {
-	return Alembic::AbcGeom::IXform::matches(obj->Get().getMetaData());
+	return Alembic::AbcGeom::IXform::matches(obj->get().getMetaData());
 }
-
 
 //------------------------------------------------------------------------------------------------
 // Alembic Export
 //------------------------------------------------------------------------------------------------
-BOOZE_EXPORT const char* ABC_TestXForm(AlembicIObject* obj, XForm_Sample* io_sample)
-{
-	//return ABC_PassStringToPureBasic(std::string("Hey!!"));
-	return NULL;
+AlembicOXForm::AlembicOXForm(AlembicOArchive* archive, AlembicOObject* parent, void* customData, const char* name)
+: AlembicOObject(archive, parent, customData, name, GeometricType_XForm){
+	/*
+	AbcG::OXform xfo(archive->get().getTop(), name);
+
+	// add a couple of ops
+	AbcG::XformOp transop(AbcG::kTranslateOperation, AbcG::kTranslateHint);
+	AbcG::XformOp scaleop(AbcG::kScaleOperation, AbcG::kScaleHint);
+
+	AbcG::XformSample samp;
+	samp.addOp(transop, AbcG::V3f(1.0, 2.0, 3.0));
+	samp.addOp(scaleop, AbcG::V3f(2.0, 4.0, 6.0));
+
+	AbcG::OXformSchema schema = xfo.getSchema();
+
+	schema.set(samp);
+
+	//m_object.reset(new AbcG::OXform(m_archive->get().getTop(), name));
+	//m_schema = m_xform->getSchema();
+	//m_object = m_xform;
+	*/
+
+	AbcU::shared_ptr< AbcG::OObject > xform = makeXform(archive->get().getTop(), name);
+
 }
 
-BOOZE_EXPORT void ABC_SaveXFormSample(float* xform, Alembic::AbcGeom::OXformSchema & schema, Alembic::AbcGeom::XformSample & sample, float time)
-{
+void AlembicOXForm::save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent){
+	/*
+	MessageBox(NULL, L"SAVE", L"SAVE", MB_OK);
+	ABCOXformPtr xfoPtr = AbcU::dynamic_pointer_cast< AbcG::OXform> (m_object);
+	AbcG::OXform xfo = *xfoPtr;
+	AbcG::OXformSchema schema = xfo.getSchema();
+	Alembic::AbcGeom::XformSample sample;
+	sample.setTranslation(Imath::V3f((float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX));
+	//sample.setRotation(Imath::V3d(qx, qy, qz), qw * RADIANTODEGREE);
+	sample.setScale(Imath::V3f(1,1,1));
+	
+	// save the sample
+	schema.set(sample);
 
+	for (int i = 0; i < m_children.size(); ++i)m_children[i]->save(time, xfo);
+	*/
+}
+
+
+BOOZE_EXPORT void ABC_SaveXFormSample(Imath::M44f& xform, Alembic::AbcGeom::OXformSchema & schema, Alembic::AbcGeom::XformSample & sample, float time)
+{
+	xform[0][0] = 0.0;
 	// extract the x, y, z axes
-	Imath::V3f x(xform[0], xform[1], xform[2]);
-	Imath::V3f y(xform[4], xform[5], xform[6]);
-	Imath::V3f z(xform[8], xform[9], xform[10]);
+	Imath::V3f x(xform[0][0], xform[0][1], xform[0][2]);
+	Imath::V3f y(xform[1][0], xform[1][1], xform[1][2]);
+	Imath::V3f z(xform[2][0], xform[2][1], xform[2][2]);
 
 	// scale
 	Imath::V3f s(x.length(), y.length(), z.length());
 
 	// compute quaternion
 	float qx, qy, qz, qw, qw4;
-	float tr = xform[0] + xform[5] + xform[10];
+	float tr = xform[0][0] + xform[1][1] + xform[2][2];
 	float S;
 	if (tr > 0.0f){
 		S = sqrtf(tr + 1.0f)  * 2.0f;
 		qw = 0.25 * S;
-		qx = (xform[9] - xform[6]) / S;
-		qy = (xform[2] - xform[8]) / S;
-		qz = (xform[4] - xform[1]) / S;
+		qx = (xform[2][1] - xform[1][2]) / S;
+		qy = (xform[0][2] - xform[2][0]) / S;
+		qz = (xform[1][0] - xform[0][1]) / S;
 	}
-	else if (xform[0] > xform[5] && xform[0] > xform[10]){
-		S = sqrtf(1.0f + xform[0] - xform[5] - xform[10]) * 2.0f;
-		qw = (xform[9] - xform[6]) / S;
+	else if (xform[0][0] > xform[1][1] && xform[0][0] > xform[2][2]){
+		S = sqrtf(1.0f + xform[0][0] - xform[1][1] - xform[2][2]) * 2.0f;
+		qw = (xform[2][1] - xform[1][2]) / S;
 		qx = 0.25f * S;
-		qy = (xform[1] + xform[4]) / S;
-		qz = (xform[2] + xform[8]) / S;
+		qy = (xform[0][1] + xform[1][0]) / S;
+		qz = (xform[0][2] + xform[2][0]) / S;
 	}
-	else if (xform[5] > xform[10]){
-		S = sqrtf(1.0f + xform[5] - xform[0] - xform[10]) * 2.0f;
-		qw = (xform[2] - xform[8]) / S;
-		qx = (xform[1] + xform[4]) / S;
+	else if (xform[1][1] > xform[2][2]){
+		S = sqrtf(1.0f + xform[1][1] - xform[0][0] - xform[2][2]) * 2.0f;
+		qw = (xform[0][2] - xform[2][0]) / S;
+		qx = (xform[0][1] + xform[1][0]) / S;
 		qy = 0.25f * S;
-		qz = (xform[6] + xform[9]) / S;
+		qz = (xform[1][2] + xform[2][1]) / S;
 	}
 	else{
-		S = sqrtf(1.0f + xform[10] - xform[0] - xform[5]) * 2.0f;
-		qw = (xform[4] - xform[1]) / S;
-		qx = (xform[2] + xform[8]) / S;
-		qy = (xform[6] + xform[9]) / S;
+		S = sqrtf(1.0f + xform[2][2] - xform[0][0] - xform[1][1]) * 2.0f;
+		qw = (xform[1][0] - xform[0][1]) / S;
+		qx = (xform[0][2] + xform[2][0]) / S;
+		qy = (xform[1][2] + xform[2][1]) / S;
 		qz = 0.25f * S;
 	}
 	// set the rotation!
 	Imath::Quatf r(qw, qx, qy, qz);
 
 	// finally set the position!
-	Imath::V3f t(xform[12], xform[13], xform[14]);
+	Imath::V3f t(xform[3][0], xform[3][1], xform[3][2]);
 
    sample.setTranslation(t);
    sample.setRotation(Imath::V3d(qx, qy, qz), qw * RADIANTODEGREE);
@@ -93,10 +135,10 @@ BOOZE_EXPORT void ABC_SaveXFormSample(float* xform, Alembic::AbcGeom::OXformSche
 
 BOOZE_EXPORT void ABC_GetXFormSample(AlembicIObject* obj, float frame, XForm_Sample* io_sample)
 {
-	if(!obj->Get().valid()||!ABC_ObjectIsIXForm(obj))
+	if(!obj->get().valid()||!ABC_ObjectIsIXForm(obj))
 		return;
 
-	Alembic::AbcGeom::IXform xform(obj->Get(),Alembic::Abc::kWrapExisting);
+	Alembic::AbcGeom::IXform xform(obj->get(),Alembic::Abc::kWrapExisting);
 	//CString path = ctxt.GetParameterValue(L"path");
 	//CString identifier = ctxt.GetParameterValue(L"identifier");
 	Alembic::AbcCoreAbstract::index_t sampleIndex = (Alembic::AbcCoreAbstract::index_t)int(frame)-1;

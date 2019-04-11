@@ -9,29 +9,22 @@ AlembicICamera::AlembicICamera(AbcG::IObject& object) :AlembicIObject(object)
 	m_type = GeometricType_Camera;
 }
 
-bool AlembicICamera::Initialize()
+bool AlembicICamera::initialize()
 {
 	AbcG::ICamera _camera(m_object);
-	GetProperties();
+	getProperties();
 	return true;
 }
 
 //------------------------------------------------------------------------------------------------
 // Alembic Export
 //------------------------------------------------------------------------------------------------
-AlembicOCamera::AlembicOCamera(AlembicWriteJob * job, AlembicOObject* parent, void* customData, const char* name)
-: AlembicOObject(job, parent, customData, GeometricType_Camera){
-	std::string xformName = name;
-	std::string shapeName = name;
-	shapeName += "Shape";
+AlembicOCamera::AlembicOCamera(AlembicOArchive* archive, AlembicOObject* parent, void* customData, const char* name)
+: AlembicOObject(archive, parent, customData, name, GeometricType_Camera){
 
-	Alembic::AbcGeom::OXform xformObj(parent->Get(), xformName, job->GetAnimatedTs());
-	Alembic::AbcGeom::OCamera cameraObj(xformObj, shapeName, job->GetAnimatedTs());
-
-	m_camera = cameraObj.getSchema();
 };
 
-ABCStatus AlembicOCamera::Save(double time, ABC_Camera_Sample_Infos* infos, ABC_Camera_Sample* sample)
+void AlembicOCamera::save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent)
 {
 	/*
 	Application app;
@@ -131,7 +124,6 @@ ABCStatus AlembicOCamera::Save(double time, ABC_Camera_Sample_Infos* infos, ABC_
 
 	_numsamples++;
 	*/
-	return Status_OK;
 }
 
 /*

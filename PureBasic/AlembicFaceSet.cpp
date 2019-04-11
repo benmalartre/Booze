@@ -9,10 +9,10 @@ AlembicIFaceSet::AlembicIFaceSet(AbcG::IObject& object) :AlembicIObject(object)
 	m_type = GeometricType_FaceSet;
 }
 
-bool AlembicIFaceSet::Initialize()
+bool AlembicIFaceSet::initialize()
 {
-	AbcG::IFaceSet _faceset(m_object);
-	GetProperties();
+	AbcG::IFaceSet m_faceset(m_object);
+	getProperties();
 	return true;
 }
 
@@ -33,7 +33,7 @@ AlembicOCurves::AlembicOCurves(AlembicWriteJob * in_job)
 }
 */
 
-ABCStatus AlembicOFaceSet::Save(double time, ABC_FaceSet_Sample_Infos* infos, ABC_FaceSet_Sample* sample)
+ABCStatus AlembicOFaceSet::save(float time)
 {
 	/*
 	Application app;

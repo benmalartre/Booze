@@ -262,7 +262,7 @@ AlembicIProperty::AlembicIProperty(Alembic::Abc::PropertyHeader& header){
 		m_type = PropertyType_Compound;
 }
 
-void AlembicIProperty::Init(Alembic::Abc::ICompoundProperty& iParentProp)
+void AlembicIProperty::init(Alembic::Abc::ICompoundProperty& iParentProp)
 {
 	if(m_type == PropertyType_Scalar)
 	{
@@ -826,17 +826,17 @@ void AlembicIProperty::Init(Alembic::Abc::ICompoundProperty& iParentProp)
 	}
 }
 
-bool AlembicIProperty::GetSampleDescription(float time, ABC_Property_Sample_Infos* infos)
+bool AlembicIProperty::getSampleDescription(float time, ABC_Property_Sample_Infos* infos)
 {
 	infos->m_time = time;
-	infos->m_traits = GetDataTraits();
-	infos->m_type = GetPropertyType();
-	infos->m_numItems = GetNbItems((Abc::chrono_t)time);
+	infos->m_traits = getDataTraits();
+	infos->m_type = getPropertyType();
+	infos->m_numItems = getNbItems((Abc::chrono_t)time);
 	return true;
 
 }
 
-void AlembicIProperty::GetSample(float time, ABC_Property_Sample_Infos* infos, ABC_Property_Sample* sample)
+void AlembicIProperty::getSample(float time, ABC_Property_Sample_Infos* infos, ABC_Property_Sample* sample)
 {	
 	Alembic::AbcCoreAbstract::chrono_t t(time);
 	Alembic::Abc::ISampleSelector selector(t,Alembic::Abc::ISampleSelector::kNearIndex);
@@ -868,24 +868,24 @@ void AlembicIProperty::GetSample(float time, ABC_Property_Sample_Infos* infos, A
 	}
 }
 
-bool AlembicIProperty::IsConstant(){
+bool AlembicIProperty::isConstant(){
 	return false;
 }
 
-const char*	AlembicIProperty::GetName()const{
+const char*	AlembicIProperty::getName()const{
 	return this->m_name.c_str();
 }
 
 
-ABCPropertyType	AlembicIProperty::GetPropertyType()const{
+ABCPropertyType	AlembicIProperty::getPropertyType()const{
 	return this->m_type;
 }
 
-ABCDataTraits AlembicIProperty::GetDataTraits()const{
+ABCDataTraits AlembicIProperty::getDataTraits()const{
 	return this->m_traits;
 }
 
-Alembic::Abc::int64_t AlembicIProperty::GetNbItems(Alembic::Abc::chrono_t T)const{
+Alembic::Abc::int64_t AlembicIProperty::getNbItems(Alembic::Abc::chrono_t T)const{
 	Alembic::Abc::ISampleSelector selector(T,Alembic::Abc::ISampleSelector::kNearIndex);
 
 	switch(m_type){
@@ -916,7 +916,7 @@ Alembic::Abc::int64_t AlembicIProperty::GetNbItems(Alembic::Abc::chrono_t T)cons
 	}
 }
 
-const char* AlembicIProperty::GetInterpretation() const{
+const char* AlembicIProperty::getInterpretation() const{
 	std::string out = m_header.getMetaData().get("interpretation");
 	if(out=="")out = "simple";
 	return out.c_str();

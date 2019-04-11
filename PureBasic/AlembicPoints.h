@@ -41,25 +41,27 @@ private:
 	int m_numSamples;
 public:
 	AlembicIPoints(AbcG::IObject& iObj);
-	virtual bool Initialize();
-	virtual void GetSampleDescription(float frame, ABC_Points_Sample_Infos* infos);
-	virtual size_t UpdateSample(ABC_Points_Sample_Infos* infos, ABC_Points_Sample* io_sample);
+	virtual bool			initialize();
+	virtual void			getSampleDescription(float frame, ABC_Points_Sample_Infos* infos);
+	virtual size_t			updateSample(ABC_Points_Sample_Infos* infos, ABC_Points_Sample* io_sample);
 };
 
 //------------------------------------------------------------------------------------------------
 // Alembic Export
 //------------------------------------------------------------------------------------------------
+typedef AbcU::shared_ptr< AbcG::OPoints> ABCOPointsPtr;
+
 class AlembicOPoints : public AlembicOObject
 {
 protected:
-AbcG::OXformSchema m_xform;
-AbcG::OPointsSchema m_points;
-AbcG::OPointsSchema::Sample m_sample;
-int m_numSamples;
+	ABCOPointsPtr						m_points;
+	AbcG::OPointsSchema					m_schema;
+	AbcG::OPointsSchema::Sample			m_sample;
+	int									m_numSamples;
 
 public:
-	AlembicOPoints( AlembicWriteJob * in_job, AlembicOObject* parent, void* customData, const char* name);
-	virtual ABCStatus Save(float time);
+	AlembicOPoints(AlembicOArchive* archive, AlembicOObject* parent, void* customData, const char* name);
+	virtual void					save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent) override;
 };
 
 BOOZE_NAMESPACE_CLOSE_SCOPE

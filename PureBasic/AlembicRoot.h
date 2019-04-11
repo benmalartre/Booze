@@ -1,45 +1,32 @@
-#ifndef _PBALEMBIC_CAMERA_H_
-#define _PBALEMBIC_CAMERA_H_
+#ifndef _PBALEMBIC_ROOT_H_
+#define _PBALEMBIC_ROOT_H_
 
 #include "AlembicObject.h"
 
 BOOZE_NAMESPACE_OPEN_SCOPE
 
-struct ABC_Camera_Sample_Infos
-{
-
-};
-
-struct ABC_Camera_Sample
-{
-
-};
-
 //------------------------------------------------------------------------------------------------
 // Alembic Import
 //------------------------------------------------------------------------------------------------
-class AlembicICamera : public AlembicIObject
+class AlembicIRoot : public AlembicIObject
 {
 public:
-	AlembicICamera(AbcG::IObject& iObj);
+	AlembicIRoot(AbcG::IObject& iObj);
 	virtual bool initialize();
 
 protected:
-	Alembic::AbcGeom::ICameraSchema			m_camera;
+	Alembic::AbcGeom::IXformSchema			m_xform;
 };
 
 //------------------------------------------------------------------------------------------------
 // Alembic Export
 //------------------------------------------------------------------------------------------------
-typedef AbcU::shared_ptr< AbcG::OCamera> ABCOCameraPtr;
-class AlembicOCamera : public AlembicOObject
+typedef AbcU::shared_ptr< AbcG::OObject> ABCORootPtr;
+class AlembicORoot : public AlembicOObject
 {
-protected:
-	ABCOCameraPtr					m_camera;
-	Alembic::AbcGeom::OCameraSchema m_schema;
 
 public:
-	AlembicOCamera(AlembicOArchive* archive, AlembicOObject* parent, void* customData, const char* name);
+	AlembicORoot(AlembicOArchive* archive, void* customData, const char* name);
 	virtual void							save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent) override;
 };
 

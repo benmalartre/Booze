@@ -2,6 +2,7 @@
 #define _BOOZE_FOUNDATION_H_
 #ifndef _WIN32
 #include <stdint.h>
+#include <WinUser.h>
 #else
 #include "../stdint.h"
 #endif
@@ -18,10 +19,11 @@
 
 #include "AlembicExport.h"
 
-namespace Abc = Alembic::Abc;;
+namespace Abc = Alembic::Abc;
 namespace AbcA = Alembic::AbcCoreAbstract;
 namespace AbcF = Alembic::AbcCoreFactory;
 namespace AbcG = Alembic::AbcGeom;
+namespace AbcU = Alembic::Util;
 
 using namespace std;
 extern bool ABC_HDF5_SUPPORT;
@@ -36,7 +38,7 @@ enum ABCStatusEnum
 
 enum ABCGeometricTypeEnum
 {
-	GeometricType_Unknown,
+	GeometricType_Root,
     GeometricType_XForm,
 	GeometricType_Points,
 	GeometricType_Curves,

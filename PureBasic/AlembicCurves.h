@@ -40,34 +40,35 @@ class AlembicICurves : public AlembicIObject
 {
 public:
 	AlembicICurves(AbcG::IObject& iObj);
-	virtual bool Initialize();
+	virtual bool					initialize();
 
 protected:
-	AbcG::IXformSchema m_xform;
-	AbcG::ICurvesSchema m_curves;
-	AbcG::ICompoundProperty m_compound;
-	AbcG::ICurvesSchema::Sample m_sample;
-	size_t m_numSamples;
-	size_t m_numPoints;
-	size_t m_numCurves;
+	AbcG::IXformSchema				m_xform;
+	AbcG::ICurvesSchema				m_curves;
+	AbcG::ICompoundProperty			m_compound;
+	AbcG::ICurvesSchema::Sample		m_sample;
+	size_t							m_numSamples;
+	size_t							m_numPoints;
+	size_t							m_numCurves;
 };
 
 //------------------------------------------------------------------------------------------------
 // Alembic Export
 //------------------------------------------------------------------------------------------------
+typedef AbcU::shared_ptr< AbcG::OCurves> ABCOCurvesPtr;
 class AlembicOCurves : public AlembicOObject
 {
 protected:
-	AbcG::OXformSchema m_xform;
-	AbcG::OCurvesSchema m_curves;
-	AbcG::OCurvesSchema::Sample m_sample;
-	size_t m_numsamples;
-	size_t m_numPoints;
-	size_t m_numCurves;
+	ABCOCurvesPtr					m_curves;
+	AbcG::OCurvesSchema				m_schema;
+	AbcG::OCurvesSchema::Sample		m_sample;
+	size_t							m_numsamples;
+	size_t							m_numPoints;
+	size_t							m_numCurves;
 
 public:
-	AlembicOCurves(AlembicWriteJob* job, AlembicOObject* parent, void* customData, const char* name);
-	virtual ABCStatus Save(double time, ABC_Curves_Sample_Infos* infos, ABC_Curves_Sample* sample);
+	AlembicOCurves(AlembicOArchive* archive, AlembicOObject* parent, void* customData, const char* name);
+	virtual void					save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent) override;
 };
 
 BOOZE_NAMESPACE_CLOSE_SCOPE

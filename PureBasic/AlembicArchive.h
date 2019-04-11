@@ -6,61 +6,68 @@
 
 BOOZE_NAMESPACE_OPEN_SCOPE
 
+//------------------------------------------------------------------------------------------------
+// Alembic Export
+//------------------------------------------------------------------------------------------------
 class AlembicOObject;
 class AlembicWriteJob;
 class AlembicOArchive
 {
 public:
 	AlembicOArchive(AlembicWriteJob* job);
-	virtual bool Open(const char* filename);
-	virtual bool Close();
-	virtual bool IsValid(){ return m_valid; };
-	virtual AlembicOObject* AddObject(AlembicOObject* parent, const char* name, ABCGeometricType type, void* ptr);
-	virtual Abc::OArchive Get(){ return m_archive; };
-	virtual AlembicOObject* GetTop(){ return m_top; };
-	virtual AlembicWriteJob* GetJob(){ return m_job; };
-	virtual int GetNumObjects();
-	virtual AlembicOObject* GetObjectByIndex(unsigned index){ return m_objects[index]; };
-	virtual AlembicOObject* GetObjectByName(const char* name);
+	~AlembicOArchive();
+	virtual bool							open(const char* filename);
+	virtual bool							close();
+	virtual bool							isValid(){ return m_valid; };
+	virtual AlembicOObject*					addObject(AlembicOObject* parent, char* name, ABCGeometricType type, void* ptr);
+	virtual Abc::OArchive					get(){ return m_archive; };
+	virtual AlembicOObject*					getRoot(){ return m_root; };
+	virtual AlembicWriteJob*				getJob(){ return m_job; };
+	virtual int								getNumObjects();
+	virtual AlembicOObject*					getObjectByIndex(unsigned index){ return m_objects[index]; };
+	virtual AlembicOObject*					getObjectByName(const char* name);
 
 private:
 	
-	Abc::OArchive m_archive;
-	AlembicOObject* m_top;
-	AlembicWriteJob* m_job;
-	bool m_valid;
-	std::vector<AlembicOObject*> m_objects;
-	std::map<string, int> m_map;
+	Abc::OArchive							m_archive;
+	AlembicOObject*							m_root;
+	AlembicWriteJob*						m_job;
+	bool									m_valid;
+	std::vector<AlembicOObject*>			m_objects;
+	std::map<string, int>					m_map;
 };
 
+//------------------------------------------------------------------------------------------------
+// Alembic Import
+//------------------------------------------------------------------------------------------------
 class AlembicIObject;
 class AlembicIArchive
 {
 public:
 	AlembicIArchive() :m_uses(0){};
-	virtual bool Open(const char* filename);
-	virtual bool Close();
-	virtual bool IsValid(){return m_valid;};
-	virtual const char* GetInfos();
-	virtual void AddObject(AlembicIObject* obj);
-	virtual uint64_t GetNumIdentifiers();
-	virtual uint64_t GetNumObjects();
-	virtual const char* GetIdentifier(uint64_t id);
-	virtual const AbcG::IObject& GetIObj(uint64_t i);
-	virtual AlembicIObject* GetObj(uint64_t index){return m_objects[index];};
-	virtual AlembicIObject* GetObjByName(const char* name);
-	virtual Abc::IArchive& Get(){ return m_archive; };
-	virtual void IncrementUses(){ m_uses++; };
-	virtual void DecrementUses(){ m_uses--; };
-	virtual uint32_t NumUses(){ return m_uses; };
-	virtual double GetStartTime(){return m_startTime;};
-	virtual double GetEndTime(){ return m_endTime; };
-	virtual uint64_t GetNumTimeSampling();
-	virtual Abc::index_t GetMaxNumSamplesForTimeSamplingIndex(uint32_t index);
+	virtual bool							open(const char* filename);
+	virtual bool							close();
+	virtual bool							isValid(){return m_valid;};
+	virtual const char*						getInfos();
+	virtual void							addObject(AlembicIObject* obj);
+	virtual uint64_t						getNumIdentifiers();
+	virtual uint64_t						getNumObjects();
+	virtual const char*						getIdentifier(uint64_t id);
+	virtual const AbcG::IObject&			getIObj(uint64_t i);
+	virtual AlembicIObject*					getObj(uint64_t index){return m_objects[index];};
+	virtual AlembicIObject*					getObjByName(const char* name);
+	virtual Abc::IArchive&					get(){ return m_archive; };
+	virtual void							incrementUses(){ m_uses++; };
+	virtual void							decrementUses(){ m_uses--; };
+	virtual uint32_t						numUses(){ return m_uses; };
+	virtual double							getStartTime(){return m_startTime;};
+	virtual double							getEndTime(){ return m_endTime; };
+	virtual uint64_t						getNumTimeSampling();
+	virtual Abc::index_t					getMaxNumSamplesForTimeSamplingIndex(uint32_t index);
 
 private:
-	void Walk(AbcG::IObject iObj);
-	void ParseTree();
+	void walk(AbcG::IObject iObj);
+	void parseTree();
 	Abc::IArchive m_archive;
 	double m_startTime;
 	double m_endTime;

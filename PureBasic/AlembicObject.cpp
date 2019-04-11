@@ -12,28 +12,33 @@
 
 BOOZE_NAMESPACE_OPEN_SCOPE
 
+//=================================================================================================
+// Alembic Export
+//=================================================================================================
+// Constructor
+//-------------------------------------------------------------------------------------------------
 BOOZE_EXPORT AlembicIObject* newIObject(AlembicIArchive* archive, uint64_t index)
 {
 	//AbcG::IObject iObj = archive->GetObj(index);
 	// AbcG::IObject(archive->Get(), std::string(archive->GetIdentifier(index)));
-	AbcG::IObject iObj = archive->GetIObj(index);
+	AbcG::IObject iObj = archive->getIObj(index);
 
 	if (AbcG::IPolyMesh::matches(iObj.getMetaData())){
 		AlembicIPolymesh* polymesh = new AlembicIPolymesh(iObj);
-		polymesh->Initialize();
-		archive->AddObject((AlembicIObject*)polymesh);
+		polymesh->initialize();
+		archive->addObject((AlembicIObject*)polymesh);
 		return (AlembicIObject*)polymesh;
 	}
 	else if (AbcG::IPoints::matches(iObj.getMetaData())){
 		AlembicIPoints* points = new AlembicIPoints(iObj);
-		points->Initialize();
-		archive->AddObject((AlembicIObject*)points);
+		points->initialize();
+		archive->addObject((AlembicIObject*)points);
 		return (AlembicIObject*)points;
 	}
 	else if (AbcG::IXform::matches(iObj.getMetaData())){
 		AlembicIXForm* xform = new AlembicIXForm(iObj);
-		xform->Initialize();
-		archive->AddObject((AlembicIObject*)xform);
+		xform->initialize();
+		archive->addObject((AlembicIObject*)xform);
 		return (AlembicIObject*)xform;
 	}
 	/*
@@ -45,22 +50,22 @@ BOOZE_EXPORT AlembicIObject* newIObject(AlembicIArchive* archive, uint64_t index
 	*/
 	else if (AbcG::ICurves::matches(iObj.getMetaData())){
 		AlembicICurves* curves = new AlembicICurves(iObj);
-		curves->Initialize();
-		archive->AddObject((AlembicIObject*)curves);
+		curves->initialize();
+		archive->addObject((AlembicIObject*)curves);
 		return (AlembicIObject*)curves;
 		
 	}
 	else if (AbcG::IFaceSet::matches(iObj.getMetaData())){
 		AlembicIFaceSet* faceset = new AlembicIFaceSet(iObj);
-		faceset->Initialize();
-		archive->AddObject((AlembicIObject*)faceset);
+		faceset->initialize();
+		archive->addObject((AlembicIObject*)faceset);
 		return (AlembicIObject*)faceset;
 	}
 	
 	else if (AbcG::ICamera::matches(iObj.getMetaData())){
 		AlembicICamera* camera = new AlembicICamera(iObj);
-		camera->Initialize();
-		archive->AddObject((AlembicIObject*)camera);
+		camera->initialize();
+		archive->addObject((AlembicIObject*)camera);
 		return (AlembicIObject*)camera;
 		
 	}
@@ -76,33 +81,36 @@ BOOZE_EXPORT AlembicIObject* newIObject(AlembicIArchive* archive, uint64_t index
 	return new AlembicIObject(iObj);
 }
 
+// Destructor
+//-------------------------------------------------------------------------------------------------
 BOOZE_EXPORT void deleteIObject(AlembicIObject* object)
 {
 	delete object;
 }
 
-bool AlembicIObject::Initialize(){
-	m_type = GeometricType_Unknown;
+bool AlembicIObject::initialize(){
+	m_type = GeometricType_Root;
 	return false;
 }
 
-const char* AlembicIObject::GetName(){
+const char* AlembicIObject::getName(){
 	return m_object.getName().c_str();
 }
 
-const char* AlembicIObject::GetFullName(){
+const char* AlembicIObject::getFullName(){
 	return m_object.getFullName().c_str();
 }
 
-bool  AlembicIObject::HasProperty(const char* p_name){
-	for (int i = 0; i<this->GetNumProperties(); i++){
-		if (this->GetProperty(i)->GetName() == (std::string)p_name)return true;
+// Properties
+//-------------------------------------------------------------------------------------------------
+bool  AlembicIObject::hasProperty(const char* p_name){
+	for (int i = 0; i<this->getNumProperties(); i++){
+		if (this->getProperty(i)->getName() == (std::string)p_name)return true;
 	}
 	return false;
 }
 
-// Get Properties
-void AlembicIObject::GetProperties()
+void AlembicIObject::getProperties()
 {
 	AbcG::ICompoundProperty p;
 	bool hasArbGeomParams = false;
@@ -110,7 +118,7 @@ void AlembicIObject::GetProperties()
 	{
 		case GeometricType_PolyMesh:
 		{
-			Alembic::AbcGeom::IPolyMesh mesh(Get(), Alembic::Abc::kWrapExisting);
+			Alembic::AbcGeom::IPolyMesh mesh(get(), Alembic::Abc::kWrapExisting);
 			if (!mesh.valid())return;
 			p = Alembic::AbcGeom::ICompoundProperty(mesh.getSchema().getArbGeomParams());
 			if (p.valid())hasArbGeomParams = true;
@@ -118,7 +126,7 @@ void AlembicIObject::GetProperties()
 		}
 		case GeometricType_Points:
 		{
-			Alembic::AbcGeom::IPoints points(Get(), Alembic::Abc::kWrapExisting);
+			Alembic::AbcGeom::IPoints points(get(), Alembic::Abc::kWrapExisting);
 			if (!points.valid())return;
 			p = Alembic::AbcGeom::ICompoundProperty(points.getSchema().getArbGeomParams());
 			if (p.valid())hasArbGeomParams = true;
@@ -126,7 +134,7 @@ void AlembicIObject::GetProperties()
 		}
 		case GeometricType_Curves:
 		{
-			Alembic::AbcGeom::ICurves curves(Get(), Alembic::Abc::kWrapExisting);
+			Alembic::AbcGeom::ICurves curves(get(), Alembic::Abc::kWrapExisting);
 			if (!curves.valid())return;
 			p = Alembic::AbcGeom::ICompoundProperty(curves.getSchema().getArbGeomParams());
 			if (p.valid())hasArbGeomParams = true;
@@ -141,7 +149,7 @@ void AlembicIObject::GetProperties()
 		for (size_t i = 0; i < p.getNumProperties(); i++) {
 			Alembic::Abc::PropertyHeader header = p.getPropertyHeader(i);
 			AlembicIProperty* prop = new AlembicIProperty(header);
-			prop->Init(p);
+			prop->init(p);
 			m_props.push_back(prop);
 		}
 	}
@@ -160,7 +168,7 @@ void AlembicIObject::GetProperties()
 	*/
 }
 
-AlembicIProperty* AlembicIObject::GetProperty(uint64_t index)
+AlembicIProperty* AlembicIObject::getProperty(uint64_t index)
 {
 	if (index<m_props.size())
 		return m_props[index];
@@ -275,6 +283,15 @@ AlembicIProperty* AlembicIObject::GetProperty(uint64_t id)
     return NULL;
 }
 */
+
+
+void AlembicOObject::save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent){
+	for (int i = 0; i < m_children.size(); ++i)
+	{
+		m_children[i]->save(time, parent);
+	}
+}
+
 
 BOOZE_NAMESPACE_CLOSE_SCOPE
 

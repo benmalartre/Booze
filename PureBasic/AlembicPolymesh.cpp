@@ -13,16 +13,16 @@ bool AlembicIPolymesh::Initialize()
 {
 	AbcG::IPolyMesh mesh(m_object);
 	m_variance = mesh.getSchema().getTopologyVariance();
-	GetProperties();
+	getProperties();
 	return true;
 }
 
 BOOZE_EXPORT bool ABC_ObjectIsPolymesh(AlembicIObject* obj)
 {
-	return obj->GetType() == GeometricType_PolyMesh;
+	return obj->getType() == GeometricType_PolyMesh;
 };
 
-void AlembicIPolymesh::GetTopoSampleDescription(float frame, ABC_Polymesh_Topo_Sample_Infos* infos)
+void AlembicIPolymesh::getTopoSampleDescription(float frame, ABC_Polymesh_Topo_Sample_Infos* infos)
 {
 	if (!m_object.valid() || m_type != GeometricType_PolyMesh)return;
 
@@ -109,7 +109,7 @@ void AlembicIPolymesh::GetTopoSampleDescription(float frame, ABC_Polymesh_Topo_S
 	}
 }
 
-int AlembicIPolymesh::UpdateTopoSample(ABC_Polymesh_Topo_Sample_Infos* infos, ABC_Polymesh_Topo_Sample* io_sample)
+int AlembicIPolymesh::updateTopoSample(ABC_Polymesh_Topo_Sample_Infos* infos, ABC_Polymesh_Topo_Sample* io_sample)
 {
 	AbcG::IPolyMesh mesh(m_object, Abc::kWrapExisting);
 
@@ -232,11 +232,11 @@ int AlembicIPolymesh::UpdateTopoSample(ABC_Polymesh_Topo_Sample_Infos* infos, AB
 	return meshFaceIndices->size();
 }
 
-void AlembicIPolymesh::UpdatePointPosition(ABC_Polymesh_Sample_Infos* infos, ABC_Polymesh_Sample* io_sample){
+void AlembicIPolymesh::updatePointPosition(ABC_Polymesh_Sample_Infos* infos, ABC_Polymesh_Sample* io_sample){
 
 }
 
-size_t AlembicIPolymesh::UpdateSample(ABC_Polymesh_Topo_Sample_Infos* infos, ABC_Polymesh_Topo_Sample* io_sample)
+size_t AlembicIPolymesh::updateSample(ABC_Polymesh_Topo_Sample_Infos* infos, ABC_Polymesh_Topo_Sample* io_sample)
 {
 	AbcG::IPolyMesh mesh(m_object, Abc::kWrapExisting);
 
@@ -282,9 +282,9 @@ size_t AlembicIPolymesh::UpdateSample(ABC_Polymesh_Topo_Sample_Infos* infos, ABC
 
 BOOZE_EXPORT void ABC_GetPolymeshTopoSampleDescription(AlembicIObject* obj, float frame, ABC_Polymesh_Topo_Sample_Infos* infos)
 {
-	if(!obj->Get().valid()||!ABC_ObjectIsPolymesh(obj))return;
+	if(!obj->get().valid()||!ABC_ObjectIsPolymesh(obj))return;
 
-	AbcG::IPolyMesh mesh(obj->Get(),Abc::kWrapExisting);
+	AbcG::IPolyMesh mesh(obj->get(),Abc::kWrapExisting);
 	if(!mesh.valid())return ;
 
 	// Get Sample Index
@@ -369,7 +369,7 @@ BOOZE_EXPORT void ABC_GetPolymeshTopoSampleDescription(AlembicIObject* obj, floa
 
 BOOZE_EXPORT int ABC_UpdatePolymeshTopoSample(AlembicIObject* obj, ABC_Polymesh_Topo_Sample_Infos* infos, ABC_Polymesh_Topo_Sample* io_sample)
 {
-	AbcG::IPolyMesh mesh(obj->Get(),Abc::kWrapExisting);
+	AbcG::IPolyMesh mesh(obj->get(),Abc::kWrapExisting);
 
 	AbcG::IPolyMeshSchema::Sample sample;
 	mesh.getSchema().get(sample,infos->m_sampleIndex);
@@ -496,7 +496,7 @@ BOOZE_EXPORT void ABC_UpdatePointPosition(AlembicIObject* obj, ABC_Polymesh_Topo
 
 BOOZE_EXPORT int ABC_UpdatePolymeshSample(AlembicIObject* obj, ABC_Polymesh_Topo_Sample_Infos* infos, ABC_Polymesh_Topo_Sample* io_sample)
 {
-	AbcG::IPolyMesh mesh(obj->Get(),Abc::kWrapExisting);
+	AbcG::IPolyMesh mesh(obj->get(),Abc::kWrapExisting);
 
 	AbcG::IPolyMeshSchema::Sample sample;
 	mesh.getSchema().get(sample,infos->m_sampleIndex);
@@ -506,15 +506,16 @@ BOOZE_EXPORT int ABC_UpdatePolymeshSample(AlembicIObject* obj, ABC_Polymesh_Topo
 	int offset=0;
 	int offset1;
 	/*
-   for(size_t i=0;i<meshPos->size();i++)
-   {
+	for(size_t i=0;i<meshPos->size();i++)
+	{
 		io_sample->_positions[offset++]=meshPos->get()[i].x;
 		io_sample->_positions[offset++]=meshPos->get()[i].y;
 		io_sample->_positions[offset++]=meshPos->get()[i].z;	
-   }
+	}
 	*/
 	memcpy(io_sample->m_positions,&meshPos->get()[0],infos->m_numPoints*3*sizeof(float));
-   AbcG::IN3fGeomParam meshNormParam = mesh.getSchema().getNormalsParam();
+	AbcG::IN3fGeomParam meshNormParam = mesh.getSchema().getNormalsParam();
+
 	if(meshNormParam.valid())
 	{
 		AbcG::N3fArraySamplePtr meshNorm = meshNormParam.getExpandedValue().getVals();
@@ -522,7 +523,6 @@ BOOZE_EXPORT int ABC_UpdatePolymeshSample(AlembicIObject* obj, ABC_Polymesh_Topo
 		//io_sample->_nbnorm = meshNorm->size();
 		if(meshNorm->size() == infos->m_numIndices)
 		{
-
 			// let's apply it!
 			 offset = 0;
 			 for(size_t i=0;i<meshNorm->size();i++)
@@ -540,63 +540,114 @@ BOOZE_EXPORT int ABC_UpdatePolymeshSample(AlembicIObject* obj, ABC_Polymesh_Topo
 //------------------------------------------------------------------------------------------------
 // Alembic Export
 //------------------------------------------------------------------------------------------------
-AlembicOPolymesh::AlembicOPolymesh(AlembicWriteJob* job, AlembicOObject* parent, void* customData, const char* name)
-: AlembicOObject(job, parent, customData, GeometricType_PolyMesh){
-
-	std::string xformName = name;
-	std::string shapeName = name; 
-	shapeName+="Shape";
-
-	Alembic::AbcGeom::OXform xform(parent->Get(), xformName, job->GetAnimatedTs());
-	Alembic::AbcGeom::OPolyMesh mesh(xform, shapeName, job->GetAnimatedTs());
-
-	m_xform = xform.getSchema();
-	m_mesh = mesh.getSchema();
-	m_numSamples = 0;
+AlembicOPolymesh::AlembicOPolymesh(AlembicOArchive* archive, AlembicOObject* parent, void* customData, const char* name)
+: AlembicOObject(archive, parent, customData, name, GeometricType_PolyMesh){
+	
 };
 
-void AlembicOPolymesh::SetPositions(Imath::V3f* positions, int32_t numVertices)
+AlembicOPolymesh::~AlembicOPolymesh()
 {
-	m_sample.setPositions(AbcG::V3fArraySample(positions, numVertices));
+	
 }
 
-void AlembicOPolymesh::SetDescription(int32_t* faceIndices, int32_t* faceCounts, int32_t numFaces)
+
+void AlembicOPolymesh::set(Imath::V3f* positions, int32_t numVertices, int32_t* faceIndices, int32_t* faceCounts, int32_t numFaces)
 {
-	int numIndices = 0;
-	for (unsigned i = 0; i<numFaces; i++)numIndices += faceCounts[i];
-	m_sample.setFaceIndices(AbcG::Int32ArraySample(faceIndices, numIndices));
-	m_sample.setFaceCounts(AbcG::Int32ArraySample(faceCounts, numFaces));
+	int32_t numIndices = 0;
+
+	// positions
+	m_positions.resize(numVertices);
+	memcpy(&m_positions[0][0], &positions[0][0], numVertices*sizeof(Imath::V3f));
+	
+	// face indices
+	m_counts.resize(numFaces);
+	memcpy(&m_counts[0], &faceCounts[0], numFaces*sizeof(int32_t));
+	for (int32_t i = 0; i < numFaces; i++)numIndices += faceCounts[i];
+
+	// face vertex count
+	m_indices.resize(numIndices);
+	memcpy(&m_indices[0], &faceIndices[0], numIndices*sizeof(int32_t));
+
+	// sample
+	m_sample.m_positions = &m_positions[0][0];
+	m_sample.m_faceIndices = &m_indices[0];
+	m_sample.m_faceCount = &m_counts[0];
+	
+	// infos
+	m_infos.m_numPoints = numVertices;
+	m_infos.m_numFaces = numFaces;
+	m_infos.m_numIndices = numIndices;
+	m_infos.m_numSamples = numIndices;
+
+	m_infos.m_hasColor = false;
+	m_infos.m_hasEnvelope = false;
+	m_infos.m_hasNormal = false;
+	m_infos.m_hasTangent = false;
+	m_infos.m_hasUvs = false;
+	m_infos.m_hasVelocity = false;
+}
+
+void AlembicOPolymesh::setPositions(Imath::V3f* positions, int32_t numVertices)
+{
+	if (numVertices != m_positions.size())m_positions.resize(numVertices);
+	for (int32_t i = 0; i < numVertices; i++)m_positions[i] = positions[i];
+	//memcpy(&m_positions[0][0], &positions[0][0], numVertices*sizeof(Imath::V3f));
+
+	m_sample.m_positions = &m_positions[0][0];
+	m_infos.m_numPoints = numVertices;
+
+}
+
+void AlembicOPolymesh::setDescription(int32_t* faceIndices, int32_t* faceCounts, int32_t numFaces)
+{
+
+	// face vertex count
+	int32_t numIndices = 0;
+	for (int32_t i = 0; i < numFaces; i++)numIndices += faceCounts[i];
+	m_counts.resize(numFaces);
+	memcpy(&m_counts[0], &faceCounts[0], numFaces*sizeof(int32_t));
+	
+	// face indices
+	m_indices.resize(numIndices);
+	memcpy(&m_indices[0], &faceIndices[0], numIndices*sizeof(int32_t));
+
+	// sample
+	m_sample.m_faceIndices = &m_indices[0];
+	m_sample.m_faceCount = &m_counts[0];
+
+	// infos
+	m_infos.m_numFaces = numFaces;
+	m_infos.m_numIndices = numIndices;
+	m_infos.m_numSamples = numIndices;
 }
 
 /*
-ABCStatus AlembicOPolymesh::Set(
-	Imath::V3f* positions,
-	int numVertices,
-	int* faceIndices,
-	int* faceCounts,
-	int numFaces)
-{
-	int numIndices = 0;
-	for (unsigned i = 0; i<numFaces; i++)numIndices += faceCounts[i];
-	m_meshSample.setPositions(AbcG::V3fArraySample(positions, numVertices));
-	if (numFaces > 0 && numIndices > 0){
-		m_meshSample.setFaceIndices(AbcG::Int32ArraySample(faceIndices, numIndices));
-		m_meshSample.setFaceCounts(AbcG::Int32ArraySample(faceCounts, numFaces));
-	}
-
-	return Status_OK;
-}
+MessageBox on windows :)	
+#include <winuser.h>
+MessageBox(0, L"plouf", L"paf", 0);
 */
-ABCStatus AlembicOPolymesh::Save(){
-	m_mesh.set(m_sample);
+
+void AlembicOPolymesh::save(AbcA::TimeSamplingPtr time, AbcG::OObject& parent){
+
+	AbcG::OPolyMesh mesh(parent, m_name, time);
+	AbcG::OPolyMeshSchema schema = mesh.getSchema();
+	
+	AbcG::OPolyMeshSchema::Sample sample(
+		AbcG::V3fArraySample((Imath::V3f*)m_sample.m_positions, m_infos.m_numPoints),
+		AbcG::Int32ArraySample(m_sample.m_faceIndices, m_infos.m_numIndices),
+		AbcG::Int32ArraySample(m_sample.m_faceCount, m_infos.m_numFaces));
+	schema.set(sample);
 
 	// not actually the right data; just making it up
 	AbcG::Box3d cbox;
 	cbox.extendBy(AbcG::V3d(1.0, -1.0, 0.0));
 	cbox.extendBy(AbcG::V3d(-1.0, 1.0, 3.0));
-	m_mesh.getChildBoundsProperty().set(cbox);
-	return Status_OK;
+
+	for (int i = 0; i < m_children.size(); ++i)m_children[i]->save(time, mesh);
+	
+	//test(schema, Imath::V3f(0,0,0));
 }
+
 
 BOOZE_EXPORT bool ABC_SavePolymeshSample(
 	AlembicOPolymesh* mesh,

@@ -90,6 +90,23 @@ void vectorLerp(double alpha, std::vector<T> & vec,
         vec.push_back(val);
     }
 }
+std::string scopeToString(AbcG::GeometryScope input);
+
+using Alembic::AbcCoreAbstract::chrono_t;
+using Alembic::AbcCoreAbstract::index_t;
+
+Alembic::Util::shared_ptr< Alembic::Abc::OObject >
+makeXform(Alembic::Abc::OObject & parent, const char* name);
+
+
+//-*****************************************************************************
+Alembic::Util::shared_ptr< Alembic::Abc::OObject >
+subdCube(Alembic::Abc::OObject & parent, const char* name);
+
+//-*****************************************************************************
+void OWrapExisting();
+
+
 
 #define RADIANTODEGREE 57.295779513
 #define DEGREETORADIAN 0.01745329252
