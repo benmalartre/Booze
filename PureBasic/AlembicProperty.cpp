@@ -922,9 +922,188 @@ const char* AlembicIProperty::getInterpretation() const{
 	return out.c_str();
 }
 
-//------------------------------------------------------
+//============================================================================================
 // AlembicOProperty
-//------------------------------------------------------
+//============================================================================================
+
+/*
+size_t AlembicOProperty::getNumSamples()
+{
+if (m_isArray && m_array.valid())return m_array.getNumSamples();
+else if (!m_isArray && m_scalar.valid()) return m_scalar.getNumSamples();
+else return 0;
+}
+*/
+
+AlembicOProperty::AlembicOProperty(Alembic::Abc::OCompoundProperty& prop, BOOZE_ATTRIBUTE* attr, unsigned int Ts)
+{
+	Alembic::Abc::MetaData metadata = metadata;
+
+	m_name = attr->m_name;
+
+	if(attr->m_dataStructure == BOOZE_STRUCT_SINGLE && attr->m_dataType == BOOZE_CTXT_SINGLETON)
+	{
+		m_isArray = false;
+		metadata.set("isArray","0");
+		switch(attr->m_dataType)
+		{
+			case BOOZE_TYPE_BOOL:
+			{
+				Alembic::Abc::OBoolProperty out(prop, m_name,metadata, Ts);
+				m_scalar = out;
+				break;
+			}
+			case BOOZE_TYPE_LONG:
+			{
+				Alembic::Abc::OUInt32Property out(prop, m_name,metadata, Ts);
+				m_scalar = out;
+				break;
+			}
+			case BOOZE_TYPE_FLOAT:
+			{
+				Alembic::Abc::OFloatProperty out(prop, m_name,metadata, Ts);
+				m_scalar = out;
+				break;
+			}
+			case BOOZE_TYPE_VECTOR2:
+			{
+				Alembic::Abc::OV2fProperty out(prop, m_name,metadata, Ts);
+				m_scalar = out;
+				break;
+			}
+			case BOOZE_TYPE_VECTOR3:
+			{
+				Alembic::Abc::OV3fProperty out(prop, m_name,metadata, Ts);
+				m_scalar = out;
+				break;
+			}
+			case BOOZE_TYPE_VECTOR4:
+			{
+				Alembic::Abc::OC4fProperty out(prop, m_name,metadata, Ts);
+				m_scalar = out;
+				break;
+			}
+			case BOOZE_TYPE_COLOR:
+			{
+				Alembic::Abc::OC4fProperty out(prop, m_name,metadata, Ts);
+				m_scalar = out;
+				break;
+			}
+			case BOOZE_TYPE_QUATERNION:
+			{
+				Alembic::Abc::OQuatfProperty out(prop, m_name,metadata, Ts);
+				m_scalar = out;
+				break;
+			}
+			case BOOZE_TYPE_ROTATION:
+			{
+				Alembic::Abc::OQuatfProperty out(prop, m_name,metadata, Ts);
+				m_scalar = out;
+				break;
+			}
+			case BOOZE_TYPE_MATRIX3:
+			{
+				Alembic::Abc::OM33fProperty out(prop, m_name,metadata, Ts);
+				m_scalar = out;
+				break;
+			}
+			case BOOZE_TYPE_MATRIX4:
+			{
+				Alembic::Abc::OM44fProperty out(prop, m_name,metadata, Ts);
+				m_scalar = out;
+				break;
+			}
+			case BOOZE_TYPE_STRING:
+			{
+				Alembic::Abc::OStringProperty out(prop, m_name,metadata, Ts);
+				m_scalar = out;
+				break;
+			}
+		}
+	}
+	else
+	{
+		m_isArray = true;
+		metadata.set("isArray","1");
+		switch(attr->m_dataType)
+		{
+			case BOOZE_TYPE_BOOL:
+			{
+				Alembic::Abc::OBoolArrayProperty out(prop, m_name,metadata, Ts);
+				m_array = out;
+				break;
+			}
+			case BOOZE_TYPE_LONG:
+			{
+				Alembic::Abc::OUInt32ArrayProperty out(prop, m_name,metadata, Ts);
+				m_array = out;
+				break;
+			}
+			case BOOZE_TYPE_FLOAT:
+			{
+				Alembic::Abc::OFloatArrayProperty out(prop, m_name,metadata, Ts);
+				m_array = out;
+				break;
+			}
+			case BOOZE_TYPE_VECTOR2:
+			{
+				Alembic::Abc::OV2fArrayProperty out(prop, m_name,metadata, Ts);
+				m_array = out;
+				break;
+			}
+			case BOOZE_TYPE_VECTOR3:
+			{
+				Alembic::Abc::OV3fArrayProperty out(prop, m_name,metadata, Ts);
+				m_array = out;
+				break;
+			}
+			case BOOZE_TYPE_VECTOR4:
+			{
+				Alembic::Abc::OC4fArrayProperty out(prop, m_name,metadata, Ts);
+				m_array = out;
+				break;
+			}
+			case BOOZE_TYPE_COLOR:
+			{
+				Alembic::Abc::OC4fArrayProperty out(prop, m_name,metadata, Ts);
+				m_array = out;
+				break;
+			}
+			case BOOZE_TYPE_QUATERNION:
+			{
+				Alembic::Abc::OQuatfArrayProperty out(prop, m_name, Ts);
+				m_array = out;
+				break;
+			}
+			case BOOZE_TYPE_ROTATION:
+			{
+				Alembic::Abc::OQuatfArrayProperty out(prop, m_name, Ts);
+				m_array = out;
+				break;
+			}
+			case BOOZE_TYPE_MATRIX3:
+			{
+				Alembic::Abc::OM33fArrayProperty out(prop, m_name,metadata, Ts);
+				m_array = out;
+				break;
+			}
+			case BOOZE_TYPE_MATRIX4:
+			{
+				Alembic::Abc::OM44fArrayProperty out(prop, m_name,metadata, Ts);
+				m_array = out;
+				break;
+			}
+			case BOOZE_TYPE_STRING:
+			{
+				Alembic::Abc::OStringArrayProperty out(prop, m_name,metadata, Ts);
+				m_array = out;
+				break;
+			}
+		}
+	}
+}
+
+
 AlembicOProperty::AlembicOProperty(Alembic::Abc::OCompoundProperty& iParentProp, const ABCPropertyType type,const ABCDataTraits traits, const ABCGeometryScope scope, const std::string& name){
 	m_name = name;
 	m_type = type;
@@ -1578,5 +1757,98 @@ AlembicOProperty::AlembicOProperty(Alembic::Abc::OCompoundProperty& iParentProp,
 		}
 	}
 }
+
+#define SAVE_PROPERTY(TYPE, SAMPLE)					\
+	BOOZE_ARRAY* data = (BOOZE_ARRAY*)datas->m_datas;	\
+	std::vector<TYPE> v;								\
+	int nbp = data->m_itemCount;						\
+	v.resize(nbp);										\
+	memcpy(&v[0], &data[0], sizeof(TYPE)*nbp);			\
+	m_array.set(SAMPLE(v));								\
+	break;												\
+
+void AlembicOProperty::save(BOOZE_ATTRIBUTE* datas)
+{
+
+	if (datas->m_isArray)
+	{
+		switch (datas->m_dataType)
+		{
+		case BOOZE_TYPE_BOOL:
+		{
+								SAVE_PROPERTY(Abc::bool_t, AbcG::BoolArraySample);
+		}
+
+		case BOOZE_TYPE_LONG:
+		{
+								SAVE_PROPERTY(Abc::uint32_t, AbcG::UInt32ArraySample);
+		}
+
+		case BOOZE_TYPE_FLOAT:
+		{
+								 SAVE_PROPERTY(Abc::float32_t, AbcG::FloatArraySample);
+		}
+
+		case BOOZE_TYPE_VECTOR2:
+		{
+								   SAVE_PROPERTY(Imath::V2f, AbcG::V2fArraySample);
+		}
+
+		case BOOZE_TYPE_VECTOR3:
+		{
+								   SAVE_PROPERTY(Imath::V3f, AbcG::V3fArraySample);
+		}
+
+		case BOOZE_TYPE_VECTOR4:
+		{
+								   SAVE_PROPERTY(Imath::C4f, AbcG::C4fArraySample);
+		}
+
+		case BOOZE_TYPE_QUATERNION:
+		{
+									  SAVE_PROPERTY(Imath::Quatf, AbcG::QuatfArraySample);
+		}
+
+		case BOOZE_TYPE_ROTATION:
+		{
+									SAVE_PROPERTY(Imath::Quatf, AbcG::QuatfArraySample);
+		}
+
+		case BOOZE_TYPE_COLOR:
+		{
+								 SAVE_PROPERTY(Imath::C4f, AbcG::C4fArraySample);
+		}
+
+		case BOOZE_TYPE_MATRIX3:
+		{
+								   SAVE_PROPERTY(Imath::M33f, AbcG::M33fArraySample);
+		}
+
+		case BOOZE_TYPE_MATRIX4:
+		{
+								   SAVE_PROPERTY(Imath::M44f, AbcG::M44fArraySample);
+		}
+
+		case BOOZE_TYPE_STRING:
+		{
+								  BOOZE_ARRAY* data = (BOOZE_ARRAY*)datas->m_datas;
+
+								  std::vector<std::string> v;
+								  int nbp = data->m_itemCount;
+								  v.resize(nbp);
+								  memcpy(&v[0], &data[0], sizeof(std::string)*nbp);
+								  m_array.set(Alembic::Abc::StringArraySample(v));;
+								  break;
+		}
+
+		}
+	}
+	else
+	{
+
+	}
+
+}
+
 
 BOOZE_NAMESPACE_CLOSE_SCOPE

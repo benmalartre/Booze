@@ -4,6 +4,7 @@
 #include "AlembicFoundation.h"
 #include "AlembicArchive.h"
 #include "AlembicProperty.h"
+#include "AlembicAttribute.h"
 #include "AlembicTimeSampling.h"
 
 BOOZE_NAMESPACE_OPEN_SCOPE

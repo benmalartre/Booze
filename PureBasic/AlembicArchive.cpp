@@ -10,15 +10,13 @@
 #include <map>
 #include <functional>
 
-
-
 BOOZE_NAMESPACE_OPEN_SCOPE
 
 //=================================================================================================
 // IArchive
 //=================================================================================================
 // Constructor
-//-------------------------------------------------------------------------------------------------
+//----------------------------------------------------------
 AlembicIArchive* newIArchive()
 {
 	AlembicIArchive* archive = new AlembicIArchive();
@@ -26,14 +24,14 @@ AlembicIArchive* newIArchive()
 }
 
 // Destructor
-//-------------------------------------------------------------------------------------------------
+//----------------------------------------------------------
 void deleteIArchive(AlembicIArchive* archive)
 {
 	delete archive;
 }
 
 // Open Archive
-//-------------------------------------------------------------------------------------------------
+//---------------------------------------------------------
 bool AlembicIArchive::open(const char* filename)
 {
 	close();
@@ -78,10 +76,9 @@ bool AlembicIArchive::open(const char* filename)
 }
 
 // Get Infos
-//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------
 const char* AlembicIArchive::getInfos()
 {
-
 	std::string infos;
 
 	if (m_archive)
@@ -159,7 +156,7 @@ const AbcG::IObject& AlembicIArchive::getIObj(uint64_t i)
 }
 
 // Get Object by Name
-//-------------------------------------------------------------------------------------------------
+//--------------------------------------------------------
 AlembicIObject* AlembicIArchive::getObjByName(const char* name)
 {
 	size_t j = 0;
@@ -173,14 +170,14 @@ AlembicIObject* AlembicIArchive::getObjByName(const char* name)
 }
 
 // Get Num Time Sampling
-//-------------------------------------------------------------------------------------------------
+//--------------------------------------------------------
 uint64_t AlembicIArchive::getNumTimeSampling()
 {
 	return m_archive.getNumTimeSamplings();
 }
 
 // Get Max Num Samples For Time Sampling
-//-------------------------------------------------------------------------------------------------
+//--------------------------------------------------------
 Abc::index_t AlembicIArchive::getMaxNumSamplesForTimeSamplingIndex( uint32_t index)
 {
 	return m_archive.getMaxNumSamplesForTimeSamplingIndex(index);
@@ -188,89 +185,87 @@ Abc::index_t AlembicIArchive::getMaxNumSamplesForTimeSamplingIndex( uint32_t ind
 
 /*
 // Get Start Frame
-//-------------------------------------------------------------------------------------------------
+//--------------------------------------------------------
 float AlembicIArchive::GetStartTime( uint64_t fps)
 {
 	return _startTime*(float)fps;
 }
 
 // Get End Frame
-//-------------------------------------------------------------------------------------------------
+//--------------------------------------------------------
 float AlembicIArchive::GetEndTime(uint64_t fps)
 {
 	return _endTime*(float)fps;
 }
 */
-// Close ARchive
-//-------------------------------------------------------------------------------------------------
+// Close Archive
+//--------------------------------------------------------
 bool AlembicIArchive::close()
 {
 	return false;
 }
 
 //=================================================================================================
-// OArchive
+//	OArchive
 //=================================================================================================
-// Constructor
-//-------------------------------------------------------------------------------------------------
-AlembicOArchive* newOArchive(AlembicWriteJob* job)
-{
-	AlembicOArchive* archive = new AlembicOArchive(job);
-	return archive;
-}
-
-// Destructor
+//		Constructor
 //--------------------------------------------------------
-void deleteOArchive(AlembicOArchive* archive)
-{
-	delete archive;
-}
-
 AlembicOArchive::AlembicOArchive(AlembicWriteJob* job)
 {
 	m_job = job;
+	if (job->getFileName() != "") open(job->getFileName());
 	
+}
+
+//		Destructor
+//--------------------------------------------------------
+AlembicOArchive::~AlembicOArchive()
+{
+	close();
+}
+
+//		Open
+//--------------------------------------------------------
+bool AlembicOArchive::open(const char* filename)
+{
 	// create a new archive for writing
 	m_archive = CreateArchiveWithInfo(
 		Alembic::AbcCoreOgawa::WriteArchive(),
-		job->getFileName(),
+		filename,
 		"Alembic PureBasic 1.0 Plugin",
-		job->getFileName(),
+		filename,
 		Alembic::Abc::ErrorHandler::kThrowPolicy
 		);
 
 	m_valid = m_archive.valid();
-	m_root = new AlembicORoot(this, NULL, "root");
-	m_objects.push_back(m_root);
+	if (m_valid)
+	{
+		m_root = new AlembicORoot(this, NULL, "root");
+		m_objects.push_back(m_root);
+	}
+	
+	return m_valid;
 }
 
-AlembicOArchive::~AlembicOArchive()
-{
-	std::cout << "delete archive" << std::endl;
-	close();
-}
-
-bool AlembicOArchive::open(const char* filename)
-{
-	return true;
-}
-
+//		Close
+//--------------------------------------------------------
 bool AlembicOArchive::close()
 {
-	std::cout << "delete objects" << std::endl;
 	for (int32_t i = m_objects.size() - 1; i >= 0; i--){
-		std::cout << "object" << i << " : ";
-		std::cout << m_objects[i]->get().getName() << std::endl;
 		delete m_objects[i];
 	}
 	return true;
 }
 
+//		Get Num Objects
+//--------------------------------------------------------
 int AlembicOArchive::getNumObjects()
 {
 	return m_objects.size();
 }
 
+//		Get Object By Name
+//--------------------------------------------------------
 AlembicOObject* AlembicOArchive::getObjectByName(const char* name)
 {
 	std::map<string, int>::iterator it;
@@ -279,23 +274,28 @@ AlembicOObject* AlembicOArchive::getObjectByName(const char* name)
 	return NULL;
 }
 
-#define ARCHIVE_ADD_OBJECT(TYPE, NAME) \
-	TYPE* NAME = new TYPE(this, parent, customData, name); \
-if (parent)parent->addChild(NAME); \
-	m_objects.push_back(NAME); \
-	return NAME;\
 
+//		Add Object (macro)
+// -------------------------------------------------------
+#define ARCHIVE_ADD_OBJECT(TYPE, NAME)						\
+	TYPE* NAME = new TYPE(this, parent, customData, name);	\
+if (parent)parent->addChild(NAME);							\
+	m_objects.push_back(NAME);								\
+	return NAME;											\
+
+//		Add Object
+// -------------------------------------------------------
 AlembicOObject* AlembicOArchive::addObject(AlembicOObject* parent, char* name, ABCGeometricType type, void* customData){
 	
 	switch (type){
 		case GeometricType_Camera:
 		{
-									 ARCHIVE_ADD_OBJECT(AlembicOCamera, camera);
+			ARCHIVE_ADD_OBJECT(AlembicOCamera, camera);
 		}
 			
 		case GeometricType_Curves:
 		{
-									 ARCHIVE_ADD_OBJECT(AlembicOCurves, curves);
+			ARCHIVE_ADD_OBJECT(AlembicOCurves, curves);
 		}
 			
 		case GeometricType_FaceSet:
@@ -310,23 +310,41 @@ AlembicOObject* AlembicOArchive::addObject(AlembicOObject* parent, char* name, A
 			
 		case GeometricType_Points:
 		{
-									 ARCHIVE_ADD_OBJECT(AlembicOPoints, points);
+			ARCHIVE_ADD_OBJECT(AlembicOPoints, points);
 		}
 			
 		case GeometricType_PolyMesh:
 		{
-									   ARCHIVE_ADD_OBJECT(AlembicOPolymesh, mesh);
+			ARCHIVE_ADD_OBJECT(AlembicOPolymesh, mesh);
 		}
 
 		case GeometricType_XForm:
 		{
-									ARCHIVE_ADD_OBJECT(AlembicOXForm, xform);
+			ARCHIVE_ADD_OBJECT(AlembicOXForm, xform);
 		}
 			
 	}
 	
 	return NULL;
 	
+}
+
+//=================================================================================================
+// EXPORTED FUNCTIONS
+//=================================================================================================
+// Constructor
+//--------------------------------------------------------
+AlembicOArchive* newOArchive(AlembicWriteJob* job)
+{
+	AlembicOArchive* archive = new AlembicOArchive(job);
+	return archive;
+}
+
+// Destructor
+//--------------------------------------------------------
+void deleteOArchive(AlembicOArchive* archive)
+{
+	delete archive;
 }
 
 BOOZE_NAMESPACE_CLOSE_SCOPE

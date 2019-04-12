@@ -7,8 +7,8 @@ BOOZE_NAMESPACE_OPEN_SCOPE
 
 struct ABC_Points_Sample_Infos
 {
-	uint64_t m_numPoints;
-	uint64_t m_sampleIndex;
+	int32_t m_numPoints;
+	int32_t m_sampleIndex;
 	bool m_hasVelocity;
 	bool m_hasSize;
 	bool m_hasOrientation;
@@ -56,14 +56,18 @@ class AlembicOPoints : public AlembicOObject
 {
 protected:
 	ABCOPointsPtr						m_points;
-	AbcG::OPointsSchema					m_schema;
-	AbcG::OPointsSchema::Sample			m_sample;
 	int									m_numSamples;
+	ABC_Points_Sample_Infos				m_infos;
+	ABC_Points_Sample					m_sample;
+	std::vector<AbcG::V3f>				m_positions;
+	std::vector<uint64_t>				m_indices;
+
 
 public:
 	AlembicOPoints(AlembicOArchive* archive, AlembicOObject* parent, void* customData, const char* name);
-
-	~AlembicOPoints(){ if (m_points)delete m_points.get(); };
+	virtual	void				set(AbcG::V3f* positions, int32_t* ids, int32_t numIndices);
+	virtual	void				setPositions(AbcG::V3f* positions, int32_t numPoints);
+	~AlembicOPoints(){};
 	void						save(AbcA::TimeSamplingPtr time) override;
 	AbcG::OObject				get()override{ return *m_points; };
 	ABCOObjectPtr				getPtr() override { return m_points; };

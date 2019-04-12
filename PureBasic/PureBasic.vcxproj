@@ -140,6 +140,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AlembicArchive.cpp" />
+    <ClCompile Include="AlembicAttribute.cpp" />
     <ClCompile Include="AlembicCamera.cpp" />
     <ClCompile Include="AlembicCurves.cpp" />
     <ClCompile Include="AlembicFaceSet.cpp" />
@@ -157,6 +158,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AlembicArchive.h" />
+    <ClInclude Include="AlembicAttribute.h" />
     <ClInclude Include="AlembicCamera.h" />
     <ClInclude Include="AlembicCurves.h" />
     <ClInclude Include="AlembicExport.h" />

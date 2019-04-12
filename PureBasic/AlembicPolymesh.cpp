@@ -544,8 +544,6 @@ AlembicOPolymesh::AlembicOPolymesh(AlembicOArchive* archive, AlembicOObject* par
 : AlembicOObject(archive, parent, customData, name, GeometricType_PolyMesh){
 	ABCOPolymeshPtr msh(new AbcG::OPolyMesh(parent->get(), name, getJob()->getTimeSampling()->getPtr()));
 	m_mesh = msh;
-
-	//test(m_mesh->getSchema(), Imath::V3f(0, 0, 0));
 };
 
 

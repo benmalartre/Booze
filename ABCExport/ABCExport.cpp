@@ -5,6 +5,8 @@
 #include <AlembicXForm.h>
 #include <iostream>
 
+#include "Particles.h"
+
 using namespace BOOZE;
 
 void randomTransform(ABCOObjectPtr& obj)
@@ -73,6 +75,31 @@ void phase3(AlembicWriteJob* job, ABCCollection& collec){
 
 int main(){
 
+	ParticleSystem::Parameters params;
+	params.gravity = V3f(0.0, -9.81, 0.0);
+	params.elasticity = 0.75f;
+	params.lifespan = 4.5f;
+	params.emitRate = 600.0f;
+	params.emitRadius = 0.5f;
+	params.emitVelocitySpread = 1.5f;
+	params.emitVelocity = V3f(1.0, 10.0, 2.35);
+	params.emitColorSpread = 0.25f;
+	params.emitColor = C3f(0.85f, 0.9f, 0.1f);
+
+	{
+		AbcG::OArchive archive(Alembic::AbcCoreOgawa::WriteArchive(),
+			"particlesOut1.abc");
+		AbcG::OObject topObj(archive, AbcG::kTop);
+
+		RunAndWriteParticles(topObj, params, 20, 1.0 / 24.0);
+	}
+
+	std::cout << "Wrote particlesOut1.abc" << std::endl;
+
+	ReadParticles("particlesOut1.abc");
+
+	return 0;
+	/*
 	float frames[10] = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.0f };
 	std::string filename = "E:/Projects/RnD/Noodle/abc/Export.abc";
 	AlembicWriteJob* job = new AlembicWriteJob(filename.c_str(), &frames[0], 10);
@@ -91,4 +118,5 @@ int main(){
 	std::cout << "READY TO DEBUG MOTHER FUCKER" << std::endl;
 
 	delete job;
+	*/
 }
