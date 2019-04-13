@@ -2,8 +2,8 @@
 #define _BOOZE_FOUNDATION_H_
 #ifndef _WIN32
 #include <stdint.h>
-#include <WinUser.h>
 #else
+#include <WinUser.h>
 #include "../stdint.h"
 #endif
 #include <Alembic/Abc/All.h>

@@ -5,7 +5,6 @@
 #include "AlembicPolymesh.h"
 #include "AlembicXForm.h"
 
-#include <WinUser.h>
 BOOZE_NAMESPACE_OPEN_SCOPE
 
 AlembicWriteJob::AlembicWriteJob(const char* filename, float* frames, int numFrames)
