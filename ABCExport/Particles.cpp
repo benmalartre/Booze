@@ -165,16 +165,6 @@ chrono_t iFps
 	for (index_t sampIndex = 0;
 		sampIndex < (index_t)iNumFrames; ++sampIndex)
 	{
-		/*
-		Alembic::AbcGeom::OPointsSchema::Sample samp;
-
-		samp.setPositions(parts.positionVec());
-		samp.setVelocities(parts.velocityVec());
-
-		// get particleIds
-		samp.setIds(parts.idVec());
-		pSchema.set(samp);
-		*/
 		// First, write the sample.
 		AbcG::OPointsSchema::Sample psamp(
 			AbcG::V3fArraySample(parts.positionVec()),

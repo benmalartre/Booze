@@ -41,9 +41,12 @@ private:
 	int m_numSamples;
 public:
 	AlembicIPoints(AbcG::IObject& iObj);
-	virtual bool			initialize();
+	
 	virtual void			getSampleDescription(float frame, ABC_Points_Sample_Infos* infos);
 	virtual size_t			updateSample(ABC_Points_Sample_Infos* infos, ABC_Points_Sample* io_sample);
+
+	virtual					~AlembicIPoints(){};
+	bool					initialize() override;
 
 };
 

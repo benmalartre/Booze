@@ -68,13 +68,14 @@ class AlembicIPolymesh : public AlembicIObject
 {
 public:
 	AlembicIPolymesh(AbcG::IObject& iObj);
-	virtual	~AlembicIPolymesh(){};
-	virtual bool					initialize();
+
 	virtual void					getTopoSampleDescription(float time, ABC_Polymesh_Topo_Sample_Infos* infos);
 	virtual int						updateTopoSample(ABC_Polymesh_Topo_Sample_Infos* infos, ABC_Polymesh_Topo_Sample* io_sample);
 	virtual void					updatePointPosition(ABC_Polymesh_Sample_Infos* infos, ABC_Polymesh_Sample* io_sample);
 	virtual size_t					updateSample(ABC_Polymesh_Topo_Sample_Infos* infos, ABC_Polymesh_Topo_Sample* io_sample);
 
+	virtual							~AlembicIPolymesh(){};
+	bool							initialize() override;
 private:
 	AbcG::IXformSchema				m_xform;
 	AbcG::IPolyMeshSchema			m_mesh;
@@ -108,7 +109,7 @@ public:
 	virtual void					setPositions(Imath::V3f* positions, int numVertices);
 	virtual void					setDescription(int* faceIndices, int* faceCounts, int numFaces);
 
-	virtual ~AlembicOPolymesh(){};
+	virtual							~AlembicOPolymesh(){};
 	void							save(AbcA::TimeSamplingPtr time) override;
 	AbcG::OObject					get()override{ return *m_mesh; };
 	ABCOObjectPtr					getPtr() override { return (ABCOObjectPtr&)m_mesh; };

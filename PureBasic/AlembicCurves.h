@@ -40,7 +40,9 @@ class AlembicICurves : public AlembicIObject
 {
 public:
 	AlembicICurves(AbcG::IObject& iObj);
-	virtual bool					initialize();
+
+	virtual							~AlembicICurves(){};
+	bool							initialize() override;
 
 protected:
 	AbcG::IXformSchema				m_xform;

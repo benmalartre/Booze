@@ -376,7 +376,7 @@ void AlembicOPoints::setPositions(Imath::V3f* positions, int32_t numPoints)
 void AlembicOPoints::save(AbcA::TimeSamplingPtr time)
 {
 	/*
-	ABCOPointsPtr pntPtr = AbcU::dynamic_pointer_cast< AbcG::OPoints >(getPtr());
+	ABCOPointsPtr pntPtr = AbcU::dynamic_pointer_cast< AbcG::OPoints >(getPtr());	
 	ParticleSystem::Parameters params;
 	params.gravity = V3f(0.0, -9.81, 0.0);
 	params.elasticity = 0.75f;

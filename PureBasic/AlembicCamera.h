@@ -22,7 +22,9 @@ class AlembicICamera : public AlembicIObject
 {
 public:
 	AlembicICamera(AbcG::IObject& iObj);
-	virtual bool initialize();
+
+	virtual									~AlembicICamera(){};
+	bool									initialize() override;
 
 protected:
 	Alembic::AbcGeom::ICameraSchema			m_camera;

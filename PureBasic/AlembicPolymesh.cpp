@@ -25,7 +25,7 @@ BOOZE_EXPORT bool ABC_ObjectIsPolymesh(AlembicIObject* obj)
 void AlembicIPolymesh::getTopoSampleDescription(float frame, ABC_Polymesh_Topo_Sample_Infos* infos)
 {
 	if (!m_object.valid() || m_type != GeometricType_PolyMesh)return;
-
+	
 	AbcG::IPolyMesh mesh(m_object, Abc::kWrapExisting);
 	if (!mesh.valid())return;
 
@@ -107,6 +107,7 @@ void AlembicIPolymesh::getTopoSampleDescription(float frame, ABC_Polymesh_Topo_S
 			}
 		}
 	}
+
 }
 
 int AlembicIPolymesh::updateTopoSample(ABC_Polymesh_Topo_Sample_Infos* infos, ABC_Polymesh_Topo_Sample* io_sample)
