@@ -20,7 +20,7 @@ public:
 	virtual bool							close();
 	virtual bool							isValid(){ return m_valid; };
 	virtual AlembicOObject*					addObject(AlembicOObject* parent, char* name, ABCGeometricType type, void* ptr);
-	virtual Abc::OArchive					get(){ return m_archive; };
+	virtual Abc::OArchive&					get(){ return m_archive; };
 	virtual AlembicOObject*					getRoot(){ return m_root; };
 	virtual AlembicWriteJob*				getJob(){ return m_job; };
 	virtual int								getNumObjects();
